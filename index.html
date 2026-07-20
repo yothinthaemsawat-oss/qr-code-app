@@ -105,7 +105,7 @@
                     </div>
                     <div class="mb-6">
                         <label class="block text-gray-700 text-sm font-bold mb-2">รหัสผ่าน (Password)</label>
-                        <input type="password" id="password" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="กรอกรหัสผ่าน" value="admin123">
+                        <input type="password" id="password" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="กรอกรหัสผ่าน" >
                     </div>
                     <button onclick="handleLogin()" class="w-full bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-lg shadow-md">เข้าสู่ระบบจัดการ</button>
                 </div>
@@ -401,19 +401,19 @@
                 <div class="flex-1">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">ตัวกรองห้องเรียน</label>
                     <select id="report-filter-room" onchange="applyReportFilters()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-slate-50">
-                        <option value="all">ทุกห้องเรียน (All)</option>
+                        <option value="all">ทุกห้องเรียน</option>
                     </select>
                 </div>
                 <div class="flex-1">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">ตัวกรองรายวิชา</label>
                     <select id="report-filter-subject" onchange="applyReportFilters()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-slate-50">
-                        <option value="all">ทุกรายวิชา (All)</option>
+                        <option value="all">ทุกรายวิชา</option>
                     </select>
                 </div>
                 <div class="flex-1">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">เลือกช่วงเวลา (เดือน)</label>
                     <select id="report-filter-month" onchange="applyReportFilters()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-slate-50">
-                        <option value="all">ทุกเดือน (All Months)</option>
+                        <option value="all">ทุกเดือน (Months)</option>
                         <option value="04">พฤษภาคม (05)</option>
                         <option value="05">มิถุนายน (06)</option>
                         <option value="06">กรกฎาคม (07)</option>
@@ -810,7 +810,7 @@ if (IS_MOCK_ENV) {
                 if(el) {
                     const currentVal = el.value;
                     const isReport = id === 'report-filter-room';
-                    el.innerHTML = isReport ? '<option value="all">ทุกห้องเรียน (All)</option>' : '<option value="">-- เลือกห้อง --</option>';
+                    el.innerHTML = isReport ? '<option value="all">ทุกห้องเรียน</option>' : '<option value="">-- เลือกห้อง --</option>';
                     rooms.forEach(r => el.innerHTML += `<option value="${r}">${r}</option>`);
                     el.value = currentVal || (isReport ? 'all' : '');
                 }
@@ -824,7 +824,7 @@ if (IS_MOCK_ENV) {
                 if(el) {
                     const currentVal = el.value;
                     const isParentOrReport = id === 'parent-subject-select' || id === 'report-filter-subject';
-                    el.innerHTML = isParentOrReport ? '<option value="all">ทุกวิชา (All)</option>' : '<option value="">-- เลือกวิชา --</option>';
+                    el.innerHTML = isParentOrReport ? '<option value="all">ทุกวิชา</option>' : '<option value="">-- เลือกวิชา --</option>';
                     globalSubjects.forEach(s => el.innerHTML += `<option value="${s}">${s}</option>`);
                     el.value = currentVal || (isParentOrReport ? 'all' : '');
                 }
