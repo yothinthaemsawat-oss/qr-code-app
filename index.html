@@ -1312,21 +1312,23 @@ if (IS_MOCK_ENV) {
             }
         }
 
-        function loadDashboardData() {
-            google.script.run.withSuccessHandler(data => {
-                const tbody = document.getElementById('dashboard-table-body');
-                tbody.innerHTML = '';
-                data.forEach(row => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td class="px-4 py-2 text-xs text-gray-500">${row.date}</td>
-                            <td class="px-4 py-2 text-xs font-bold">${row.room}</td>
-                            <td class="px-4 py-2 text-sm font-medium text-gray-900">${row.studentName}</td>
-                            <td class="px-4 py-2 text-sm"><span class="text-teal-600 text-[10px] font-bold block">${row.subject}</span>${row.workTitle}</td>
-                            <td class="px-4 py-2 text-center font-bold text-teal-600 bg-teal-50">${row.score}</td>
-                        </tr>`;
-                });
-            }).getDashboardData();
+        function startFaceRandomizer() {
+            if(toolStudents.length === 0) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกห้องเรียนก่อน', 'warning');
+            const img = document.getElementById('face-img'); const nameEl = document.getElementById('face-name'); const btn = document.getElementById('face-btn');
+            
+            btn.disabled = true; let counter = 0;
+            let interval = setInterval(() => {
+                let r = toolStudents[Math.floor(Math.random() * toolStudents.length)];
+                img.src = r.photo || 'https://via.placeholder.com/200?text=ไม่มีรูป'; nameEl.innerText = r.fullName;
+                counter++;
+                if(counter > 30) {
+                    clearInterval(interval);
+                    let winner = toolStudents[Math.floor(Math.random() * toolStudents.length)];
+                    img.src = winner.photo || 'https://via.placeholder.com/200?text=ไม่มีรูป';
+                    nameEl.innerHTML = `🎉 ${winner.fullName} 🎉`;
+                    btn.disabled = false; confettiEffect();
+                }
+            }, 100);
         }
 
         // Parent Check
