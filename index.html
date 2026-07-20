@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบถ่ายภาพและส่งข้อมูลไป Google Apps Script</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        video {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+            background: #000;
+        }
+        canvas {
+            display: none;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            margin-top: 15px;
+            cursor: pointer;
+            background-color: #0F9D58;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #0b8043;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>ถ่ายภาพด้วยกล้องมือถือ/คอมพิวเตอร์</h2>
+    <video id="video" autoplay playsinline></video><br>
+    <button id="capture-btn" disabled>ถ่ายภาพและบันทึก</button>
+    <canvas id="canvas"></canvas>
+    <div id="status">กำลังเปิดกล้อง...</div>
+</div>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureBtn = document.getElementById('capture-btn');
+    const statusDiv = document.getElementById('status');
+
+    // นำ URL ของ Google Apps Script มาใส่ตรงนี้ (หลังจาก Deploy เป็น Web App แล้ว)
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycby45a_L_ryAbhecMpBRxVhCaZ70eMrUELBDAHtQMqtkbMDIck3xYQx400nHrqpR8FAZ/exec';
+
+    // ขออนุญาตเปิดใช้งานกล้องของเบราว์เซอร์
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+        .then(stream => {
+            video.srcObject = stream;
+            captureBtn.disabled = false;
+            statusDiv.textContent = 'พร้อมถ่ายภาพ';
+        })
+        .catch(err => {
+            statusDiv.textContent = 'ไม่สามารถเข้าถึงกล้องได้: ' + err.message;
+            statusDiv.style.color = 'red';
+        });
+
+    // เมื่อกดปุ่มถ่ายภาพ
+    captureBtn.addEventListener('click', () => {
+        captureBtn.disabled = true;
+        statusDiv.textContent = 'กำลังประมวลผลและส่งข้อมูล...';
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // แปลงรูปภาพเป็น Base64
+        const imageDataURL = canvas.toDataURL('image/jpeg', 0.8);
+
+        // ส่งข้อมูลภาพไปยัง Google Apps Script ผ่าน POST request
+        fetch(GAS_URL, {
+            method: 'POST',
+            mode: 'no-cors', // ป้องกันปัญหา CORS ของ Google Apps Script
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ image: imageDataURL })
+        })
+        .then(() => {
+            statusDiv.textContent = 'บันทึกภาพสำเร็จเรียบร้อย!';
+            statusDiv.style.color = 'green';
+            setTimeout(() => {
+                captureBtn.disabled = false;
+                statusDiv.textContent = 'พร้อมถ่ายภาพ';
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            statusDiv.textContent = 'เกิดข้อผิดพลาดในการส่งข้อมูล';
+            statusDiv.style.color = 'red';
+            captureBtn.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
