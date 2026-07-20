@@ -552,18 +552,12 @@
                 </div>
             </div>
 
-            <!-- GAS Integration Info Alert -->
-            <div class="mt-6 bg-teal-50 border border-teal-100 p-4 rounded-xl flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-teal-800">
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-info-circle text-teal-600 text-lg"></i>
-                    <span>คุณสามารถติดตั้งระบบดึงข้อมูลสำหรับ Dashboard และ Export ไปยัง **Google Apps Script (Code.gs)** ได้ง่ายๆ</span>
-                </div>
-                <button onclick="showGasSetupCode()" class="bg-teal-700 hover:bg-teal-800 text-white font-bold py-1.5 px-4 rounded-lg text-xs transition whitespace-nowrap">
-                    <i class="fas fa-code mr-1"></i> ดูโค้ด Code.gs สำหรับติดตั้ง
-                </button>
-            </div>
-        </div>
-
+           <!-- ปุ่มดึงข้อมูลจากชีท (Refresh) -->
+<div class="mt-6 flex justify-end">
+    <button onclick="fetchReportData()" class="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl shadow-sm transition-all flex items-center gap-2 focus:ring-2 focus:ring-teal-500 focus:outline-none hover:-translate-y-0.5">
+        <i class="fas fa-sync-alt"></i> อัปเดตข้อมูลจากชีท
+    </button>
+</div>
         <!-- View 8: Parent / Student Record Detail -->
         <div id="view-parent-dashboard" class="w-full hidden-view mt-4">
             <div class="flex justify-between items-center mb-4">
