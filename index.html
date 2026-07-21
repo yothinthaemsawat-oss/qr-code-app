@@ -1889,29 +1889,27 @@ if (IS_MOCK_ENV) {
             }
         });
         // ==========================================
-        // ฟังก์ชัน: เปลี่ยนเป็น "ส่งแล้ว" อัตโนมัติเมื่อกรอกคะแนน
+        // ฟังก์ชัน: เปลี่ยนเป็น "ส่งแล้ว" อัตโนมัติเมื่อกรอกคะแนน (ฉบับปรับปรุง)
         // ==========================================
-        document.addEventListener('input', function(event) {
+        document.addEventListener('change', function(event) {
             const input = event.target;
             
-            // 1. ตรวจสอบว่าจุดที่กำลังพิมพ์ คือช่องกรอกข้อมูลในตาราง
-            if (input.tagName === 'INPUT' && input.closest('table') && input.type !== 'hidden' && input.type !== 'checkbox') {
+            // 1. เช็คว่าเป็นช่องกรอกคะแนนในตาราง
+            if (input.tagName === 'INPUT' && input.closest('table') && input.type !== 'hidden') {
                 const row = input.closest('tr');
                 const scoreVal = input.value.trim();
                 
-                // 2. ถ้ามีการกรอกคะแนนลงไป (เช็คว่าไม่ว่างเปล่า และเป็นตัวเลข)
-                if (scoreVal !== '' && !isNaN(scoreVal)) {
-                    
-                    // 3. ค้นหาป้ายสถานะในบรรทัดเดียวกันที่มีคำว่า "ยังไม่ส่ง"
-                    // (ทำเพื่อป้องกันไม่ให้ระบบไปกดซ้ำ หากสถานะเป็น "ส่งแล้ว" อยู่แล้ว)
-                    const notSubmittedElement = Array.from(row.querySelectorAll('*')).find(el => 
-                        el.textContent && el.textContent.includes('ยังไม่ส่ง') && 
-                        (el.tagName === 'BUTTON' || el.tagName === 'SPAN' || el.tagName === 'DIV' || el.tagName === 'TD')
-                    );
-                    
-                    // 4. ถ้าเจอสถานะ "ยังไม่ส่ง" ให้จำลองการกดคลิกที่ปุ่มนั้น เพื่อให้ระบบเดิมทำงานเปลี่ยนเป็น "ส่งแล้ว"
-                    if (notSubmittedElement) {
-                        notSubmittedElement.click(); 
+                // 2. เช็คว่ามีการกรอกค่าลงไป
+                if (scoreVal !== '') {
+                    // 3. ค้นหาป้ายสถานะในบรรทัดนั้น
+                    const elements = row.querySelectorAll('span, button, div, td');
+                    for (let el of elements) {
+                        if (el.textContent && el.textContent.includes('ยังไม่ส่ง')) {
+                            // 4. ค้นหาตัวที่เป็น "ปุ่มกด" หรือมีคำสั่ง "onclick" ครอบอยู่จริงๆ แล้วสั่งคลิก
+                            const targetToClick = el.closest('[onclick]') || el.closest('button') || el;
+                            targetToClick.click();
+                            break; // เจอแล้วกดเลย แล้วหยุดค้นหา
+                        }
                     }
                 }
             }
