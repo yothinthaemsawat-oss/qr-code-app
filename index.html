@@ -1858,6 +1858,36 @@ if (IS_MOCK_ENV) {
                 width: '600px'
             });
         }
+        // ==========================================
+        // ฟังก์ชัน: เลื่อนช่องกรอกคะแนนอัตโนมัติเมื่อกด Enter
+        // ==========================================
+        document.addEventListener('keydown', function(event) {
+            // 1. ตรวจสอบว่าปุ่มที่กดคือ Enter หรือไม่
+            if (event.key === 'Enter') {
+                const currentInput = document.activeElement;
+                
+                // 2. เช็คว่าจุดที่เคอร์เซอร์อยู่ เป็นช่องกรอกข้อมูล (INPUT) ในตารางหรือไม่
+                if (currentInput.tagName === 'INPUT' && currentInput.closest('table')) {
+                    event.preventDefault(); // ป้องกันไม่ให้หน้าเว็บรีเฟรชหรือกระตุก
+                    
+                    const table = currentInput.closest('table');
+                    
+                    // 3. ดึงช่องกรอกคะแนนทั้งหมดในตารางนั้นมาเรียงต่อกัน
+                    // (ละเว้นช่องที่ซ่อนอยู่ หรือช่องติ๊กถูก)
+                    const allInputs = Array.from(table.querySelectorAll('input:not([type="hidden"]):not([type="checkbox"])'));
+                    
+                    // 4. หาตำแหน่งของช่องปัจจุบันที่กำลังพิมพ์อยู่
+                    const currentIndex = allInputs.indexOf(currentInput);
+                    
+                    // 5. ถ้ามีคนถัดไป ให้เลื่อนเคอร์เซอร์ไปหาคนนั้น
+                    if (currentIndex > -1 && currentIndex < allInputs.length - 1) {
+                        const nextInput = allInputs[currentIndex + 1];
+                        nextInput.focus();  // ย้ายเคอร์เซอร์ไปช่องถัดไป
+                        nextInput.select(); // ไฮไลท์คลุมดำตัวเลขเดิม (เช่น เลข 0) เพื่อให้พิมพ์ทับได้เลย
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>
