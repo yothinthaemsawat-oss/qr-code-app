@@ -1888,6 +1888,34 @@ if (IS_MOCK_ENV) {
                 }
             }
         });
+        // ==========================================
+        // ฟังก์ชัน: เปลี่ยนเป็น "ส่งแล้ว" อัตโนมัติเมื่อกรอกคะแนน
+        // ==========================================
+        document.addEventListener('input', function(event) {
+            const input = event.target;
+            
+            // 1. ตรวจสอบว่าจุดที่กำลังพิมพ์ คือช่องกรอกข้อมูลในตาราง
+            if (input.tagName === 'INPUT' && input.closest('table') && input.type !== 'hidden' && input.type !== 'checkbox') {
+                const row = input.closest('tr');
+                const scoreVal = input.value.trim();
+                
+                // 2. ถ้ามีการกรอกคะแนนลงไป (เช็คว่าไม่ว่างเปล่า และเป็นตัวเลข)
+                if (scoreVal !== '' && !isNaN(scoreVal)) {
+                    
+                    // 3. ค้นหาป้ายสถานะในบรรทัดเดียวกันที่มีคำว่า "ยังไม่ส่ง"
+                    // (ทำเพื่อป้องกันไม่ให้ระบบไปกดซ้ำ หากสถานะเป็น "ส่งแล้ว" อยู่แล้ว)
+                    const notSubmittedElement = Array.from(row.querySelectorAll('*')).find(el => 
+                        el.textContent && el.textContent.includes('ยังไม่ส่ง') && 
+                        (el.tagName === 'BUTTON' || el.tagName === 'SPAN' || el.tagName === 'DIV' || el.tagName === 'TD')
+                    );
+                    
+                    // 4. ถ้าเจอสถานะ "ยังไม่ส่ง" ให้จำลองการกดคลิกที่ปุ่มนั้น เพื่อให้ระบบเดิมทำงานเปลี่ยนเป็น "ส่งแล้ว"
+                    if (notSubmittedElement) {
+                        notSubmittedElement.click(); 
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>
