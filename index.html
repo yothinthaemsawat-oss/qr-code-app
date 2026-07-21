@@ -804,6 +804,30 @@ if (IS_MOCK_ENV) {
             loadAssignments();
             loadDashboardData();
         }
+        function loadDashboardData() {
+            google.script.run.withSuccessHandler(data => {
+                const tbody = document.getElementById('dashboard-table-body');
+                if(!tbody) return;
+                tbody.innerHTML = '';
+                
+                if(data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-400 font-medium">ยังไม่มีประวัติการส่งงานล่าสุด</td></tr>';
+                    return;
+                }
+                
+                data.forEach(d => {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-teal-50 transition border-b border-gray-50">
+                            <td class="px-4 py-3 whitespace-nowrap text-xs text-gray-500">${d.date}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-center font-bold text-gray-700 bg-gray-50"><span class="bg-indigo-50 text-indigo-700 text-xs px-2 py-1 rounded">${d.room}</span></td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-800">${d.studentName}</td>
+                            <td class="px-4 py-3 text-sm"><span class="font-bold text-teal-700">${d.subject}</span><br><span class="text-xs text-gray-500">${d.workTitle}</span></td>
+                            <td class="px-4 py-3 text-center whitespace-nowrap font-black text-emerald-600 bg-emerald-50/50">${d.score}</td>
+                        </tr>
+                    `;
+                });
+            }).getDashboardData();
+        }
 
         function populateRoomDropdowns() {
             const rooms = [...new Set(globalStudents.map(s => s.room))].filter(r => r).sort();
