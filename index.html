@@ -326,9 +326,10 @@
                     <div id="card-grid" class="card-grid max-h-[400px] overflow-y-auto p-2"></div>
                 </div>
 
-                <div id="tool-face" class="tool-section w-full text-center hidden">
+              <div id="tool-face" class="tool-section w-full text-center hidden">
                     <div class="w-48 h-48 mx-auto rounded-full overflow-hidden border-8 border-pink-100 shadow-xl mb-6 relative bg-gray-100 flex items-center justify-center">
-                       
+                       <!-- เติมแท็ก img บรรทัดนี้ครับ -->
+                       <img id="face-img" src="https://via.placeholder.com/200?text=รอสุ่ม" class="w-full h-full object-cover">
                     </div>
                     <div id="face-name" class="h-10 text-2xl font-bold text-pink-600 mb-4">เตรียมพร้อม</div>
                     <button onclick="startFaceRandomizer()" id="face-btn" class="bg-pink-500 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-pink-600">สุ่มเลย!</button>
@@ -1344,25 +1345,6 @@ if (IS_MOCK_ENV) {
                 const osc = ctx.createOscillator(); osc.frequency.setValueAtTime(1200, ctx.currentTime);
                 osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.3);
             }
-        }
-
-        function startFaceRandomizer() {
-            if(toolStudents.length === 0) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกห้องเรียนก่อน', 'warning');
-            const img = document.getElementById('face-img'); const nameEl = document.getElementById('face-name'); const btn = document.getElementById('face-btn');
-            
-            btn.disabled = true; let counter = 0;
-            let interval = setInterval(() => {
-                let r = toolStudents[Math.floor(Math.random() * toolStudents.length)];
-                img.src = r.photo || 'https://via.placeholder.com/200?text=ไม่มีรูป'; nameEl.innerText = r.fullName;
-                counter++;
-                if(counter > 30) {
-                    clearInterval(interval);
-                    let winner = toolStudents[Math.floor(Math.random() * toolStudents.length)];
-                    img.src = winner.photo || 'https://via.placeholder.com/200?text=ไม่มีรูป';
-                    nameEl.innerHTML = `🎉 ${winner.fullName} 🎉`;
-                    btn.disabled = false; confettiEffect();
-                }
-            }, 100);
         }
 
         // Parent Check
