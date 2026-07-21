@@ -804,17 +804,26 @@ if (IS_MOCK_ENV) {
             loadAssignments();
             loadDashboardData();
         }
-        function loadDashboardData() {
+       function loadDashboardData() {
             google.script.run.withSuccessHandler(data => {
                 const tbody = document.getElementById('dashboard-table-body');
                 if(!tbody) return;
+                
+                // 1. เพิ่มการเช็คความปลอดภัย (Safe Check) กัน Error หน้าขาว
+                if (!data || !Array.isArray(data)) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-red-500 font-medium">ไม่พบข้อมูล หรือขาดฟังก์ชัน getDashboardData ใน Code.gs</td></tr>';
+                    return;
+                }
+                
                 tbody.innerHTML = '';
                 
+                // 2. เช็คว่ามีข้อมูลส่งงานหรือไม่
                 if(data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-400 font-medium">ยังไม่มีประวัติการส่งงานล่าสุด</td></tr>';
                     return;
                 }
                 
+                // 3. นำข้อมูลมาแสดงผล
                 data.forEach(d => {
                     tbody.innerHTML += `
                         <tr class="hover:bg-teal-50 transition border-b border-gray-50">
