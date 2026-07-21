@@ -552,6 +552,8 @@
                 </div>
             </div>
 
+          </div> <!-- เติม </div> ตรงบรรทัดนี้ เพื่อปิดโครงสร้างหน้า Dashboard ให้สมบูรณ์ -->
+            
            <!-- ปุ่มดึงข้อมูลจากชีท (Refresh) -->
 <!-- ค้นหาบรรทัดนี้แล้วแก้ onclick ใหม่ให้ถูกต้องครับ -->
 <div class="mt-6 flex justify-end">
@@ -771,32 +773,32 @@ if (IS_MOCK_ENV) {
             }
         }
 
-        function handleLogin() {
+       function handleLogin() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
             if(!user || !pass) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกชื่อครูและกรอกรหัสผ่าน', 'warning');
             
             Swal.fire({ title: 'กำลังตรวจสอบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             google.script.run.withSuccessHandler(res => {
-                if(res.success) {
+                if(res && res.success) {
                     Swal.close();
                     document.getElementById('nav-brand').innerText = `${res.name}`;
-                    showView('view-reports'); // Direct educators into the premium Reporting & Export view
+                    openReports(); // เปลี่ยนจุดนี้ เพื่อบังคับดึงข้อมูลทำกราฟทันที
                     loadTeacherData();
-                } else Swal.fire('เกิดข้อผิดพลาด', res.message, 'error');
+                } else {
+                    Swal.fire('เกิดข้อผิดพลาด', res ? res.message : 'ไม่สามารถเข้าสู่ระบบได้', 'error');
+                }
             }).verifyLogin(user, pass);
         }
-
         function logout() {
             document.getElementById('username').value = ''; document.getElementById('password').value = '';
             showView('view-home'); switchLoginTab('parent');
         }
 
-        function loadTeacherData() {
+       function loadTeacherData() {
             google.script.run.withSuccessHandler(data => { 
-                globalStudents = data; 
+                globalStudents = Array.isArray(data) ? data : []; // ป้องกันหน้าขาวด้วยการบังคับให้เป็น Array
                 populateRoomDropdowns();
-                // If on reports page, load report data
                 if(!document.getElementById('view-reports').classList.contains('hidden-view')) {
                     applyReportFilters();
                 }
@@ -884,11 +886,10 @@ if (IS_MOCK_ENV) {
 
         function loadAssignments() {
             google.script.run.withSuccessHandler(data => {
-                globalAssignments = data;
+                globalAssignments = Array.isArray(data) ? data : []; // ป้องกันหน้าขาว
                 renderAssignmentTable();
             }).getAssignments();
         }
-
         function renderAssignmentTable() {
             const tbody = document.getElementById('assign-table-body');
             tbody.innerHTML = '';
