@@ -1888,27 +1888,42 @@ if (IS_MOCK_ENV) {
                 }
             }
         });
+       // ==========================================
+        // ฟังก์ชัน: เปลี่ยนเป็น "ส่งแล้ว" ทันทีที่พิมพ์คะแนน (แบบ Real-time)
         // ==========================================
-        // ฟังก์ชัน: เปลี่ยนเป็น "ส่งแล้ว" อัตโนมัติเมื่อกรอกคะแนน (ฉบับปรับปรุง)
-        // ==========================================
-        document.addEventListener('change', function(event) {
+        document.addEventListener('input', function(event) {
             const input = event.target;
             
-            // 1. เช็คว่าเป็นช่องกรอกคะแนนในตาราง
-            if (input.tagName === 'INPUT' && input.closest('table') && input.type !== 'hidden') {
+            // 1. ตรวจสอบว่าเป็นช่องกรอกคะแนนในตาราง
+            if (input.tagName === 'INPUT' && input.closest('tr') && input.type !== 'hidden') {
                 const row = input.closest('tr');
                 const scoreVal = input.value.trim();
                 
-                // 2. เช็คว่ามีการกรอกค่าลงไป
+                // 2. ถ้ามีการพิมพ์ตัวเลขลงไป (ไม่เป็นช่องว่าง)
                 if (scoreVal !== '') {
-                    // 3. ค้นหาป้ายสถานะในบรรทัดนั้น
-                    const elements = row.querySelectorAll('span, button, div, td');
-                    for (let el of elements) {
-                        if (el.textContent && el.textContent.includes('ยังไม่ส่ง')) {
-                            // 4. ค้นหาตัวที่เป็น "ปุ่มกด" หรือมีคำสั่ง "onclick" ครอบอยู่จริงๆ แล้วสั่งคลิก
-                            const targetToClick = el.closest('[onclick]') || el.closest('button') || el;
-                            targetToClick.click();
-                            break; // เจอแล้วกดเลย แล้วหยุดค้นหา
+                    
+                    // 3. หาป้ายสถานะทั้งหมดในบรรทัดเดียวกัน
+                    const statusElements = row.querySelectorAll('*');
+                    
+                    for (let el of statusElements) {
+                        // 4. เช็คอย่างเข้มงวดว่าต้องเป็นคำว่า "ยังไม่ส่ง" เท่านั้น 
+                        // (ถ้าเป็น "ส่งแล้ว" อยู่แล้ว โค้ดจะไม่ทำงานซ้ำ ป้องกันระบบรวนตอนพิมพ์เลขสองหลัก)
+                        if (el.textContent && el.textContent.trim().includes('ยังไม่ส่ง')) {
+                            
+                            // 5. หาจุดที่เป็นปุ่มกดจริงๆ แล้วสั่งจำลองการคลิกทันที
+                            const clickableBtn = el.closest('[onclick]') || (el.tagName === 'BUTTON' ? el : null);
+                            
+                            if (clickableBtn) {
+                                clickableBtn.click(); 
+                            } else {
+                                // (แผนสำรอง) ถ้าหาปุ่มกดไม่เจอ ให้บังคับเปลี่ยนข้อความและสีเขียวด้วย HTML โดยตรง
+                                el.innerHTML = '<i class="fas fa-check mr-1"></i> ส่งแล้ว';
+                                el.className = el.className.replace(/text-red-\d+/g, 'text-emerald-600')
+                                                           .replace(/bg-red-\d+/g, 'bg-emerald-50')
+                                                           .replace(/text-pink-\d+/g, 'text-emerald-600')
+                                                           .replace(/bg-pink-\d+/g, 'bg-emerald-50');
+                            }
+                            break; // เมื่อเปลี่ยนแล้วให้หยุดทำงาน เพื่อความลื่นไหล
                         }
                     }
                 }
