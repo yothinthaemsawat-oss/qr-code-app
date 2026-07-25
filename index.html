@@ -1869,36 +1869,46 @@ if (IS_MOCK_ENV) {
                 width: '600px'
             });
         }
-        // ==========================================
-        // ฟังก์ชัน: เลื่อนช่องกรอกคะแนนอัตโนมัติเมื่อกด Enter
+       // ==========================================
+        // ฟังก์ชัน: เลื่อนช่องกรอกคะแนนด้วย Enter และลูกศร ขึ้น/ลง
         // ==========================================
         document.addEventListener('keydown', function(event) {
-            // 1. ตรวจสอบว่าปุ่มที่กดคือ Enter หรือไม่
-            if (event.key === 'Enter') {
+            // 1. เช็คว่าปุ่มที่กดคือ Enter, ลูกศรลง (ArrowDown) หรือ ลูกศรขึ้น (ArrowUp)
+            if (event.key === 'Enter' || event.key === 'ArrowDown' || event.key === 'ArrowUp') {
                 const currentInput = document.activeElement;
                 
-                // 2. เช็คว่าจุดที่เคอร์เซอร์อยู่ เป็นช่องกรอกข้อมูล (INPUT) ในตารางหรือไม่
-                if (currentInput.tagName === 'INPUT' && currentInput.closest('table')) {
-                    event.preventDefault(); // ป้องกันไม่ให้หน้าเว็บรีเฟรชหรือกระตุก
+                // 2. เช็คว่าจุดที่เคอร์เซอร์อยู่ เป็นช่องกรอกข้อมูลในตารางหรือไม่
+                if (currentInput.tagName === 'INPUT' && currentInput.closest('table') && currentInput.type !== 'hidden') {
+                    
+                    // 3. ป้องกันการทำงานปกติของเบราว์เซอร์ (ป้องกันไม่ให้ตัวเลขเปลี่ยนตอนกดลูกศร)
+                    event.preventDefault(); 
                     
                     const table = currentInput.closest('table');
-                    
-                    // 3. ดึงช่องกรอกคะแนนทั้งหมดในตารางนั้นมาเรียงต่อกัน
-                    // (ละเว้นช่องที่ซ่อนอยู่ หรือช่องติ๊กถูก)
                     const allInputs = Array.from(table.querySelectorAll('input:not([type="hidden"]):not([type="checkbox"])'));
-                    
-                    // 4. หาตำแหน่งของช่องปัจจุบันที่กำลังพิมพ์อยู่
                     const currentIndex = allInputs.indexOf(currentInput);
                     
-                    // 5. ถ้ามีคนถัดไป ให้เลื่อนเคอร์เซอร์ไปหาคนนั้น
-                    if (currentIndex > -1 && currentIndex < allInputs.length - 1) {
-                        const nextInput = allInputs[currentIndex + 1];
-                        nextInput.focus();  // ย้ายเคอร์เซอร์ไปช่องถัดไป
-                        nextInput.select(); // ไฮไลท์คลุมดำตัวเลขเดิม (เช่น เลข 0) เพื่อให้พิมพ์ทับได้เลย
+                    if (currentIndex > -1) {
+                        let targetInput = null;
+                        
+                        // 4. คำนวณหาช่องเป้าหมายที่จะกระโดดไป
+                        if ((event.key === 'Enter' || event.key === 'ArrowDown') && currentIndex < allInputs.length - 1) {
+                            // เลื่อนลงล่าง
+                            targetInput = allInputs[currentIndex + 1];
+                        } else if (event.key === 'ArrowUp' && currentIndex > 0) {
+                            // เลื่อนขึ้นบน
+                            targetInput = allInputs[currentIndex - 1];
+                        }
+                        
+                        // 5. เลื่อนเคอร์เซอร์ไปหาช่องเป้าหมายพร้อมคลุมดำตัวเลขรอไว้
+                        if (targetInput) {
+                            targetInput.focus();
+                            targetInput.select();
+                        }
                     }
                 }
             }
         });
+        
        // ==========================================
         // ฟังก์ชัน: เปลี่ยนเป็น "ส่งแล้ว" ทันทีแบบปลอดภัย (ไม่กระทบปุ่มบันทึก)
         // ==========================================
