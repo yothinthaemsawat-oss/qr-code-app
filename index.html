@@ -261,9 +261,11 @@
                     <button onclick="saveAllTrackerScores()" class="bg-blue-800 hover:bg-black text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md animate-pulse hover:animate-none"><i class="fas fa-save mr-1"></i> กดบันทึกข้อมูลทั้งหมด</button>
                 </div>
                 <div class="overflow-x-auto max-h-[500px]">
-                    <table class="min-w-full divide-y divide-gray-200">
+                  <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-100 sticky top-0 z-10">
                             <tr>
+                                <!-- เพิ่มบรรทัด เลขที่ เข้ามา -->
+                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 w-12">เลขที่</th> 
                                 <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 w-16">รูป</th>
                                 <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 w-24">รหัส</th>
                                 <th class="px-4 py-3 text-left text-xs font-bold text-gray-500">ชื่อ - สกุล</th>
@@ -272,7 +274,8 @@
                             </tr>
                         </thead>
                         <tbody id="tracker-table-body" class="bg-white divide-y divide-gray-100 text-sm">
-                            <tr><td colspan="5" class="text-center py-10 text-gray-400">กรุณาเลือกข้อมูลด้านบน แล้วกดดึงข้อมูล</td></tr>
+                            <!-- เปลี่ยน colspan จาก 5 เป็น 6 เพื่อให้ข้อความอยู่กึ่งกลางพอดี -->
+                            <tr><td colspan="6" class="text-center py-10 text-gray-400">กรุณาเลือกข้อมูลด้านบน แล้วกดดึงข้อมูล</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1068,18 +1071,22 @@ if (IS_MOCK_ENV) {
 
         function openGradeTracker() { showView('view-grade-tracker'); }
 
-        function filterTasksForTracker() {
+       function filterTasksForTracker() {
             const room = document.getElementById('tracker-room-filter').value;
             const sub = document.getElementById('tracker-subject-filter').value;
             const taskSelect = document.getElementById('tracker-task');
             
             taskSelect.innerHTML = '<option value="">-- เลือกงาน --</option>';
-            document.getElementById('tracker-table-body').innerHTML = '<tr><td colspan="5" class="text-center py-10 text-gray-400">กรุณาเลือกงาน เพื่อแสดงข้อมูล</td></tr>';
+            // แก้ไข colspan ให้เป็น 6
+            document.getElementById('tracker-table-body').innerHTML = '<tr><td colspan="6" class="text-center py-10 text-gray-400">กรุณาเลือกงาน เพื่อแสดงข้อมูล</td></tr>';
             
             if(!room || !sub) return;
             
             const filtered = globalAssignments.filter(a => a.targetRoom === room && a.subject === sub);
-            filtered.forEach(t => taskSelect.innerHTML += `<option value="${t.taskName}">${t.taskName}</option>`);
+            filtered.forEach(t => {
+                const safeValue = t.taskName.replace(/"/g, '&quot;');
+                taskSelect.innerHTML += `<option value="${safeValue}">${t.taskName}</option>`;
+            });
         }
 
         function loadTrackerData() {
@@ -1097,11 +1104,13 @@ if (IS_MOCK_ENV) {
                 tbody.innerHTML = '';
                 
                 if(data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500 font-bold">ไม่พบรายชื่อนักเรียนในห้องนี้</td></tr>';
+                    // แก้ไข colspan ให้เป็น 6
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500 font-bold">ไม่พบรายชื่อนักเรียนในห้องนี้</td></tr>';
                     return;
                 }
                 
-                data.forEach(std => {
+                // เพิ่ม parameter 'index' เพื่อใช้นับเลขที่ 1, 2, 3...
+                data.forEach((std, index) => {
                     let isSubmitted = std.status === "ส่งแล้ว";
                     
                     let statusHtml = `
@@ -1119,6 +1128,8 @@ if (IS_MOCK_ENV) {
                     
                     tbody.innerHTML += `
                         <tr class="hover:bg-teal-50 transition">
+                            <!-- เพิ่มคอลัมน์แสดงเลขที่ โดยใช้ index + 1 -->
+                            <td class="px-4 py-2 text-center text-sm font-bold text-gray-600">${index + 1}</td>
                             <td class="px-4 py-2">${photoHtml}</td>
                             <td class="px-4 py-2 text-xs font-bold text-gray-500">${std.studentId}</td>
                             <td class="px-4 py-2 text-sm font-medium text-gray-800">${std.studentName}</td>
