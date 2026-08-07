@@ -2063,11 +2063,11 @@
                     unitSelect.innerHTML = '<option value="all">ดูทุกบทเรียน</option>';
                     const uniqueUnits = new Set();
                     
+                    // แก้ไข: ดึง unitName ตรงๆ จากที่ส่งมาจากหลังบ้าน
                     currentParentRecords.forEach(r => {
-                        const taskInfo = globalAssignments.find(a => a.subject === r.subject && a.taskName === r.workTitle) || {};
-                        const unitName = taskInfo.learningUnit || "ทั่วไป";
+                        const unitName = r.unitName || "ทั่วไป";
                         uniqueUnits.add(unitName);
-                        r.unitName = unitName;
+                        r.unitName = unitName; // แปะค่าไว้ให้ renderParentCards ใช้งาน
                     });
                     
                     uniqueUnits.forEach(u => {
