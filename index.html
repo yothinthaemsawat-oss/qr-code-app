@@ -41,6 +41,9 @@
         /* Scrollbar styles */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Student Card Animation */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .st-card { animation: fadeIn 0.4s ease-out forwards; }
     </style>
 </head>
 <body class="text-gray-800 antialiased h-screen flex flex-col bg-slate-50">
@@ -261,11 +264,10 @@
                     <button onclick="saveAllTrackerScores()" class="bg-blue-800 hover:bg-black text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md animate-pulse hover:animate-none"><i class="fas fa-save mr-1"></i> กดบันทึกข้อมูลทั้งหมด</button>
                 </div>
                 <div class="overflow-x-auto max-h-[500px]">
-                  <table class="min-w-full divide-y divide-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-100 sticky top-0 z-10">
                             <tr>
-                                <!-- เพิ่มบรรทัด เลขที่ เข้ามา -->
-                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 w-12">เลขที่</th> 
+                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 w-12">เลขที่</th>
                                 <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 w-16">รูป</th>
                                 <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 w-24">รหัส</th>
                                 <th class="px-4 py-3 text-left text-xs font-bold text-gray-500">ชื่อ - สกุล</th>
@@ -274,7 +276,6 @@
                             </tr>
                         </thead>
                         <tbody id="tracker-table-body" class="bg-white divide-y divide-gray-100 text-sm">
-                            <!-- เปลี่ยน colspan จาก 5 เป็น 6 เพื่อให้ข้อความอยู่กึ่งกลางพอดี -->
                             <tr><td colspan="6" class="text-center py-10 text-gray-400">กรุณาเลือกข้อมูลด้านบน แล้วกดดึงข้อมูล</td></tr>
                         </tbody>
                     </table>
@@ -329,9 +330,8 @@
                     <div id="card-grid" class="card-grid max-h-[400px] overflow-y-auto p-2"></div>
                 </div>
 
-              <div id="tool-face" class="tool-section w-full text-center hidden">
+                <div id="tool-face" class="tool-section w-full text-center hidden">
                     <div class="w-48 h-48 mx-auto rounded-full overflow-hidden border-8 border-pink-100 shadow-xl mb-6 relative bg-gray-100 flex items-center justify-center">
-                       <!-- เติมแท็ก img บรรทัดนี้ครับ -->
                        <img id="face-img" src="https://via.placeholder.com/200?text=รอสุ่ม" class="w-full h-full object-cover">
                     </div>
                     <div id="face-name" class="h-10 text-2xl font-bold text-pink-600 mb-4">เตรียมพร้อม</div>
@@ -556,40 +556,82 @@
                 </div>
             </div>
 
-          </div> <!-- เติม </div> ตรงบรรทัดนี้ เพื่อปิดโครงสร้างหน้า Dashboard ให้สมบูรณ์ -->
-            
-           <!-- ปุ่มดึงข้อมูลจากชีท (Refresh) -->
-<!-- ค้นหาบรรทัดนี้แล้วแก้ onclick ใหม่ให้ถูกต้องครับ -->
-<div class="mt-6 flex justify-end">
-    <button onclick="fetchRawReportData()" class="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl shadow-sm transition-all flex items-center gap-2 focus:ring-2 focus:ring-teal-500 focus:outline-none hover:-translate-y-0.5">
-        <i class="fas fa-sync-alt"></i> อัปเดตข้อมูลจากชีท
-    </button>
-</div>
-        <!-- View 8: Parent / Student Record Detail -->
-        <div id="view-parent-dashboard" class="w-full hidden-view mt-4">
-            <div class="flex justify-between items-center mb-4">
-                <button onclick="showView('view-home')" class="text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm hover:text-gray-900"><i class="fas fa-arrow-left mr-1"></i> กลับ</button>
-                <button onclick="handleParentSearch()" class="text-teal-600 bg-teal-50 px-4 py-2 rounded-full shadow-sm hover:bg-teal-100 font-bold"><i class="fas fa-sync-alt mr-1"></i> รีเฟรช</button>
+            <!-- ปุ่มดึงข้อมูลจากชีท (Refresh) -->
+            <div class="mt-6 flex justify-end">
+                <button onclick="fetchRawReportData()" class="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl shadow-sm transition-all flex items-center gap-2 focus:ring-2 focus:ring-teal-500 focus:outline-none hover:-translate-y-0.5">
+                    <i class="fas fa-sync-alt"></i> อัปเดตข้อมูลจากชีท
+                </button>
+            </div>
+        </div>
+
+        <!-- View 8: NEW Parent / Student Record Detail (Card Design) -->
+        <div id="view-parent-dashboard" class="w-full max-w-4xl hidden-view mt-4">
+            <!-- Header Controls -->
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="showView('view-home')" class="text-gray-600 bg-white px-5 py-2.5 rounded-full shadow-sm hover:text-gray-900 font-medium transition hover:-translate-x-1 flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i> กลับหน้าแรก
+                </button>
+                <button onclick="handleParentSearch()" class="text-teal-600 bg-white px-5 py-2.5 rounded-full shadow-sm hover:bg-teal-50 font-bold transition flex items-center border border-teal-100">
+                    <i class="fas fa-sync-alt mr-2"></i> อัปเดตข้อมูล
+                </button>
             </div>
             
-            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6 border-t-8 border-teal-500 text-center relative overflow-hidden">
-                <img id="p-student-photo" src="" class="w-24 h-24 rounded-full object-cover mx-auto mb-3 border-4 border-teal-50 shadow-sm hidden z-10 relative">
-                <h2 class="text-2xl font-extrabold text-gray-800 z-10 relative" id="p-student-name">ชื่อ - สกุล</h2>
-                <p class="text-teal-600 font-medium mt-1 z-10 relative">ห้องเรียน: <span id="p-student-room" class="font-bold bg-teal-50 px-3 py-1 rounded-full"></span></p>
-                <div class="mt-4 pt-4 border-t inline-block w-full">
-                    <span class="text-gray-500 text-sm block mb-1">ผลการเรียนรายวิชา</span>
-                    <span id="p-subject-label" class="font-bold text-gray-800 bg-gray-100 px-4 py-1.5 rounded-lg">ทั้งหมด</span>
+            <!-- Student Profile Header Card -->
+            <div class="bg-white rounded-3xl shadow-lg p-8 mb-8 border-t-8 border-teal-500 text-center relative overflow-hidden">
+                <!-- Background Pattern -->
+                <div class="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 rounded-full bg-teal-50 opacity-50 z-0"></div>
+                <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 rounded-full bg-emerald-50 opacity-50 z-0"></div>
+                
+                <div class="relative z-10">
+                    <div class="inline-block p-1 bg-white rounded-full shadow-md mb-4">
+                        <img id="p-student-photo" src="" class="w-28 h-28 rounded-full object-cover border-4 border-teal-50 hidden">
+                        <div id="p-student-photo-placeholder" class="w-28 h-28 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-4xl">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-3xl font-extrabold text-gray-800 tracking-tight" id="p-student-name">ชื่อ - สกุล</h2>
+                    
+                    <div class="flex justify-center items-center gap-3 mt-3">
+                        <span class="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-sm font-semibold flex items-center">
+                            <i class="fas fa-id-card mr-1.5 opacity-60"></i> รหัส <span id="p-student-id" class="ml-1">---</span>
+                        </span>
+                        <span class="bg-teal-50 text-teal-700 px-4 py-1.5 rounded-full text-sm font-bold flex items-center border border-teal-100">
+                            <i class="fas fa-chalkboard-teacher mr-1.5 opacity-60"></i> ห้องเรียน <span id="p-student-room" class="ml-1">---</span>
+                        </span>
+                    </div>
+
+                    <!-- Progress Bar Summary -->
+                    <div class="mt-8 max-w-lg mx-auto bg-slate-50 rounded-2xl p-5 border border-slate-100">
+                        <div class="flex justify-between items-end mb-2">
+                            <div class="text-left">
+                                <span class="text-slate-500 text-xs font-bold block uppercase tracking-wider mb-1">ผลการเรียนรายวิชา</span>
+                                <span id="p-subject-label" class="font-bold text-slate-800 text-lg">รวมทุกวิชา</span>
+                            </div>
+                            <div class="text-right">
+                                <span id="p-total-score" class="font-black text-2xl text-teal-600">0</span>
+                                <span class="text-slate-400 text-sm font-medium" id="p-max-score-label">/ 0 คะแนน</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-3 mb-1 overflow-hidden">
+                            <div id="p-progress-bar" class="bg-gradient-to-r from-teal-400 to-emerald-500 h-3 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                        </div>
+                        <div class="text-right text-xs font-bold text-teal-600 mt-1" id="p-percent-label">0%</div>
+                    </div>
                 </div>
             </div>
             
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <div class="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
-                    <h3 class="font-bold text-gray-700"><i class="fas fa-list-check text-teal-500 mr-2"></i>รายการส่งงาน</h3>
-                    <span id="p-total-score" class="font-bold text-teal-700 bg-teal-100 px-3 py-1 rounded-full text-sm">รวม 0 คะแนน</span>
-                </div>
-                <table class="min-w-full divide-y divide-gray-200">
-                    <tbody id="parent-table-body" class="bg-white divide-y divide-gray-200 text-sm"></tbody>
-                </table>
+            <!-- Cards Container for Assignments -->
+            <div class="mb-4 flex justify-between items-center px-2">
+                <h3 class="font-extrabold text-gray-700 text-xl flex items-center">
+                    <i class="fas fa-tasks text-teal-500 mr-2 bg-teal-50 p-2 rounded-lg"></i> รายการงานที่มอบหมาย
+                </h3>
+                <span id="p-task-count" class="bg-gray-100 text-gray-600 font-bold px-3 py-1 rounded-full text-sm">0 รายการ</span>
+            </div>
+
+            <!-- Dynamic Cards Grid -->
+            <div id="parent-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-10">
+                <!-- Cards will be injected here by JavaScript -->
             </div>
         </div>
 
@@ -601,123 +643,45 @@
         // If google.script.run is unavailable (e.g. previewing locally), we fall back seamlessly to localStorage mock DB.
         const IS_MOCK_ENV = typeof google === 'undefined' || !google.script || !google.script.run;
 
-        // Rich pre-populated dataset spanning multiple subjects, dates and months to make charts look beautiful!
-        const INITIAL_MOCK_SUBJECTS = ['วิทยาศาสตร์ ป.6', 'คณิตศาสตร์ ป.6', 'ภาษาอังกฤษ ป.6'];
-        
-        const INITIAL_MOCK_STUDENTS = [
-            { studentId: '1001', fullName: 'นภัทร แซ่ตั้ง', room: 'ป.6/1', photo: 'https://placehold.co/150x150/14b8a6/ffffff?text=NP' },
-            { studentId: '1002', fullName: 'กิตติศักดิ์ แก้วรักษา', room: 'ป.6/1', photo: 'https://placehold.co/150x150/3b82f6/ffffff?text=KS' },
-            { studentId: '1003', fullName: 'มณีรัตน์ ศรีสวัสดิ์', room: 'ป.6/1', photo: 'https://placehold.co/150x150/ec4899/ffffff?text=MR' },
-            { studentId: '1004', fullName: 'วิไลพร รักดี', room: 'ป.6/1', photo: 'https://placehold.co/150x150/a855f7/ffffff?text=WP' },
-            { studentId: '1005', fullName: 'ชญานนท์ เจริญสุข', room: 'ป.6/1', photo: 'https://placehold.co/150x150/f59e0b/ffffff?text=CN' },
+        // นำโค้ดนี้ไปวางแทนที่บล็อก if (IS_MOCK_ENV) {...} เดิมทั้งหมด
+        if (IS_MOCK_ENV) {
+            console.log("Running via GitHub Pages API Bridge");
             
-            { studentId: '2001', fullName: 'เอกสิทธิ์ มงคลเดช', room: 'ป.6/2', photo: 'https://placehold.co/150x150/14b8a6/ffffff?text=AS' },
-            { studentId: '2002', fullName: 'ธนารีย์ แสนวิเศษ', room: 'ป.6/2', photo: 'https://placehold.co/150x150/3b82f6/ffffff?text=TR' },
-            { studentId: '2003', fullName: 'ปิยมาศ ขวัญทอง', room: 'ป.6/2', photo: 'https://placehold.co/150x150/ec4899/ffffff?text=PM' },
-            { studentId: '2004', fullName: 'ณรงค์กร คมคาย', room: 'ป.6/2', photo: 'https://placehold.co/150x150/a855f7/ffffff?text=NK' },
-            { studentId: '2005', fullName: 'สุดารัตน์ หอมรื่น', room: 'ป.6/2', photo: 'https://placehold.co/150x150/f59e0b/ffffff?text=SR' },
-
-            { studentId: '3001', fullName: 'พัทธดนย์ จันทร์หอม', room: 'ป.6/3', photo: 'https://placehold.co/150x150/14b8a6/ffffff?text=PD' },
-            { studentId: '3002', fullName: 'นันทิยา ดีเลิศ', room: 'ป.6/3', photo: 'https://placehold.co/150x150/3b82f6/ffffff?text=NT' },
-            { studentId: '3003', fullName: 'อัครพล ลาภยืนยง', room: 'ป.6/3', photo: 'https://placehold.co/150x150/ec4899/ffffff?text=AP' },
-            { studentId: '3004', fullName: 'วรรณวิสา ภักดีชน', room: 'ป.6/3', photo: 'https://placehold.co/150x150/a855f7/ffffff?text=WW' },
-            { studentId: '3005', fullName: 'พีระพงษ์ ยอดรัก', room: 'ป.6/3', photo: 'https://placehold.co/150x150/f59e0b/ffffff?text=PR' }
-        ];
-
-        const INITIAL_MOCK_ASSIGNMENTS = [
-            { subject: 'วิทยาศาสตร์ ป.6', targetRoom: 'ป.6/1', taskName: 'ใบงานที่ 1 ระบบย่อยอาหาร', defaultScore: 10, CreatedAt: '2026-05-12T10:00:00' },
-            { subject: 'วิทยาศาสตร์ ป.6', targetRoom: 'ป.6/1', taskName: 'ใบงานที่ 2 ระบบหายใจ', defaultScore: 10, CreatedAt: '2026-06-15T11:30:00' },
-            { subject: 'วิทยาศาสตร์ ป.6', targetRoom: 'ป.6/1', taskName: 'สอบเก็บคะแนนเคมีพื้นฐาน', defaultScore: 20, CreatedAt: '2026-07-10T14:00:00' },
-            { subject: 'คณิตศาสตร์ ป.6', targetRoom: 'ป.6/1', taskName: 'การหารเศษส่วน', defaultScore: 10, CreatedAt: '2026-06-02T09:00:00' },
-            { subject: 'คณิตศาสตร์ ป.6', targetRoom: 'ป.6/1', taskName: 'โจทย์ปัญหาร้อยละ', defaultScore: 10, CreatedAt: '2026-07-08T09:30:00' },
+            // ⚠️ นำ Web App URL ของคุณมาใส่ที่นี่ ⚠️
+            const GAS_URL = 'https://script.google.com/macros/s/AKfycby45a_L_ryAbhecMpBRxVhCaZ70eMrUELBDAHtQMqtkbMDIck3xYQx400nHrqpR8FAZ/exec';
             
-            { subject: 'วิทยาศาสตร์ ป.6', targetRoom: 'ป.6/2', taskName: 'ใบงานที่ 1 ระบบย่อยอาหาร', defaultScore: 10, CreatedAt: '2026-05-12T10:00:00' },
-            { subject: 'วิทยาศาสตร์ ป.6', targetRoom: 'ป.6/2', taskName: 'ใบงานที่ 2 ระบบหายใจ', defaultScore: 10, CreatedAt: '2026-06-16T11:30:00' },
-            { subject: 'ภาษาอังกฤษ ป.6', targetRoom: 'ป.6/2', taskName: 'Vocabulary Test Week 1', defaultScore: 15, CreatedAt: '2026-06-20T13:15:00' },
-            { subject: 'ภาษาอังกฤษ ป.6', targetRoom: 'ป.6/2', taskName: 'Speaking Presentation', defaultScore: 20, CreatedAt: '2026-07-14T10:45:00' },
-
-            { subject: 'คณิตศาสตร์ ป.6', targetRoom: 'ป.6/3', taskName: 'การหารเศษส่วน', defaultScore: 10, CreatedAt: '2026-06-03T09:00:00' },
-            { subject: 'ภาษาอังกฤษ ป.6', targetRoom: 'ป.6/3', taskName: 'Vocabulary Test Week 1', defaultScore: 15, CreatedAt: '2026-06-22T13:15:00' }
-        ];
-
-        const INITIAL_MOCK_SUBMISSIONS = [
-            // May
-            { Timestamp: '2026-05-12T10:15:00', UID: 'S1', studentId: '1001', studentName: 'นภัทร แซ่ตั้ง', room: 'ป.6/1', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'ใบงานที่ 1 ระบบย่อยอาหาร', score: 10, ScanType: 'QR Scan' },
-            { Timestamp: '2026-05-12T10:17:12', UID: 'S2', studentId: '1002', studentName: 'กิตติศักดิ์ แก้วรักษา', room: 'ป.6/1', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'ใบงานที่ 1 ระบบย่อยอาหาร', score: 9, ScanType: 'QR Scan' },
-            { Timestamp: '2026-05-12T10:19:00', UID: 'S3', studentId: '1003', studentName: 'มณีรัตน์ ศรีสวัสดิ์', room: 'ป.6/1', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'ใบงานที่ 1 ระบบย่อยอาหาร', score: 10, ScanType: 'QR Scan' },
-            { Timestamp: '2026-05-12T11:02:44', UID: 'S4', studentId: '1004', studentName: 'วิไลพร รักดี', room: 'ป.6/1', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'ใบงานที่ 1 ระบบย่อยอาหาร', score: 8, ScanType: 'Manual Update' },
-            { Timestamp: '2026-05-13T08:30:10', UID: 'S5', studentId: '2001', studentName: 'เอกสิทธิ์ มงคลเดช', room: 'ป.6/2', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'ใบงานที่ 1 ระบบย่อยอาหาร', score: 9, ScanType: 'QR Scan' },
-            { Timestamp: '2026-05-13T08:34:00', UID: 'S6', studentId: '2002', studentName: 'ธนารีย์ แสนวิเศษ', room: 'ป.6/2', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'ใบงานที่ 1 ระบบย่อยอาหาร', score: 10, ScanType: 'QR Scan' },
-            { Timestamp: '2026-05-13T08:45:00', UID: 'S7', studentId: '2003', studentName: 'ปิยมาศ ขวัญทอง', room: 'ป.6/2', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'ใบงานที่ 1 ระบบย่อยอาหาร', score: 7, ScanType: 'Manual Update' },
-            
-            // June
-            { Timestamp: '2026-06-02T10:05:00', UID: 'S8', studentId: '1001', studentName: 'นภัทร แซ่ตั้ง', room: 'ป.6/1', subject: 'คณิตศาสตร์ ป.6', workTitle: 'การหารเศษส่วน', score: 8, ScanType: 'QR Scan' },
-            { Timestamp: '2026-06-02T10:12:00', UID: 'S9', studentId: '1003', studentName: 'มณีรัตน์ ศรีสวัสดิ์', room: 'ป.6/1', subject: 'คณิตศาสตร์ ป.6', workTitle: 'การหารเศษส่วน', score: 9, ScanType: 'QR Scan' },
-            { Timestamp: '2026-06-02T10:44:00', UID: 'S10', studentId: '1005', studentName: 'ชญานนท์ เจริญสุข', room: 'ป.6/1', subject: 'คณิตศาสตร์ ป.6', workTitle: 'การหารเศษส่วน', score: 10, ScanType: 'QR Scan' },
-            { Timestamp: '2026-06-15T11:45:00', UID: 'S11', studentId: '1001', studentName: 'นภัทร แซ่ตั้ง', room: 'ป.6/1', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'ใบงานที่ 2 ระบบหายใจ', score: 10, ScanType: 'QR Scan' },
-            { Timestamp: '2026-06-15T11:48:12', UID: 'S12', studentId: '1002', studentName: 'กิตติศักดิ์ แก้วรักษา', room: 'ป.6/1', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'ใบงานที่ 2 ระบบหายใจ', score: 8, ScanType: 'QR Scan' },
-            { Timestamp: '2026-06-15T11:51:00', UID: 'S13', studentId: '1004', studentName: 'วิไลพร รักดี', room: 'ป.6/1', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'ใบงานที่ 2 ระบบหายใจ', score: 9, ScanType: 'QR Scan' },
-            { Timestamp: '2026-06-16T12:00:00', UID: 'S14', studentId: '2001', studentName: 'เอกสิทธิ์ มงคลเดช', room: 'ป.6/2', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'ใบงานที่ 2 ระบบหายใจ', score: 8, ScanType: 'QR Scan' },
-            { Timestamp: '2026-06-16T12:05:00', UID: 'S15', studentId: '2003', studentName: 'ปิยมาศ ขวัญทอง', room: 'ป.6/2', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'ใบงานที่ 2 ระบบหายใจ', score: 10, ScanType: 'QR Scan' },
-            { Timestamp: '2026-06-16T12:08:00', UID: 'S16', studentId: '2004', studentName: 'ณรงค์กร คมคาย', room: 'ป.6/2', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'ใบงานที่ 2 ระบบหายใจ', score: 9, ScanType: 'QR Scan' },
-            { Timestamp: '2026-06-20T13:40:00', UID: 'S17', studentId: '2001', studentName: 'เอกสิทธิ์ มงคลเดช', room: 'ป.6/2', subject: 'ภาษาอังกฤษ ป.6', workTitle: 'Vocabulary Test Week 1', score: 12, ScanType: 'QR Scan' },
-            { Timestamp: '2026-06-20T13:45:00', UID: 'S18', studentId: '2002', studentName: 'ธนารีย์ แสนวิเศษ', room: 'ป.6/2', subject: 'ภาษาอังกฤษ ป.6', workTitle: 'Vocabulary Test Week 1', score: 15, ScanType: 'QR Scan' },
-            { Timestamp: '2026-06-20T13:50:00', UID: 'S19', studentId: '2005', studentName: 'สุดารัตน์ หอมรื่น', room: 'ป.6/2', subject: 'ภาษาอังกฤษ ป.6', workTitle: 'Vocabulary Test Week 1', score: 11, ScanType: 'QR Scan' },
-            { Timestamp: '2026-06-22T13:50:00', UID: 'S20', studentId: '3001', studentName: 'พัทธดนย์ จันทร์หอม', room: 'ป.6/3', subject: 'ภาษาอังกฤษ ป.6', workTitle: 'Vocabulary Test Week 1', score: 14, ScanType: 'QR Scan' },
-            { Timestamp: '2026-06-22T13:55:00', UID: 'S21', studentId: '3002', studentName: 'นันทิยา ดีเลิศ', room: 'ป.6/3', subject: 'ภาษาอังกฤษ ป.6', workTitle: 'Vocabulary Test Week 1', score: 15, ScanType: 'QR Scan' },
-            
-            // July
-            { Timestamp: '2026-07-08T10:00:00', UID: 'S22', studentId: '1001', studentName: 'นภัทร แซ่ตั้ง', room: 'ป.6/1', subject: 'คณิตศาสตร์ ป.6', workTitle: 'โจทย์ปัญหาร้อยละ', score: 8, ScanType: 'QR Scan' },
-            { Timestamp: '2026-07-08T10:05:00', UID: 'S23', studentId: '1002', studentName: 'กิตติศักดิ์ แก้วรักษา', room: 'ป.6/1', subject: 'คณิตศาสตร์ ป.6', workTitle: 'โจทย์ปัญหาร้อยละ', score: 10, ScanType: 'QR Scan' },
-            { Timestamp: '2026-07-08T10:10:00', UID: 'S24', studentId: '1004', studentName: 'วิไลพร รักดี', room: 'ป.6/1', subject: 'คณิตศาสตร์ ป.6', workTitle: 'โจทย์ปัญหาร้อยละ', score: 7, ScanType: 'QR Scan' },
-            { Timestamp: '2026-07-08T10:15:00', UID: 'S25', studentId: '1005', studentName: 'ชญานนท์ เจริญสุข', room: 'ป.6/1', subject: 'คณิตศาสตร์ ป.6', workTitle: 'โจทย์ปัญหาร้อยละ', score: 9, ScanType: 'QR Scan' },
-            { Timestamp: '2026-07-10T14:30:00', UID: 'S26', studentId: '1001', studentName: 'นภัทร แซ่ตั้ง', room: 'ป.6/1', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'สอบเก็บคะแนนเคมีพื้นฐาน', score: 18, ScanType: 'QR Scan' },
-            { Timestamp: '2026-07-10T14:34:00', UID: 'S27', studentId: '1003', studentName: 'มณีรัตน์ ศรีสวัสดิ์', room: 'ป.6/1', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'สอบเก็บคะแนนเคมีพื้นฐาน', score: 20, ScanType: 'QR Scan' },
-            { Timestamp: '2026-07-10T14:40:00', UID: 'S28', studentId: '1004', studentName: 'วิไลพร รักดี', room: 'ป.6/1', subject: 'วิทยาศาสตร์ ป.6', workTitle: 'สอบเก็บคะแนนเคมีพื้นฐาน', score: 15, ScanType: 'QR Scan' },
-            { Timestamp: '2026-07-14T11:15:00', UID: 'S29', studentId: '2001', studentName: 'เอกสิทธิ์ มงคลเดช', room: 'ป.6/2', subject: 'ภาษาอังกฤษ ป.6', workTitle: 'Speaking Presentation', score: 19, ScanType: 'QR Scan' },
-            { Timestamp: '2026-07-14T11:20:00', UID: 'S30', studentId: '2002', studentName: 'ธนารีย์ แสนวิเศษ', room: 'ป.6/2', subject: 'ภาษาอังกฤษ ป.6', workTitle: 'Speaking Presentation', score: 18, ScanType: 'QR Scan' },
-            { Timestamp: '2026-07-14T11:25:00', UID: 'S31', studentId: '2003', studentName: 'ปิยมาศ ขวัญทอง', room: 'ป.6/2', subject: 'ภาษาอังกฤษ ป.6', workTitle: 'Speaking Presentation', score: 20, ScanType: 'QR Scan' }
-        ];
-
-       // นำโค้ดนี้ไปวางแทนที่บล็อก if (IS_MOCK_ENV) {...} เดิมทั้งหมด
-if (IS_MOCK_ENV) {
-    console.log("Running via GitHub Pages API Bridge");
-    
-    // ⚠️ นำ Web App URL ของคุณมาใส่ที่นี่ ⚠️
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycby45a_L_ryAbhecMpBRxVhCaZ70eMrUELBDAHtQMqtkbMDIck3xYQx400nHrqpR8FAZ/exec';
-    
-    // สร้างตัวจำลองเพื่อดักจับคำสั่ง google.script.run แล้วแปลงเป็นการยิง fetch แบบอัตโนมัติ
-    window.google = {
-        script: {
-            run: {
-                withSuccessHandler: function(onSuccess) {
-                    return new Proxy({}, {
-                        get: function(target, prop) {
-                            return function(...args) {
-                                // ยิง POST Request กลับไปที่ Google Apps Script
-                                fetch(GAS_URL, {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'text/plain;charset=utf-8',
-                                    },
-                                    body: JSON.stringify({ action: prop, params: args })
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (onSuccess) onSuccess(data);
-                                })
-                                .catch(error => {
-                                    console.error("API Fetch Error:", error);
-                                    Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
-                                });
-                            }
+            // สร้างตัวจำลองเพื่อดักจับคำสั่ง google.script.run แล้วแปลงเป็นการยิง fetch แบบอัตโนมัติ
+            window.google = {
+                script: {
+                    run: {
+                        withSuccessHandler: function(onSuccess) {
+                            return new Proxy({}, {
+                                get: function(target, prop) {
+                                    return function(...args) {
+                                        // ยิง POST Request กลับไปที่ Google Apps Script
+                                        fetch(GAS_URL, {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'text/plain;charset=utf-8',
+                                            },
+                                            body: JSON.stringify({ action: prop, params: args })
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (onSuccess) onSuccess(data);
+                                        })
+                                        .catch(error => {
+                                            console.error("API Fetch Error:", error);
+                                            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
+                                        });
+                                    }
+                                }
+                            });
                         }
-                    });
+                    }
                 }
-            }
+            };
         }
-    };
-}
     </script>
 
     <!-- Front-End Client Logic -->
@@ -777,7 +741,7 @@ if (IS_MOCK_ENV) {
             }
         }
 
-       function handleLogin() {
+        function handleLogin() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
             if(!user || !pass) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกชื่อครูและกรอกรหัสผ่าน', 'warning');
@@ -787,21 +751,22 @@ if (IS_MOCK_ENV) {
                 if(res && res.success) {
                     Swal.close();
                     document.getElementById('nav-brand').innerText = `${res.name}`;
-                    openReports(); // เปลี่ยนจุดนี้ เพื่อบังคับดึงข้อมูลทำกราฟทันที
+                    openReports(); // Direct educators into the premium Reporting & Export view
                     loadTeacherData();
                 } else {
                     Swal.fire('เกิดข้อผิดพลาด', res ? res.message : 'ไม่สามารถเข้าสู่ระบบได้', 'error');
                 }
             }).verifyLogin(user, pass);
         }
+
         function logout() {
             document.getElementById('username').value = ''; document.getElementById('password').value = '';
             showView('view-home'); switchLoginTab('parent');
         }
 
-       function loadTeacherData() {
+        function loadTeacherData() {
             google.script.run.withSuccessHandler(data => { 
-                globalStudents = Array.isArray(data) ? data : []; // ป้องกันหน้าขาวด้วยการบังคับให้เป็น Array
+                globalStudents = Array.isArray(data) ? data : []; 
                 populateRoomDropdowns();
                 if(!document.getElementById('view-reports').classList.contains('hidden-view')) {
                     applyReportFilters();
@@ -810,12 +775,12 @@ if (IS_MOCK_ENV) {
             loadAssignments();
             loadDashboardData();
         }
-       function loadDashboardData() {
+
+        function loadDashboardData() {
             google.script.run.withSuccessHandler(data => {
                 const tbody = document.getElementById('dashboard-table-body');
                 if(!tbody) return;
                 
-                // 1. เพิ่มการเช็คความปลอดภัย (Safe Check) กัน Error หน้าขาว
                 if (!data || !Array.isArray(data)) {
                     tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-red-500 font-medium">ไม่พบข้อมูล หรือขาดฟังก์ชัน getDashboardData ใน Code.gs</td></tr>';
                     return;
@@ -823,13 +788,11 @@ if (IS_MOCK_ENV) {
                 
                 tbody.innerHTML = '';
                 
-                // 2. เช็คว่ามีข้อมูลส่งงานหรือไม่
                 if(data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-400 font-medium">ยังไม่มีประวัติการส่งงานล่าสุด</td></tr>';
                     return;
                 }
                 
-                // 3. นำข้อมูลมาแสดงผล
                 data.forEach(d => {
                     tbody.innerHTML += `
                         <tr class="hover:bg-teal-50 transition border-b border-gray-50">
@@ -890,10 +853,11 @@ if (IS_MOCK_ENV) {
 
         function loadAssignments() {
             google.script.run.withSuccessHandler(data => {
-                globalAssignments = Array.isArray(data) ? data : []; // ป้องกันหน้าขาว
+                globalAssignments = Array.isArray(data) ? data : []; 
                 renderAssignmentTable();
             }).getAssignments();
         }
+
         function renderAssignmentTable() {
             const tbody = document.getElementById('assign-table-body');
             tbody.innerHTML = '';
@@ -947,7 +911,10 @@ if (IS_MOCK_ENV) {
             if(!room || !sub) return;
             
             const filtered = globalAssignments.filter(a => a.targetRoom === room && a.subject === sub);
-            filtered.forEach(t => taskSelect.innerHTML += `<option value="${t.taskName}">${t.taskName}</option>`);
+            filtered.forEach(t => {
+                const safeValue = t.taskName.replace(/"/g, '&quot;');
+                taskSelect.innerHTML += `<option value="${safeValue}">${t.taskName}</option>`;
+            });
         }
 
        function updateDefaultScoreUI() {
@@ -970,8 +937,7 @@ if (IS_MOCK_ENV) {
             const room = document.getElementById('scan-room-filter').value;
             const sub = document.getElementById('scan-subject-filter').value;
             const task = document.getElementById('scan-task').value;
-            // แก้ไขบรรทัดนี้ในฟังก์ชัน handleScannedId
-            const score = document.getElementById('scan-score').value || ""; // ใช้ค่าว่างแทนเลข 0
+            const score = document.getElementById('scan-score').value || "";
 
             if(!room || !sub || !task) {
                 Swal.fire('แจ้งเตือน', 'กรุณาเลือก ห้อง วิชา และงาน ด้านบนก่อน', 'warning');
@@ -994,7 +960,7 @@ if (IS_MOCK_ENV) {
 
             const dataToSave = { studentId: student.studentId, studentName: student.fullName, room: student.room, subject: sub, workTitle: task, score: score };
             google.script.run.withSuccessHandler(() => {
-                loadDashboardData(); // Update educators list logs
+                loadDashboardData(); 
             }).saveSubmissions([dataToSave]); 
 
             const timeStr = new Date().toLocaleTimeString('th-TH');
@@ -1015,7 +981,6 @@ if (IS_MOCK_ENV) {
        function renderRecentScans() {
             const list = document.getElementById('recent-scan-list');
             list.innerHTML = sessionScans.map(s => {
-                // ถ้าคะแนนว่างเปล่า ให้แสดงคำว่า "รอตรวจ" พื้นหลังสีส้ม
                 let scoreDisplay = s.score !== "" ? `คะแนน: ${s.score}` : "รอตรวจ";
                 let scoreBg = s.score !== "" ? "bg-[#1b5e20]" : "bg-orange-500";
                 
@@ -1071,13 +1036,12 @@ if (IS_MOCK_ENV) {
 
         function openGradeTracker() { showView('view-grade-tracker'); }
 
-       function filterTasksForTracker() {
+        function filterTasksForTracker() {
             const room = document.getElementById('tracker-room-filter').value;
             const sub = document.getElementById('tracker-subject-filter').value;
             const taskSelect = document.getElementById('tracker-task');
             
             taskSelect.innerHTML = '<option value="">-- เลือกงาน --</option>';
-            // แก้ไข colspan ให้เป็น 6
             document.getElementById('tracker-table-body').innerHTML = '<tr><td colspan="6" class="text-center py-10 text-gray-400">กรุณาเลือกงาน เพื่อแสดงข้อมูล</td></tr>';
             
             if(!room || !sub) return;
@@ -1104,12 +1068,10 @@ if (IS_MOCK_ENV) {
                 tbody.innerHTML = '';
                 
                 if(data.length === 0) {
-                    // แก้ไข colspan ให้เป็น 6
                     tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500 font-bold">ไม่พบรายชื่อนักเรียนในห้องนี้</td></tr>';
                     return;
                 }
                 
-                // เพิ่ม parameter 'index' เพื่อใช้นับเลขที่ 1, 2, 3...
                 data.forEach((std, index) => {
                     let isSubmitted = std.status === "ส่งแล้ว";
                     
@@ -1128,7 +1090,6 @@ if (IS_MOCK_ENV) {
                     
                     tbody.innerHTML += `
                         <tr class="hover:bg-teal-50 transition">
-                            <!-- เพิ่มคอลัมน์แสดงเลขที่ โดยใช้ index + 1 -->
                             <td class="px-4 py-2 text-center text-sm font-bold text-gray-600">${index + 1}</td>
                             <td class="px-4 py-2">${photoHtml}</td>
                             <td class="px-4 py-2 text-xs font-bold text-gray-500">${std.studentId}</td>
@@ -1358,7 +1319,7 @@ if (IS_MOCK_ENV) {
             }
         }
 
-        // Parent Check
+        // Parent Check - UPDATED WITH CARD DESIGN
         function handleParentSearch() {
             const id = document.getElementById('student-search-id').value.trim();
             const sub = document.getElementById('parent-subject-select').value;
@@ -1368,46 +1329,115 @@ if (IS_MOCK_ENV) {
             google.script.run.withSuccessHandler(res => {
                 if(res.success) {
                     Swal.close();
+                    
+                    // Update Header Profile
                     document.getElementById('p-student-name').innerText = res.student.fullName;
+                    document.getElementById('p-student-id').innerText = res.student.studentId;
                     document.getElementById('p-student-room').innerText = res.student.room;
                     document.getElementById('p-subject-label').innerText = sub === 'all' ? 'รวมทุกวิชา' : sub;
                     
                     const img = document.getElementById('p-student-photo');
-                    if(res.student.photo) { img.src = res.student.photo; img.classList.remove('hidden'); } else img.classList.add('hidden');
+                    const imgPlaceholder = document.getElementById('p-student-photo-placeholder');
+                    if(res.student.photo) { 
+                        img.src = res.student.photo; 
+                        img.classList.remove('hidden'); 
+                        imgPlaceholder.classList.add('hidden');
+                    } else {
+                        img.classList.add('hidden');
+                        imgPlaceholder.classList.remove('hidden');
+                    }
                     
-                    const tbody = document.getElementById('parent-table-body');
-                    tbody.innerHTML = '';
+                    // Generate Cards
+                    const container = document.getElementById('parent-cards-container');
+                    container.innerHTML = '';
                     let total = 0;
                     let maxTotal = 0;
-                    if(res.records.length === 0) tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-500">ไม่มีข้อมูลงานในรายวิชานี้</td></tr>';
                     
-                    res.records.forEach(r => {
+                    if(res.records.length === 0) {
+                        container.innerHTML = `
+                            <div class="col-span-full bg-white rounded-2xl p-10 text-center border border-dashed border-gray-300">
+                                <i class="fas fa-folder-open text-gray-300 text-4xl mb-3"></i>
+                                <p class="text-gray-500 font-medium">ยังไม่มีข้อมูลงานที่มอบหมายในรายวิชานี้</p>
+                            </div>`;
+                    }
+                    
+                    res.records.forEach((r, index) => {
                         if(r.isSubmitted) total += Number(r.score) || 0;
                         if(r.maxScore !== '-') maxTotal += Number(r.maxScore) || 0;
                         
-                        let statusBadge = r.isSubmitted 
-                            ? `<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-bold border border-green-200"><i class="fas fa-check mr-1"></i>ส่งแล้ว</span>` 
-                            : `<span class="bg-red-50 text-red-500 text-xs px-2 py-1 rounded-full font-bold border border-red-100"><i class="fas fa-times mr-1"></i>ยังไม่ส่ง</span>`;
-                            
-                        let scoreDisplay = r.isSubmitted 
-                            ? `<span class="text-teal-700 font-bold">${r.score}</span> <span class="text-gray-400 text-[10px]">/ ${r.maxScore}</span>` 
-                            : `<span class="text-red-400 font-bold">-</span> <span class="text-gray-400 text-[10px]">/ ${r.maxScore}</span>`;
+                        let isDone = r.isSubmitted;
+                        let statusColor = isDone ? 'emerald' : 'rose';
+                        let statusIcon = isDone ? 'fa-check-circle' : 'fa-times-circle';
+                        let statusText = isDone ? 'ส่งงานแล้ว' : 'ยังไม่ส่งงาน';
+                        
+                        let scoreDisplay = isDone 
+                            ? `<span class="text-3xl font-black text-${statusColor}-600">${r.score}</span><span class="text-sm text-gray-400 font-medium ml-1">/ ${r.maxScore}</span>` 
+                            : `<span class="text-3xl font-black text-gray-300">-</span><span class="text-sm text-gray-400 font-medium ml-1">/ ${r.maxScore}</span>`;
 
-                        tbody.innerHTML += `<tr>
-                            <td class="px-4 py-3"><div class="text-[10px] font-bold text-teal-600">${r.subject}</div><div class="font-medium text-sm text-gray-800">${r.workTitle}</div><div class="text-[10px] text-gray-400 mt-1">${r.date !== '-' ? r.date : ''}</div></td>
-                            <td class="px-4 py-3 text-center">${statusBadge}</td>
-                            <td class="px-4 py-3 text-center bg-gray-50">${scoreDisplay}</td>
-                        </tr>`;
+                        // Create Card HTML
+                        container.innerHTML += `
+                            <div class="st-card bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group" style="animation-delay: ${index * 0.05}s">
+                                <!-- Status Strip Line -->
+                                <div class="absolute top-0 left-0 w-1.5 h-full bg-${statusColor}-500"></div>
+                                
+                                <div class="flex justify-between items-start mb-3 ml-2">
+                                    <div>
+                                        <span class="inline-block px-2.5 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-lg uppercase tracking-wider mb-2">${r.subject}</span>
+                                        <h4 class="text-gray-800 font-bold text-base leading-tight group-hover:text-teal-600 transition-colors">${r.workTitle}</h4>
+                                    </div>
+                                    <div class="bg-${statusColor}-50 text-${statusColor}-600 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 shadow-inner">
+                                        <i class="fas ${statusIcon} text-xl"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 ml-2 pt-4 border-t border-slate-50 flex justify-between items-end">
+                                    <div>
+                                        <p class="text-xs text-slate-400 font-medium mb-1"><i class="far fa-clock mr-1"></i>อัปเดตล่าสุด</p>
+                                        <p class="text-sm font-bold text-slate-700">${r.date !== '-' ? r.date : 'รอการส่งงาน'}</p>
+                                    </div>
+                                    <div class="text-right bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+                                        <p class="text-[10px] text-slate-400 font-bold uppercase mb-0.5">คะแนนที่ได้</p>
+                                        <div>${scoreDisplay}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
                     });
                     
-                    document.getElementById('p-total-score').innerText = `รวม ${total} / ${maxTotal} คะแนน`;
+                    // Update Summary Progress
+                    document.getElementById('p-total-score').innerText = total;
+                    document.getElementById('p-max-score-label').innerText = `/ ${maxTotal} คะแนน`;
+                    document.getElementById('p-task-count').innerText = `${res.records.length} ชิ้นงาน`;
+                    
+                    let percent = 0;
+                    if (maxTotal > 0) percent = Math.round((total / maxTotal) * 100);
+                    
+                    // Animate Progress Bar
+                    setTimeout(() => {
+                        document.getElementById('p-progress-bar').style.width = `${percent}%`;
+                        document.getElementById('p-percent-label').innerText = `คิดเป็น ${percent}%`;
+                        
+                        // Change color based on performance
+                        const pb = document.getElementById('p-progress-bar');
+                        if(percent < 50) {
+                            pb.className = "h-3 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-rose-400 to-rose-500";
+                            document.getElementById('p-percent-label').className = "text-right text-xs font-bold text-rose-500 mt-1";
+                        } else if(percent < 80) {
+                            pb.className = "h-3 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-amber-400 to-amber-500";
+                            document.getElementById('p-percent-label').className = "text-right text-xs font-bold text-amber-500 mt-1";
+                        } else {
+                            pb.className = "h-3 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-teal-400 to-emerald-500";
+                            document.getElementById('p-percent-label').className = "text-right text-xs font-bold text-teal-600 mt-1";
+                        }
+                    }, 100);
+                    
                     showView('view-parent-dashboard');
                 } else Swal.fire('ไม่พบข้อมูล', res.message, 'error');
             }).getStudentRecords(id, sub);
         }
 
         // ==========================================
-        //  NEW REPORTING & ANALYTICS DASHBOARD LOGIC
+        // NEW REPORTING & ANALYTICS DASHBOARD LOGIC
         // ==========================================
         let fullSubmissionData = []; 
         let fullAssignmentData = []; 
@@ -1421,7 +1451,6 @@ if (IS_MOCK_ENV) {
         function fetchRawReportData() {
             Swal.fire({ title: 'กำลังดึงฐานสถิติ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             
-            // บังคับให้ดึงข้อมูลจาก Google Apps Script เสมอ
             google.script.run.withSuccessHandler(res => {
                 if(res && res.submissions) {
                     fullSubmissionData = res.submissions;
@@ -1448,22 +1477,14 @@ if (IS_MOCK_ENV) {
             const filterMonth = document.getElementById('report-filter-month').value;
             const searchVal = document.getElementById('report-search').value.toLowerCase().trim();
 
-            // Filter submissions list
             filteredReportData = fullSubmissionData.filter(row => {
-                // Room filter
                 if (filterRoom !== 'all' && row.room !== filterRoom) return false;
-                
-                // Subject filter
                 if (filterSubject !== 'all' && row.subject !== filterSubject) return false;
-                
-                // Month filter
                 if (filterMonth !== 'all') {
                     const dateObj = new Date(row.Timestamp);
-                    const monthStr = dateObj.getMonth().toString().padStart(2, '0'); // '04' is May, '05' is June, '06' is July
+                    const monthStr = dateObj.getMonth().toString().padStart(2, '0');
                     if (monthStr !== filterMonth) return false;
                 }
-
-                // Text Search filter (Student ID, Name, Task Name)
                 if (searchVal) {
                     const stdId = String(row.studentId).toLowerCase();
                     const stdName = String(row.studentName).toLowerCase();
@@ -1477,11 +1498,9 @@ if (IS_MOCK_ENV) {
                         return false;
                     }
                 }
-
                 return true;
             });
 
-            // Update Metrics Dashboard & Visual Charts
             updateKPICards(filterRoom, filterSubject, filterMonth);
             renderDetailedReportTable();
             renderCharts(filterRoom, filterSubject, filterMonth);
@@ -1489,22 +1508,17 @@ if (IS_MOCK_ENV) {
         }
 
         function updateKPICards(room, subject, month) {
-            // Count active targeted students based on selection
             let activeStudents = globalStudents;
             if (room !== 'all') activeStudents = globalStudents.filter(s => s.room === room);
             document.getElementById('kpi-total-students').innerText = activeStudents.length;
 
-            // Count target Assignments
             let activeAssignments = fullAssignmentData;
             if (room !== 'all') activeAssignments = activeAssignments.filter(a => a.targetRoom === room);
             if (subject !== 'all') activeAssignments = activeAssignments.filter(a => a.subject === subject);
             document.getElementById('kpi-total-assignments').innerText = activeAssignments.length;
 
-            // Compute submission percentage
-            // Total maximum submission events possible = activeStudents * activeAssignments
             let totalPossibleSubmissions = 0;
             if(room === 'all') {
-                // Sum up possible works for each room separately
                 const roomsList = [...new Set(globalStudents.map(s => s.room))];
                 roomsList.forEach(r => {
                     const stdInRoom = globalStudents.filter(s => s.room === r).length;
@@ -1516,16 +1530,13 @@ if (IS_MOCK_ENV) {
                 totalPossibleSubmissions = activeStudents.length * activeAssignments.length;
             }
 
-            // Count actual submissions matching the current room/subject/month
             const actualSubmissionsCount = filteredReportData.length;
-            
             let rate = 0;
             if (totalPossibleSubmissions > 0) {
                 rate = Math.round((actualSubmissionsCount / totalPossibleSubmissions) * 100);
             }
             document.getElementById('kpi-submission-rate').innerText = `${rate}%`;
 
-            // Average Grade from submitted works
             let scoreSum = 0;
             filteredReportData.forEach(s => scoreSum += Number(s.score || 0));
             let avgScore = filteredReportData.length > 0 ? (scoreSum / filteredReportData.length).toFixed(1) : '0.0';
@@ -1575,7 +1586,6 @@ if (IS_MOCK_ENV) {
                 const studentsInRoom = globalStudents.filter(s => s.room === room);
                 const assignmentsInRoom = fullAssignmentData.filter(a => a.targetRoom === room);
                 
-                // calculate submissions belonging specifically to this room
                 const submissionsInRoom = fullSubmissionData.filter(sub => sub.room === room);
                 const totalPossible = studentsInRoom.length * assignmentsInRoom.length;
                 const totalSubmitted = submissionsInRoom.length;
@@ -1617,15 +1627,11 @@ if (IS_MOCK_ENV) {
         }
 
         function renderCharts(room, subject, month) {
-            // ----------------------------------------------------
-            // Chart 1: Subject Performance Comparison (Doughnut / Pie)
-            // ----------------------------------------------------
             const subjectStats = {};
             globalSubjects.forEach(sub => {
                 subjectStats[sub] = { possible: 0, actual: 0 };
             });
 
-            // Calculate ratios per subject
             globalStudents.forEach(std => {
                 if (room !== 'all' && std.room !== room) return;
                 
@@ -1636,7 +1642,6 @@ if (IS_MOCK_ENV) {
                     if (subjectStats[assign.subject]) {
                         subjectStats[assign.subject].possible++;
                         
-                        // Check if submitted
                         const hasSubmitted = fullSubmissionData.some(sub => 
                             sub.studentId === std.studentId && 
                             sub.subject === assign.subject && 
@@ -1684,23 +1689,18 @@ if (IS_MOCK_ENV) {
                 }
             });
 
-            // ----------------------------------------------------
-            // Chart 2: Monthly Submission Trend (Line Chart)
-            // ----------------------------------------------------
             const monthsNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
             const monthCounts = Array(12).fill(0);
 
-            // Populate monthly submission frequencies based on current filters
             filteredReportData.forEach(sub => {
                 const dateObj = new Date(sub.Timestamp);
                 const m = dateObj.getMonth();
                 monthCounts[m]++;
             });
 
-            // Render only months with data to avoid empty space
             const activeMonthLabels = [];
             const activeMonthData = [];
-            for (let i = 4; i <= 7; i++) { // Render school months (May - August)
+            for (let i = 4; i <= 7; i++) { 
                 activeMonthLabels.push(monthsNames[i]);
                 activeMonthData.push(monthCounts[i]);
             }
@@ -1733,15 +1733,11 @@ if (IS_MOCK_ENV) {
             });
         }
 
-        // ==========================================
-        //  EXPORT DATA TO EXCEL / CSV ENGINE
-        // ==========================================
         function exportData(type) {
             if (filteredReportData.length === 0) {
                 return Swal.fire('เกิดข้อผิดพลาด', 'ไม่มีข้อมูลการส่งงานที่จะส่งออก กรุณาเลือกตัวกรองที่มีรายการ', 'warning');
             }
 
-            // Map and format headers for Excel/CSV spreadsheet output
             const formattedData = filteredReportData.map((row, index) => {
                 const dt = new Date(row.Timestamp);
                 const dateStr = `${dt.getDate().toString().padStart(2, '0')}/${(dt.getMonth()+1).toString().padStart(2, '0')}/${dt.getFullYear()} ${dt.getHours().toString().padStart(2, '0')}:${dt.getMinutes().toString().padStart(2, '0')}`;
@@ -1764,13 +1760,11 @@ if (IS_MOCK_ENV) {
             const fileName = `รายงานการส่งงาน_ห้อง_${activeRoom}_วิชา_${activeSubject}`.replace(/ /g, '_');
 
             if (type === 'xlsx') {
-                // EXCEL EXPORT via SheetJS
                 try {
                     const worksheet = XLSX.utils.json_to_sheet(formattedData);
                     const workbook = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(workbook, worksheet, "สถิติการส่งงาน");
                     
-                    // Style sheet columns width for better readability
                     const max_len = [10, 20, 15, 25, 12, 20, 30, 12, 15];
                     worksheet['!cols'] = max_len.map(w => ({ wch: w }));
 
@@ -1780,12 +1774,10 @@ if (IS_MOCK_ENV) {
                     Swal.fire('ข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ Excel ได้: ' + e.message, 'error');
                 }
             } else if (type === 'csv') {
-                // CSV EXPORT
                 try {
                     const headers = Object.keys(formattedData[0]);
                     const csvRows = [];
                     
-                    // Add UTF-8 Byte Order Mark (BOM) to support Thai language correctly in Excel
                     csvRows.push('\uFEFF' + headers.join(','));
 
                     for (const row of formattedData) {
@@ -1814,73 +1806,38 @@ if (IS_MOCK_ENV) {
             }
         }
 
-        function showGasSetupCode() {
-            Swal.fire({
-                title: 'วิธีการนำเข้าส่วน Google Apps Script (Code.gs)',
-                html: `
-                    <div class="text-left text-xs bg-slate-800 text-emerald-400 p-4 rounded-lg overflow-y-auto max-h-72 font-mono select-all">
-                        // คัดลอกฟังก์ชันนี้ไปวางในไฟล์ Code.gs ของคุณบน Google Sheets<br><br>
-                        function getReportData() {<br>
-                        &nbsp;&nbsp;const ss = SpreadsheetApp.getActiveSpreadsheet();<br>
-                        &nbsp;&nbsp;const subSheet = ss.getSheetByName("Submissions");<br>
-                        &nbsp;&nbsp;const assignSheet = ss.getSheetByName("Assignments");<br><br>
-                        &nbsp;&nbsp;let submissions = [];<br>
-                        &nbsp;&nbsp;if (subSheet) {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;const data = subSheet.getDataRange().getValues();<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;for (let i = 1; i < data.length; i++) {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!data[i][2]) continue;<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;submissions.push({<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Timestamp: data[i][0] ? data[i][0].toISOString() : "",<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UID: data[i][1],<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;studentId: String(data[i][2]).trim(),<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;studentName: data[i][3],<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;room: String(data[i][4]).trim(),<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;subject: data[i][5],<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;workTitle: data[i][6],<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;score: Number(data[i][7] || 0),<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ScanType: data[i][8] || "QR Scan"<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;}<br>
-                        &nbsp;&nbsp;}<br><br>
-                        &nbsp;&nbsp;let assignments = [];<br>
-                        &nbsp;&nbsp;if (assignSheet) {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;const data = assignSheet.getDataRange().getValues();<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;for (let i = 1; i < data.length; i++) {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!data[i][2]) continue;<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assignments.push({<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;subject: data[i][0],<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;targetRoom: String(data[i][1]).trim(),<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;taskName: data[i][2],<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;defaultScore: Number(data[i][3] || 10),<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CreatedAt: data[i][4] ? data[i][4].toISOString() : ""<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;}<br>
-                        &nbsp;&nbsp;}<br><br>
-                        &nbsp;&nbsp;return {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;submissions: submissions,<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;assignments: assignments<br>
-                        &nbsp;&nbsp;};<br>
+        // ==========================================
+        // ฟังก์ชัน: เปลี่ยนเป็น "ส่งแล้ว" ทันทีแบบปลอดภัย (ไม่กระทบปุ่มบันทึก)
+        // ==========================================
+        document.addEventListener('input', function(event) {
+            const input = event.target;
+            
+            if (input.tagName === 'INPUT' && input.closest('tr') && input.type !== 'hidden') {
+                const scoreVal = input.value.trim();
+                
+                if (scoreVal !== '') {
+                    const row = input.closest('tr');
+                    const clickableElements = row.querySelectorAll('button, [onclick], .cursor-pointer');
+                    
+                    for (let btn of clickableElements) {
+                        if (btn.textContent && btn.textContent.includes('ยังไม่ส่ง')) {
+                            btn.click(); 
+                            break; 
                         }
-                    </div>
-                    <p class="text-xs text-slate-500 mt-2 text-left">💡 สังเกต: เมื่อนำโค้ดด้านบนไปเชื่อมต่อ ระบบ Dashboard จะดึงข้อมูลจากฐานข้อมูล Google Sheet มาแสดงผลเป็นกราฟ และสามารถ Export ออกมาได้โดยอัตโนมัติ!</p>
-                `,
-                confirmButtonText: 'รับทราบ',
-                confirmButtonColor: '#0f766e',
-                width: '600px'
-            });
-        }
-       // ==========================================
+                    }
+                }
+            }
+        });
+
+        // ==========================================
         // ฟังก์ชัน: เลื่อนช่องกรอกคะแนนด้วย Enter และลูกศร ขึ้น/ลง
         // ==========================================
         document.addEventListener('keydown', function(event) {
-            // 1. เช็คว่าปุ่มที่กดคือ Enter, ลูกศรลง (ArrowDown) หรือ ลูกศรขึ้น (ArrowUp)
             if (event.key === 'Enter' || event.key === 'ArrowDown' || event.key === 'ArrowUp') {
                 const currentInput = document.activeElement;
                 
-                // 2. เช็คว่าจุดที่เคอร์เซอร์อยู่ เป็นช่องกรอกข้อมูลในตารางหรือไม่
                 if (currentInput.tagName === 'INPUT' && currentInput.closest('table') && currentInput.type !== 'hidden') {
                     
-                    // 3. ป้องกันการทำงานปกติของเบราว์เซอร์ (ป้องกันไม่ให้ตัวเลขเปลี่ยนตอนกดลูกศร)
                     event.preventDefault(); 
                     
                     const table = currentInput.closest('table');
@@ -1890,16 +1847,12 @@ if (IS_MOCK_ENV) {
                     if (currentIndex > -1) {
                         let targetInput = null;
                         
-                        // 4. คำนวณหาช่องเป้าหมายที่จะกระโดดไป
                         if ((event.key === 'Enter' || event.key === 'ArrowDown') && currentIndex < allInputs.length - 1) {
-                            // เลื่อนลงล่าง
                             targetInput = allInputs[currentIndex + 1];
                         } else if (event.key === 'ArrowUp' && currentIndex > 0) {
-                            // เลื่อนขึ้นบน
                             targetInput = allInputs[currentIndex - 1];
                         }
                         
-                        // 5. เลื่อนเคอร์เซอร์ไปหาช่องเป้าหมายพร้อมคลุมดำตัวเลขรอไว้
                         if (targetInput) {
                             targetInput.focus();
                             targetInput.select();
@@ -1908,34 +1861,16 @@ if (IS_MOCK_ENV) {
                 }
             }
         });
-        
-       // ==========================================
-        // ฟังก์ชัน: เปลี่ยนเป็น "ส่งแล้ว" ทันทีแบบปลอดภัย (ไม่กระทบปุ่มบันทึก)
-        // ==========================================
-        document.addEventListener('input', function(event) {
-            const input = event.target;
-            
-            // 1. ตรวจสอบว่าเป็นช่องกรอกคะแนน
-            if (input.tagName === 'INPUT' && input.closest('tr') && input.type !== 'hidden') {
-                const scoreVal = input.value.trim();
-                
-                // 2. ถ้ามีการพิมพ์ตัวเลขลงไป
-                if (scoreVal !== '') {
-                    const row = input.closest('tr');
-                    
-                    // 3. หาปุ่มที่สามารถกดได้ในบรรทัดนั้น (Button หรือตัวที่มี onclick)
-                    const clickableElements = row.querySelectorAll('button, [onclick], .cursor-pointer');
-                    
-                    for (let btn of clickableElements) {
-                        // 4. ถ้าปุ่มนั้นมีคำว่า "ยังไม่ส่ง" ให้สั่งจำลองการคลิก
-                        if (btn.textContent && btn.textContent.includes('ยังไม่ส่ง')) {
-                            btn.click(); // สั่งคลิกเพื่อให้ระบบเว็บเปลี่ยนสถานะตามปกติ
-                            break; // เจอแล้วหยุดทำงาน เพื่อป้องกันการคลิกซ้ำซ้อน
-                        }
-                    }
-                }
-            }
-        });
     </script>
 </body>
 </html>
+```eof
+
+ผมได้ปรับหน้า "ผลการเรียน" ให้เป็นดีไซน์แบบ **Card Layout** (คล้ายๆ แอปในมือถือ) โดยมีลูกเล่นเพิ่มขึ้นมาดังนี้ครับ:
+
+1. **ส่วนหัว (Profile Header):** ปรับให้เด่นขึ้น มีรหัสนักเรียนและห้องเรียนชัดเจน 
+2. **หลอดความก้าวหน้า (Progress Bar):** เพิ่มหลอดพลังคะแนนที่วิ่งขึ้นตามเป้าหมาย (สีจะเปลี่ยนตามคะแนน แดง -> ส้ม -> เขียว)
+3. **การ์ดงาน (Assignment Cards):** เปลี่ยนจากตารางเดิมๆ เป็นกล่องการ์ดแยกทีละชิ้น มีไอคอนกำกับชัดเจน แถบสีจะบอกชัดว่างานไหนส่งแล้ว (เขียว) งานไหนยังไม่ส่ง (แดง)
+4. **ความลื่นไหล:** เวลาโหลดเสร็จ การ์ดจะค่อยๆ เด้งขึ้นมาให้ความรู้สึกทันสมัยครับ
+
+รบกวนคุณครูนำโค้ดในไฟล์ด้านบนนี้ ไปทับไฟล์ `index.html` ทั้งหมดในหน้า GitHub แล้วลองเปิดดูผลลัพธ์การเรียนในโหมดผู้ปกครองดูนะครับ น่าจะถูกใจทั้งคุณครู เด็กๆ และผู้ปกครองแน่นอนครับ!
