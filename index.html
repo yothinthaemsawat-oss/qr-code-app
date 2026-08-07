@@ -275,7 +275,7 @@
                         <ul id="subject-list-ui" class="space-y-2 text-sm text-gray-600 max-h-32 overflow-y-auto pr-2 no-scrollbar"></ul>
                     </div>
 
-                    <!-- กล่อง 3: สร้างหน่วยการเรียนรู้ -->
+                   <!-- กล่อง 3: สร้างหน่วยการเรียนรู้ -->
                     <div class="bg-white rounded-xl shadow p-5 border border-indigo-100">
                         <h3 class="font-bold text-indigo-700 mb-3 border-b border-indigo-100 pb-2"><i class="fas fa-layer-group mr-1"></i> 3. สร้างหน่วยการเรียนรู้</h3>
                         <div class="space-y-3">
@@ -289,14 +289,23 @@
                                 <label class="text-xs text-gray-500 font-bold mb-1 block">3.2 เพิ่มชื่อหน่วย</label>
                                 <input type="text" id="new-unit-name" class="w-full px-3 py-2 border rounded-lg focus:ring-indigo-500 text-sm" placeholder="เช่น หน่วยที่ 1">
                             </div>
+                            
+                            <!-- เพิ่มส่วนเลือกเทอมตรงนี้ -->
                             <div>
-                                <label class="text-xs text-gray-500 font-bold mb-1 block">3.3 เพิ่มคะแนนเก็บจริงของหน่วยนี้</label>
+                                <label class="text-xs text-indigo-600 font-bold mb-1 block">3.3 ภาคเรียน (เทอม)</label>
+                                <select id="new-unit-term" class="w-full px-3 py-2 border border-indigo-200 rounded-lg focus:ring-indigo-500 text-sm bg-indigo-50 font-bold text-indigo-700">
+                                    <option value="1">เทอม 1</option>
+                                    <option value="2">เทอม 2</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500 font-bold mb-1 block">3.4 เพิ่มคะแนนเก็บจริงของหน่วยนี้</label>
                                 <input type="number" id="new-unit-score" class="w-full px-3 py-2 border rounded-lg focus:ring-indigo-500 text-sm" placeholder="คะแนนเก็บ">
                             </div>
-                            <button onclick="saveUnitUI()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold shadow-sm transition"><i class="fas fa-plus mr-1"></i> เพิ่ม / อัปเดตหน่วย</button>
+                            <button onclick="saveUnitUI()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2.5 rounded-lg text-sm font-bold shadow-sm transition mt-2"><i class="fas fa-plus mr-1"></i> เพิ่ม / อัปเดตหน่วย</button>
                         </div>
                     </div>
-                </div>
 
                 <!-- คอลัมน์ขวา: ขั้นตอนที่ 2 และ 4 -->
                 <div class="md:col-span-2 space-y-6">
@@ -725,7 +734,7 @@
                 <button onclick="openUnitSummary()" class="text-sm bg-teal-50 hover:bg-teal-100 text-teal-700 px-4 py-2 rounded-lg font-bold shadow-sm transition"><i class="fas fa-sync-alt mr-1"></i> ดึงข้อมูลใหม่</button>
             </h2>
             
-            <div class="bg-white p-5 rounded-2xl shadow-sm mb-4 border-t-4 border-teal-500 flex flex-col md:flex-row gap-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm mb-4 border-t-4 border-teal-500 flex flex-col lg:flex-row gap-4">
                 <div class="flex-1">
                     <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกห้องเรียน</label>
                     <select id="usum-room" onchange="renderUnitSummaryTable()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 text-sm font-semibold text-slate-700 bg-slate-50"></select>
@@ -734,22 +743,36 @@
                     <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกรายวิชา</label>
                     <select id="usum-subject" onchange="renderUnitSummaryTable()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 text-sm font-semibold text-slate-700 bg-slate-50"></select>
                 </div>
+                <!-- เพิ่มตัวกรองภาคเรียน -->
+                <div class="w-full lg:w-48">
+                    <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">ภาคเรียน</label>
+                    <select id="usum-term" onchange="renderUnitSummaryTable()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 text-sm font-semibold text-slate-700 bg-slate-50">
+                        <option value="1">เทอม 1</option>
+                        <option value="2">เทอม 2</option>
+                    </select>
+                </div>
+                <!-- ปุ่มส่งออก Excel -->
+                <div class="flex items-end">
+                    <button onclick="exportUnitSummaryToExcel()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-2 transform hover:-translate-y-0.5">
+                        <i class="fas fa-file-excel text-lg"></i> ส่งออก Excel
+                    </button>
+                </div>
             </div>
 
             <div class="bg-white rounded-2xl shadow-md overflow-hidden mt-4 border border-slate-100">
                 <div class="overflow-x-auto max-h-[600px]">
-                    <table class="min-w-full divide-y divide-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200" id="table-unit-summary-export">
                         <thead id="usum-table-head" class="bg-slate-50 sticky top-0 z-10 shadow-sm">
                             <!-- header will be generated -->
                         </thead>
                         <tbody id="usum-table-body" class="bg-white divide-y divide-gray-100 text-sm">
-                            <tr><td class="text-center py-12 text-slate-400 font-medium">กรุณาเลือกห้องเรียนและรายวิชาด้านบน เพื่อดึงตารางสรุปคะแนน</td></tr>
+                            <tr><td class="text-center py-12 text-slate-400 font-medium">กรุณาเลือกห้องเรียน, รายวิชา และภาคเรียน ด้านบน เพื่อดึงตารางสรุปคะแนน</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-
+        
         <!-- NEW View 10: Attendance Report (สถิติเช็คชื่อ) -->
         <div id="view-attendance-report" class="w-full max-w-5xl hidden-view mt-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
@@ -1114,14 +1137,36 @@
             }).getUnits();
         }
 
+        // ==========================================
+        // อัปเดตหน้าต่าง UI ฝั่งสั่งงาน (เพิ่มช่องเลือกเทอม)
+        // ==========================================
+        // แทรกช่องเลือกเทอมลงใน HTML ฝั่งสั่งงาน (คุณครูสามารถเอาโค้ด HTML กล่อง 3 สร้างหน่วย ไปวางทับใน View 2 ได้เลย หรือจะให้ Javascript ช่วยเพิ่มก็ได้)
+        document.addEventListener("DOMContentLoaded", function() {
+            const unitScoreInput = document.getElementById('new-unit-score').parentElement;
+            if(unitScoreInput && !document.getElementById('new-unit-term')) {
+                const termHtml = `
+                    <div class="mt-3">
+                        <label class="text-xs text-gray-500 font-bold mb-1 block">3.3 ภาคเรียน (เทอม)</label>
+                        <select id="new-unit-term" class="w-full px-3 py-2 border border-indigo-200 rounded-lg focus:ring-indigo-500 text-sm bg-indigo-50/50">
+                            <option value="1">เทอม 1</option>
+                            <option value="2">เทอม 2</option>
+                        </select>
+                    </div>`;
+                unitScoreInput.insertAdjacentHTML('beforebegin', termHtml);
+                // เปลี่ยนข้อความ label ของคะแนนให้เป็น 3.4
+                unitScoreInput.querySelector('label').innerText = "3.4 เพิ่มคะแนนเก็บจริงของหน่วยนี้";
+            }
+        });
+
         function saveUnitUI() {
             const subject = document.getElementById('unit-subject-select').value;
             const room = document.getElementById('assign-room').value; // อิงจากห้องที่เลือกในข้อ 2
             const unitName = document.getElementById('new-unit-name').value.trim();
             const unitScore = document.getElementById('new-unit-score').value;
+            const term = document.getElementById('new-unit-term') ? document.getElementById('new-unit-term').value : "1";
 
             if(!subject) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกวิชาในข้อ 3.1 ก่อน', 'warning');
-            if(!room) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกห้องเรียนเป้าหมายในข้อ 2 ก่อนสร้างหน่วย เพื่อให้แยกหน่วยตามห้องได้', 'warning');
+            if(!room) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกห้องเรียนเป้าหมายในข้อ 2 ก่อนสร้างหน่วย', 'warning');
             if(!unitName || !unitScore) return Swal.fire('แจ้งเตือน', 'กรุณาระบุชื่อหน่วย และคะแนนเก็บ ให้ครบถ้วน', 'warning');
 
             Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() });
@@ -1134,7 +1179,7 @@
                 } else {
                     Swal.fire('ข้อผิดพลาด', res.message, 'error');
                 }
-            }).addUnit(subject, room, unitName, unitScore);
+            }).addUnit(subject, room, unitName, unitScore, term);
         }
 
         function populateUnitDropdownForAssign() {
@@ -1182,9 +1227,10 @@
             }).getReportData();
         }
 
-        function renderUnitSummaryTable() {
+      function renderUnitSummaryTable() {
             const room = document.getElementById('usum-room').value;
             const subject = document.getElementById('usum-subject').value;
+            const term = document.getElementById('usum-term').value; // ดึงค่าเทอม
             const tbody = document.getElementById('usum-table-body');
             const thead = document.getElementById('usum-table-head');
 
@@ -1197,12 +1243,11 @@
             const roomStudents = globalStudents.filter(s => s.room === room);
             const roomAssigns = globalAssignments.filter(a => a.targetRoom === room && a.subject === subject);
 
-            // หาชื่อหน่วยทั้งหมดและคะแนนเต็มของหน่วย
+            // ⚠️ กรองดึงเฉพาะ "หน่วย" ของห้องเรียน, วิชา และ "เทอม" ที่เลือกเท่านั้น
+            const targetUnits = globalUnits.filter(u => u.subject === subject && (u.room === room || u.room === 'All' || !u.room) && (u.term === term || (!u.term && term === '1')));
+            
             const unitMap = {}; 
-            roomAssigns.forEach(a => {
-                const uName = a.learningUnit || 'ทั่วไป';
-                unitMap[uName] = Number(a.unitMaxScore) || Number(a.defaultScore);
-            });
+            targetUnits.forEach(u => { unitMap[u.unitName] = Number(u.unitMaxScore); });
             const unitNames = Object.keys(unitMap);
 
             // สร้างหัวตาราง (Thead)
@@ -1226,6 +1271,11 @@
                 return;
             }
 
+            if(unitNames.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400">ยังไม่มีการสร้างหน่วยการเรียนรู้สำหรับ "เทอม ${term}" ในห้องเรียนนี้</td></tr>`;
+                return;
+            }
+
             roomStudents.forEach((std, idx) => {
                 let tr = `<tr class="hover:bg-teal-50 border-b border-slate-100 transition-colors">
                     <td class="px-4 py-3 text-center text-sm text-slate-500 font-bold">${idx + 1}</td>
@@ -1242,16 +1292,12 @@
                     unitTasks.forEach(task => {
                         rawMaxSum += Number(task.defaultScore);
                         const sub = fullSubmissionData.find(s => s.studentId === std.studentId && s.subject === subject && s.workTitle === task.taskName);
-                        if(sub) {
-                            rawSum += Number(sub.score || 0);
-                        }
+                        if(sub) { rawSum += Number(sub.score || 0); }
                     });
 
                     // เทียบบัญญัติไตรยางศ์
                     let scaledScore = 0;
-                    if(rawMaxSum > 0) {
-                        scaledScore = (rawSum / rawMaxSum) * unitMap[uName];
-                    }
+                    if(rawMaxSum > 0) { scaledScore = (rawSum / rawMaxSum) * unitMap[uName]; }
                     scaledScore = Math.round(scaledScore * 10) / 10;
                     totalScaledScore += scaledScore;
 
@@ -1262,6 +1308,81 @@
                 tr += `<td class="px-4 py-3 text-center font-black text-indigo-600 bg-indigo-50/50">${totalScaledScore}</td></tr>`;
                 tbody.innerHTML += tr;
             });
+        }
+        // ==========================================
+        // NEW: ฟังก์ชันส่งออก Excel สำหรับหน้าสรุปหน่วย
+        // ==========================================
+        function exportUnitSummaryToExcel() {
+            const room = document.getElementById('usum-room').value;
+            const subject = document.getElementById('usum-subject').value;
+            const term = document.getElementById('usum-term').value;
+
+            if(!room || !subject) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกห้องและวิชาก่อนส่งออก', 'warning');
+
+            const roomStudents = globalStudents.filter(s => s.room === room);
+            const roomAssigns = globalAssignments.filter(a => a.targetRoom === room && a.subject === subject);
+            const targetUnits = globalUnits.filter(u => u.subject === subject && (u.room === room || u.room === 'All' || !u.room) && (u.term === term || (!u.term && term === '1')));
+            
+            const unitNames = targetUnits.map(u => u.unitName);
+            const unitMap = {};
+            targetUnits.forEach(u => unitMap[u.unitName] = Number(u.unitMaxScore));
+
+            if(unitNames.length === 0 || roomStudents.length === 0) return Swal.fire('แจ้งเตือน', 'ไม่มีข้อมูลตารางให้ส่งออก', 'warning');
+
+            const exportData = [];
+
+            // คำนวณคะแนนและสร้างแถวข้อมูลสำหรับ Excel
+            roomStudents.forEach((std, idx) => {
+                let row = {
+                    'เลขที่': idx + 1,
+                    'รหัส': std.studentId,
+                    'ชื่อ-สกุล': std.fullName
+                };
+
+                let totalScaledScore = 0;
+                let grandMax = 0;
+
+                unitNames.forEach(uName => {
+                    const unitTasks = roomAssigns.filter(a => (a.learningUnit || 'ทั่วไป') === uName);
+                    let rawSum = 0; let rawMaxSum = 0;
+
+                    unitTasks.forEach(task => {
+                        rawMaxSum += Number(task.defaultScore);
+                        const sub = fullSubmissionData.find(s => s.studentId === std.studentId && s.subject === subject && s.workTitle === task.taskName);
+                        if(sub) rawSum += Number(sub.score || 0);
+                    });
+
+                    let scaledScore = 0;
+                    if(rawMaxSum > 0) scaledScore = (rawSum / rawMaxSum) * unitMap[uName];
+                    scaledScore = Math.round(scaledScore * 10) / 10;
+                    
+                    totalScaledScore += scaledScore;
+                    grandMax += unitMap[uName];
+
+                    // สร้างคอลัมน์ชื่อหน่วยพร้อมวงเล็บบอกคะแนนเต็ม
+                    row[`${uName} (เต็ม ${unitMap[uName]})`] = scaledScore;
+                });
+
+                totalScaledScore = Math.round(totalScaledScore * 10) / 10;
+                row[`รวมคะแนนทั้งหมด (เต็ม ${grandMax})`] = totalScaledScore;
+
+                exportData.push(row);
+            });
+
+            try {
+                // สร้างไฟล์ Excel จากข้อมูล Array JSON
+                const worksheet = XLSX.utils.json_to_sheet(exportData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, `สรุปคะแนนเทอม${term}`);
+
+                // ตั้งชื่อไฟล์
+                const fileName = `สรุปคะแนน_${subject}_ห้อง_${room}_เทอม_${term}`.replace(/ /g, '_') + '.xlsx';
+                XLSX.writeFile(workbook, fileName);
+                
+                Swal.fire({ icon: 'success', title: 'ส่งออกสำเร็จ', text: `บันทึกไฟล์ ${fileName} ลงในเครื่องเรียบร้อยแล้ว`, timer: 2000, showConfirmButton: false });
+            } catch(e) {
+                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถส่งออกไฟล์ Excel ได้: ' + e.message, 'error');
+            }
         }
 
         // ==========================================
