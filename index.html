@@ -1197,7 +1197,6 @@
             const subject = document.getElementById('assign-subject').value;
             const room = document.getElementById('assign-room').value;
             
-            // ให้ dropdown เลือกวิชาในกล่อง 3 ตรงกับกล่อง 2 เสมอ
             document.getElementById('unit-subject-select').value = subject;
             
             const unitSelect = document.getElementById('assign-unit-select');
@@ -1208,7 +1207,6 @@
                 return;
             }
 
-            // กรองหาหน่วยเฉพาะของวิชาและห้องที่เลือก
             const unitsForSubjectRoom = globalUnits.filter(u => u.subject === subject && (u.room === room || u.room === 'All' || !u.room));
             
             if(unitsForSubjectRoom.length === 0) {
@@ -1216,7 +1214,8 @@
             } else {
                 unitSelect.innerHTML = '<option value="">-- เลือกหน่วยการเรียนรู้ --</option>';
                 unitsForSubjectRoom.forEach(u => {
-                    unitSelect.innerHTML += `<option value="${u.unitName}|${u.unitMaxScore}">${u.unitName} (เก็บ ${u.unitMaxScore} คะแนน)</option>`;
+                    // ส่งค่าเทอม (u.term) เข้าไปใน value ด้วย และแสดงเทอมให้ครูเห็น
+                    unitSelect.innerHTML += `<option value="${u.unitName}|${u.unitMaxScore}|${u.term || '1'}">[เทอม ${u.term || '1'}] ${u.unitName} (เก็บ ${u.unitMaxScore} คะแนน)</option>`;
                 });
             }
         }
@@ -1706,14 +1705,15 @@
             }).getAssignments();
         }
 
-        function renderAssignmentTable() {
+      function renderAssignmentTable() {
             const tbody = document.getElementById('assign-table-body');
             tbody.innerHTML = '';
             if(globalAssignments.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">ยังไม่มีข้อมูลงานที่สั่ง</td></tr>';
             } else {
                 globalAssignments.forEach(a => {
-                    const unitInfo = a.learningUnit !== "ทั่วไป" ? `<span class="bg-indigo-50 text-indigo-700 text-xs px-2 py-0.5 rounded border border-indigo-100 font-bold">${a.learningUnit} <span class="text-indigo-400 ml-1">/ ${a.unitMaxScore || '-'}</span></span>` : `<span class="text-gray-400 text-xs">-</span>`;
+                    const termLabel = a.term ? `<span class="bg-purple-100 text-purple-700 text-[10px] px-2 py-0.5 rounded-full mr-1">เทอม ${a.term}</span>` : '';
+                    const unitInfo = a.learningUnit !== "ทั่วไป" ? `<span class="bg-indigo-50 text-indigo-700 text-xs px-2 py-0.5 rounded border border-indigo-100 font-bold">${termLabel}${a.learningUnit} <span class="text-indigo-400 ml-1">/ ${a.unitMaxScore || '-'}</span></span>` : `<span class="text-gray-400 text-xs">-</span>`;
                     
                     tbody.innerHTML += `
                         <tr class="hover:bg-teal-50 transition border-b border-gray-50">
@@ -1730,7 +1730,7 @@
             }
         }
 
-        function saveAssignmentUI() {
+       function saveAssignmentUI() {
             const sub = document.getElementById('assign-subject').value;
             const room = document.getElementById('assign-room').value;
             const task = document.getElementById('assign-task').value.trim();
@@ -1741,7 +1741,8 @@
             if(!sub || !room || !task) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกวิชา ห้อง และตั้งชื่องาน', 'warning');
             if(!unitSelection) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกหน่วยการเรียนรู้ (หากไม่มีให้สร้างในข้อ 3 ด้านซ้ายมือก่อน)', 'warning');
             
-            const [unitName, unitMax] = unitSelection.split('|');
+            // แยกค่า ชื่อหน่วย, คะแนนเต็มหน่วย และ เทอม ที่ต่อกันไว้ออกมา
+            const [unitName, unitMax, term] = unitSelection.split('|');
 
             Swal.fire({ title: 'บันทึก...', didOpen: () => Swal.showLoading() });
             
@@ -1753,7 +1754,7 @@
                 } else {
                     Swal.fire('ข้อผิดพลาด', res.message, 'error');
                 }
-            }).addAssignment(sub, room, task, score, unitName, unitMax);
+            }).addAssignment(sub, room, task, score, unitName, unitMax, term);
         }
 
         function deleteAssignmentUI(sub, room, task) {
