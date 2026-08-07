@@ -530,14 +530,24 @@
 
         <!-- View 8: NEW Parent / Student Record Detail (Card Design) -->
         <div id="view-parent-dashboard" class="w-full max-w-4xl hidden-view mt-4">
-            <!-- Header Controls -->
-            <div class="flex justify-between items-center mb-6">
-                <button onclick="showView('view-home')" class="text-gray-600 bg-white px-5 py-2.5 rounded-full shadow-sm hover:text-gray-900 font-medium transition hover:-translate-x-1 flex items-center">
+            <!-- Header Controls with New Select Dropdown -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3">
+                <button onclick="showView('view-home')" class="w-full sm:w-auto text-gray-600 bg-white px-5 py-2.5 rounded-full shadow-sm hover:text-gray-900 font-medium transition hover:-translate-x-1 flex items-center justify-center">
                     <i class="fas fa-arrow-left mr-2"></i> กลับหน้าแรก
                 </button>
-                <button onclick="handleParentSearch()" class="text-teal-600 bg-white px-5 py-2.5 rounded-full shadow-sm hover:bg-teal-50 font-bold transition flex items-center border border-teal-100">
-                    <i class="fas fa-sync-alt mr-2"></i> อัปเดตข้อมูล
-                </button>
+                <div class="flex items-center space-x-2 w-full sm:w-auto">
+                    <!-- Dropdown เลือกวิชาในหน้า Dashboard -->
+                    <div class="relative flex-grow sm:flex-grow-0">
+                        <i class="fas fa-book absolute left-4 top-1/2 transform -translate-y-1/2 text-teal-500"></i>
+                        <select id="parent-dashboard-subject-select" onchange="syncAndSearch()" class="w-full bg-white pl-10 pr-8 py-2.5 rounded-full shadow-sm border border-teal-100 text-teal-700 font-bold focus:ring-2 focus:ring-teal-500 outline-none appearance-none cursor-pointer">
+                            <option value="all">ดูทุกรายวิชา</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-teal-500 pointer-events-none text-xs"></i>
+                    </div>
+                    <button onclick="handleParentSearch()" class="text-white bg-teal-500 px-5 py-2.5 rounded-full shadow-sm hover:bg-teal-600 font-bold transition flex items-center border border-teal-100 whitespace-nowrap">
+                        <i class="fas fa-sync-alt mr-2 sm:mr-0"></i><span class="hidden sm:inline sm:ml-2">อัปเดต</span>
+                    </button>
+                </div>
             </div>
             
             <!-- Student Profile Header Card -->
@@ -787,13 +797,15 @@
         }
 
         function updateSubjectDropdowns() {
-            const selects = ['parent-subject-select', 'assign-subject', 'scan-subject-filter', 'tracker-subject-filter', 'report-filter-subject'];
+            // เพิ่ม 'parent-dashboard-subject-select' เข้าไปในรายการ
+            const selects = ['parent-subject-select', 'assign-subject', 'scan-subject-filter', 'tracker-subject-filter', 'report-filter-subject', 'parent-dashboard-subject-select'];
             selects.forEach(id => {
                 const el = document.getElementById(id);
                 if(el) {
                     const currentVal = el.value;
-                    const isParentOrReport = id === 'parent-subject-select' || id === 'report-filter-subject';
-                    el.innerHTML = isParentOrReport ? '<option value="all">ทุกวิชา</option>' : '<option value="">-- เลือกวิชา --</option>';
+                    // อนุญาตให้หน้าจอที่เกี่ยวข้องมีเมนู "ดูทุกรายวิชา" ได้
+                    const isParentOrReport = id === 'parent-subject-select' || id === 'report-filter-subject' || id === 'parent-dashboard-subject-select';
+                    el.innerHTML = isParentOrReport ? '<option value="all">ดูทุกรายวิชา</option>' : '<option value="">-- เลือกวิชา --</option>';
                     globalSubjects.forEach(s => el.innerHTML += `<option value="${s}">${s}</option>`);
                     el.value = currentVal || (isParentOrReport ? 'all' : '');
                 }
@@ -1283,10 +1295,25 @@
             }
         }
 
-        // Parent Check - UPDATED WITH CARD DESIGN
+        // ==========================================
+        // ฟังก์ชัน: ซิงค์ Dropdown หน้าดูคะแนนและค้นหาใหม่
+        // ==========================================
+        function syncAndSearch() {
+            const dashSub = document.getElementById('parent-dashboard-subject-select').value;
+            // อัปเดตกลับไปที่ Dropdown หน้าแรกด้วย เผื่อกดย้อนกลับ
+            document.getElementById('parent-subject-select').value = dashSub;
+            handleParentSearch();
+        }
+
+        // Parent Check - UPDATED WITH CARD DESIGN & SYNC
         function handleParentSearch() {
             const id = document.getElementById('student-search-id').value.trim();
             const sub = document.getElementById('parent-subject-select').value;
+            
+            // อัปเดต Dropdown ในหน้า Dashboard ให้ตรงกับค่าที่ค้นหาล่าสุด
+            const dashSelect = document.getElementById('parent-dashboard-subject-select');
+            if (dashSelect) dashSelect.value = sub;
+
             if(!id) return Swal.fire('แจ้งเตือน', 'ระบุรหัสนักเรียน', 'warning');
 
             Swal.fire({ title: 'ค้นหา...', didOpen: () => Swal.showLoading() });
