@@ -255,6 +255,7 @@
         </div>
 
         <!-- View 2: Manage Assignments (RESTRUCTURED LAYOUT 1,2,3,4) -->
+        <!-- View 2: Manage Assignments (RESTRUCTURED LAYOUT 1,2,3,4) -->
         <div id="view-manage-assignments" class="w-full max-w-5xl hidden-view mt-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
                 <span><i class="fas fa-book text-teal-600 mr-2"></i>จัดการรายวิชา หน่วยฯ & งาน</span>
@@ -306,6 +307,7 @@
                             <button onclick="saveUnitUI()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2.5 rounded-lg text-sm font-bold shadow-sm transition mt-2"><i class="fas fa-plus mr-1"></i> เพิ่ม / อัปเดตหน่วย</button>
                         </div>
                     </div>
+                </div>
 
                 <!-- คอลัมน์ขวา: ขั้นตอนที่ 2 และ 4 -->
                 <div class="md:col-span-2 space-y-6">
@@ -1167,7 +1169,7 @@
             }
         });
 
-        function saveUnitUI() {
+     function saveUnitUI() {
             const subject = document.getElementById('unit-subject-select').value;
             const room = document.getElementById('assign-room').value; // อิงจากห้องที่เลือกในข้อ 2
             const unitName = document.getElementById('new-unit-name').value.trim();
