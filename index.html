@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบจัดการชั้นเรียนห้องเรียนครูปังปอนด์</title>
+    
     <!-- Tailwind CSS for high quality design -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -265,7 +266,7 @@
             </h2>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="md:col-span-1 bg-white rounded-xl shadow p-5">
+                <div class="md:col-span-1 bg-white rounded-xl shadow p-5 border border-gray-100">
                     <h3 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-plus-circle text-blue-500 mr-1"></i> เพิ่มรายวิชาใหม่</h3>
                     <div class="flex space-x-2 mb-4">
                         <input type="text" id="new-subject" class="w-full px-3 py-2 border rounded-lg focus:ring-teal-500 text-sm" placeholder="เช่น วิทยาศาสตร์ ป.6">
@@ -274,8 +275,9 @@
                     <ul id="subject-list-ui" class="space-y-2 text-sm text-gray-600"></ul>
                 </div>
 
-                <div class="md:col-span-2 bg-white rounded-xl shadow p-5">
+                <div class="md:col-span-2 bg-white rounded-xl shadow p-5 border border-gray-100">
                     <h3 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-clipboard-list text-orange-500 mr-1"></i> สั่งงาน / แจ้งคะแนน</h3>
+                    
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="text-xs text-gray-500 font-bold">เลือกรายวิชา</label>
@@ -286,35 +288,48 @@
                             <select id="assign-room" class="w-full px-3 py-2 border rounded-lg focus:ring-teal-500 text-sm bg-gray-50"></select>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                        <div class="md:col-span-3">
-                            <label class="text-xs text-gray-500 font-bold">ชื่อหัวข้องาน / กิจกรรม</label>
-                            <input type="text" id="assign-task" class="w-full px-3 py-2 border rounded-lg focus:ring-teal-500 text-sm" placeholder="เช่น ใบงานที่ 1 ระบบย่อยอาหาร">
-                        </div>
-                        <div class="md:col-span-1 flex space-x-2">
-                            <div class="w-full">
-                                <label class="text-xs text-gray-500 font-bold">คะแนนเต็ม</label>
-                                <input type="number" id="assign-score" class="w-full px-3 py-2 border rounded-lg focus:ring-teal-500 text-sm text-center" value="10">
+                    
+                    <div class="bg-teal-50 p-4 rounded-xl border border-teal-100 mb-4">
+                        <h4 class="text-xs font-bold text-teal-800 mb-3 uppercase tracking-wider"><i class="fas fa-info-circle mr-1"></i> รายละเอียดงาน</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="text-xs text-gray-500 font-bold">ชื่อหัวข้องาน / กิจกรรม</label>
+                                <input type="text" id="assign-task" class="w-full px-3 py-2 border rounded-lg focus:ring-teal-500 text-sm" placeholder="เช่น ใบงานที่ 1">
                             </div>
-                            <button onclick="saveAssignmentUI()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 rounded-lg font-bold mb-1"><i class="fas fa-plus"></i></button>
+                            <div>
+                                <label class="text-xs text-gray-500 font-bold">คะแนนเต็มของงานนี้</label>
+                                <input type="number" id="assign-score" class="w-full px-3 py-2 border rounded-lg focus:ring-teal-500 text-sm" value="10">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 font-bold">หน่วยการเรียนรู้ (ใส่หรือไม่ก็ได้)</label>
+                                <input type="text" id="assign-unit" class="w-full px-3 py-2 border rounded-lg focus:ring-teal-500 text-sm" placeholder="เช่น หน่วยที่ 1">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 font-bold">คะแนนเต็มของหน่วย</label>
+                                <input type="number" id="assign-unit-score" class="w-full px-3 py-2 border rounded-lg focus:ring-teal-500 text-sm" value="10">
+                            </div>
                         </div>
+                        <button onclick="saveAssignmentUI()" class="w-full bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-lg font-bold shadow-md transition transform hover:-translate-y-0.5"><i class="fas fa-plus mr-2"></i> เพิ่มรายการงาน</button>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow overflow-hidden mt-6">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">รายวิชา</th>
-                            <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">ห้อง</th>
-                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">ชื่องาน</th>
-                            <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">คะแนนเต็ม</th>
-                            <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">ลบ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="assign-table-body" class="bg-white divide-y divide-gray-200 text-sm"></tbody>
-                </table>
+            <div class="bg-white rounded-xl shadow overflow-hidden mt-6 border border-gray-100">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">รายวิชา</th>
+                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">ห้อง</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">หน่วยฯ</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">ชื่องาน</th>
+                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">คะแนน(งาน/หน่วย)</th>
+                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">ลบ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assign-table-body" class="bg-white divide-y divide-gray-200 text-sm"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -400,7 +415,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow overflow-hidden relative">
+            <div class="bg-white rounded-xl shadow overflow-hidden relative border border-gray-100">
                 <div class="flex justify-between items-center p-3 bg-gray-50 border-b">
                     <span class="text-sm font-bold text-gray-600">รายชื่อนักเรียนในห้อง</span>
                     <button onclick="saveAllTrackerScores()" class="bg-blue-800 hover:bg-black text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md animate-pulse hover:animate-none"><i class="fas fa-save mr-1"></i> กดบันทึกข้อมูลทั้งหมด</button>
@@ -499,7 +514,7 @@
                 <h2 class="text-xl font-bold text-gray-700"><i class="fas fa-history mr-2 text-teal-600"></i>ประวัติการส่งงานล่าสุด 50 รายการ</h2>
                 <button onclick="loadDashboardData()" class="text-blue-500 text-sm hover:underline font-bold"><i class="fas fa-sync-alt mr-1"></i> รีเฟรชข้อมูล</button>
             </div>
-            <div class="bg-white rounded-xl shadow overflow-hidden">
+            <div class="bg-white rounded-xl shadow overflow-hidden border border-gray-100">
                 <div class="overflow-x-auto h-[500px]">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50 sticky top-0 z-10">
@@ -517,7 +532,7 @@
             </div>
         </div>
 
-        <!-- View 7: NEW REPORTING & EXPORT DASHBOARD (Requested Feature) -->
+        <!-- View 7: NEW REPORTING & EXPORT DASHBOARD -->
         <div id="view-reports" class="w-full max-w-7xl hidden-view mt-4">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
                 <div>
@@ -652,7 +667,10 @@
             </div>
 
             <!-- ปุ่มดึงข้อมูลจากชีท (Refresh) -->
-            <div class="mt-6 flex justify-end">
+            <div class="mt-6 flex justify-end gap-3">
+                <button onclick="exportData('xlsx')" class="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-sm transition-all flex items-center gap-2 focus:ring-2 focus:ring-green-500 focus:outline-none hover:-translate-y-0.5">
+                    <i class="fas fa-file-excel"></i> ส่งออก Excel
+                </button>
                 <button onclick="fetchRawReportData()" class="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl shadow-sm transition-all flex items-center gap-2 focus:ring-2 focus:ring-teal-500 focus:outline-none hover:-translate-y-0.5">
                     <i class="fas fa-sync-alt"></i> อัปเดตข้อมูลจากชีท
                 </button>
@@ -663,7 +681,7 @@
         <div id="view-parent-dashboard" class="w-full max-w-4xl hidden-view mt-4">
             <!-- Header Controls with New Select Dropdown -->
             <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3">
-                <button onclick="showView('view-home')" class="w-full sm:w-auto text-gray-600 bg-white px-5 py-2.5 rounded-full shadow-sm hover:text-gray-900 font-medium transition hover:-translate-x-1 flex items-center justify-center">
+                <button onclick="showView('view-home')" class="w-full sm:w-auto text-gray-600 bg-white px-5 py-2.5 rounded-full shadow-sm hover:text-gray-900 font-medium transition hover:-translate-x-1 flex items-center justify-center border border-gray-100">
                     <i class="fas fa-arrow-left mr-2"></i> กลับหน้าแรก
                 </button>
                 <div class="flex items-center space-x-2 w-full sm:w-auto">
@@ -707,7 +725,7 @@
                     </div>
 
                     <!-- Progress Bar Summary -->
-                    <div class="mt-8 max-w-lg mx-auto bg-slate-50 rounded-2xl p-5 border border-slate-100">
+                    <div class="mt-8 max-w-lg mx-auto bg-slate-50 rounded-2xl p-5 border border-slate-100 shadow-inner">
                         <div class="flex justify-between items-end mb-2">
                             <div class="text-left">
                                 <span class="text-slate-500 text-xs font-bold block uppercase tracking-wider mb-1">ผลการเรียนรายวิชา</span>
@@ -748,7 +766,6 @@
         // If google.script.run is unavailable (e.g. previewing locally), we fall back seamlessly to localStorage mock DB.
         const IS_MOCK_ENV = typeof google === 'undefined' || !google.script || !google.script.run;
 
-        // นำโค้ดนี้ไปวางแทนที่บล็อก if (IS_MOCK_ENV) {...} เดิมทั้งหมด
         if (IS_MOCK_ENV) {
             console.log("Running via GitHub Pages API Bridge");
             
@@ -1257,15 +1274,16 @@
             const tbody = document.getElementById('assign-table-body');
             tbody.innerHTML = '';
             if(globalAssignments.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-gray-500">ไม่มีข้อมูลงาน</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-4 text-center text-gray-500">ไม่มีข้อมูลงาน</td></tr>';
             } else {
                 globalAssignments.forEach(a => {
                     tbody.innerHTML += `
                         <tr>
                             <td class="px-4 py-3 whitespace-nowrap"><span class="bg-teal-50 text-teal-700 text-xs px-2 py-1 rounded font-bold border border-teal-100">${a.subject}</span></td>
                             <td class="px-4 py-3 text-center font-bold text-gray-700">${a.targetRoom}</td>
+                            <td class="px-4 py-3 text-gray-600 text-xs">${a.learningUnit || '-'}</td>
                             <td class="px-4 py-3 text-gray-900 font-medium">${a.taskName}</td>
-                            <td class="px-4 py-3 text-center text-teal-600 font-bold bg-teal-50">${a.defaultScore}</td>
+                            <td class="px-4 py-3 text-center text-xs"><span class="text-teal-600 font-bold">${a.defaultScore}</span> <span class="text-gray-400">/</span> <span class="text-indigo-500 font-bold">${a.unitMaxScore || '-'}</span></td>
                             <td class="px-4 py-3 text-center"><button onclick="deleteAssignmentUI('${a.subject}', '${a.targetRoom}', '${a.taskName}')" class="text-red-400 hover:text-red-600 bg-red-50 p-2 rounded-full"><i class="fas fa-trash"></i></button></td>
                         </tr>`;
                 });
@@ -1277,12 +1295,21 @@
             const room = document.getElementById('assign-room').value;
             const task = document.getElementById('assign-task').value.trim();
             const score = document.getElementById('assign-score').value || 10;
+            const unit = document.getElementById('assign-unit').value.trim() || 'ทั่วไป';
+            const unitScore = document.getElementById('assign-unit-score').value || score;
+            
             if(!sub || !room || !task) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกวิชา ห้อง และตั้งชื่องาน', 'warning');
             
             Swal.fire({ title: 'บันทึก...', didOpen: () => Swal.showLoading() });
+            
+            // ส่งค่า learningUnit และ unitMaxScore ไปให้ Code.gs ด้วย
             google.script.run.withSuccessHandler(res => {
-                if(res.success) { Swal.close(); document.getElementById('assign-task').value=''; loadAssignments(); }
-            }).addAssignment(sub, room, task, score);
+                if(res.success) { 
+                    Swal.close(); 
+                    document.getElementById('assign-task').value=''; 
+                    loadAssignments(); 
+                }
+            }).addAssignment(sub, room, task, score, unit, unitScore);
         }
 
         function deleteAssignmentUI(sub, room, task) {
