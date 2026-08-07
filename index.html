@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบจัดการชั้นเรียนห้องเรียนครูปังปอนด์</title>
-    <!-- Tailwind CSS for high quality design -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <!-- Chart.js for beautiful interactive analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- SheetJS for client-side Excel exporting -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -38,14 +35,10 @@
         .flip-card-back { background-color: white; color: #1f2937; transform: rotateY(180deg); flex-direction: column; border: 2px solid #14b8a6; }
         .flip-card-back img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-bottom: 5px; }
         .flip-card-back span { font-size: 0.8rem; font-weight: bold; line-height: 1.2; }
-        /* Scrollbar styles */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        /* Student Card Animation */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .st-card { animation: fadeIn 0.4s ease-out forwards; }
-        
-        /* Custom Radio Buttons for Attendance */
         .att-radio:checked + label.att-present { background-color: #10b981; color: white; border-color: #10b981; }
         .att-radio:checked + label.att-leave { background-color: #f59e0b; color: white; border-color: #f59e0b; }
         .att-radio:checked + label.att-sick { background-color: #3b82f6; color: white; border-color: #3b82f6; }
@@ -63,9 +56,11 @@
                     <span id="nav-brand" class="font-bold text-lg md:text-xl text-teal-700 truncate w-24 md:w-auto">ระบบครู</span>
                 </div>
                 <div class="flex items-center space-x-1 md:space-x-2 text-gray-600 overflow-x-auto no-scrollbar">
-                    <button onclick="showView('view-teacher-dashboard')" class="hover:text-teal-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-history"></i><span class="hidden lg:inline ml-1"> ประวัติส่งงาน</span></button>
-                    <!-- ปุ่มใหม่: สรุปรายหน่วย -->
+                    <button onclick="showView('view-teacher-dashboard')" class="hover:text-teal-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-history"></i><span class="hidden md:inline ml-1"> ประวัติส่งงาน</span></button>
+                    <!-- ปุ่ม สรุปรายหน่วย และ สถิติเช็คชื่อ -->
                     <button onclick="openUnitSummary()" class="hover:text-indigo-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-th-list"></i><span class="hidden md:inline ml-1"> สรุปรายหน่วย</span></button>
+                    <button onclick="openAttendanceReport()" class="hover:text-blue-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-calendar-check"></i><span class="hidden md:inline ml-1"> สถิติเช็คชื่อ</span></button>
+                    
                     <button onclick="openReports()" class="text-teal-700 hover:text-teal-950 font-bold bg-teal-50 px-3 py-1.5 rounded-lg border border-teal-200 text-sm md:text-base whitespace-nowrap"><i class="fas fa-chart-pie mr-1 text-teal-600"></i> สรุปรายงาน</button>
                     <button onclick="openAttendance()" class="bg-blue-500 text-white hover:bg-blue-600 px-3 py-1.5 rounded-lg text-sm font-bold shadow whitespace-nowrap transition-colors"><i class="fas fa-user-check mr-1"></i> เช็คชื่อ</button>
                     <button onclick="openScanner()" class="bg-orange-500 text-white hover:bg-orange-600 px-3 py-1.5 rounded-lg text-sm font-bold shadow whitespace-nowrap"><i class="fas fa-qrcode mr-1"></i> สแกน</button>
@@ -195,6 +190,60 @@
             </div>
         </div>
 
+        <!-- NEW View: Attendance Report (สถิติเช็คชื่อ) -->
+        <div id="view-attendance-report" class="w-full max-w-5xl hidden-view mt-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
+                <span><i class="fas fa-calendar-check text-blue-600 mr-2"></i>สถิติการมาเรียน</span>
+                <button onclick="openAttendanceReport()" class="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-bold shadow-sm transition"><i class="fas fa-sync-alt mr-1"></i> ดึงข้อมูลใหม่</button>
+            </h2>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm mb-4 border-t-4 border-blue-500 flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกห้องเรียน</label>
+                    <select id="att-report-room" onchange="renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50"></select>
+                </div>
+                <div class="flex-1">
+                    <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกเดือน (อิงจากวันที่เช็ค)</label>
+                    <select id="att-report-month" onchange="renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50">
+                        <option value="all">ดูทุกเดือน (ทั้งหมด)</option>
+                        <option value="01">มกราคม</option>
+                        <option value="02">กุมภาพันธ์</option>
+                        <option value="03">มีนาคม</option>
+                        <option value="04">เมษายน</option>
+                        <option value="05">พฤษภาคม</option>
+                        <option value="06">มิถุนายน</option>
+                        <option value="07">กรกฎาคม</option>
+                        <option value="08">สิงหาคม</option>
+                        <option value="09">กันยายน</option>
+                        <option value="10">ตุลาคม</option>
+                        <option value="11">พฤศจิกายน</option>
+                        <option value="12">ธันวาคม</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden mt-4 border border-slate-100">
+                <div class="overflow-x-auto max-h-[600px]">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-slate-50 sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider w-16">เลขที่</th>
+                                <th class="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">รหัส</th>
+                                <th class="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">ชื่อ - สกุล</th>
+                                <th class="px-4 py-4 text-center text-xs font-bold text-emerald-600 uppercase tracking-wider">มาเรียน (ครั้ง)</th>
+                                <th class="px-4 py-4 text-center text-xs font-bold text-amber-500 uppercase tracking-wider">ลา (ครั้ง)</th>
+                                <th class="px-4 py-4 text-center text-xs font-bold text-blue-500 uppercase tracking-wider">ป่วย (ครั้ง)</th>
+                                <th class="px-4 py-4 text-center text-xs font-bold text-rose-500 uppercase tracking-wider">ขาดเรียน (ครั้ง)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="att-report-table-body" class="bg-white divide-y divide-gray-100 text-sm">
+                            <tr><td colspan="7" class="text-center py-12 text-slate-400 font-medium">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- View 2: Manage Assignments (RESTRUCTURED LAYOUT 1,2,3,4) -->
         <div id="view-manage-assignments" class="w-full max-w-5xl hidden-view mt-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
@@ -202,83 +251,87 @@
                 <button onclick="loadTeacherData()" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg font-medium shadow-sm"><i class="fas fa-sync-alt text-blue-500 mr-1"></i> รีเฟรชข้อมูล</button>
             </h2>
             
-            <!-- แถวที่ 1: ขั้นตอนที่ 1 และ 2 -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <!-- กล่องที่ 1 -->
-                <div class="md:col-span-1 bg-white rounded-xl shadow p-5 border border-gray-100 flex flex-col h-full">
-                    <h3 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-plus-circle text-blue-500 mr-1"></i> 1. เพิ่มรายวิชาใหม่</h3>
-                    <div class="flex space-x-2 mb-4">
-                        <input type="text" id="new-subject" class="w-full px-3 py-2 border rounded-lg focus:ring-teal-500 text-sm" placeholder="เช่น วิทยาศาสตร์ ป.6">
-                        <button onclick="saveSubjectUI()" class="bg-blue-500 text-white px-3 rounded-lg"><i class="fas fa-save"></i></button>
-                    </div>
-                    <ul id="subject-list-ui" class="space-y-2 text-sm text-gray-600 overflow-y-auto pr-2 no-scrollbar flex-grow max-h-32"></ul>
-                </div>
-
-                <!-- กล่องที่ 2 -->
-                <div class="md:col-span-2 bg-white rounded-xl shadow p-5 border border-gray-100 flex flex-col justify-center">
-                    <h3 class="font-bold text-gray-700 mb-4 border-b pb-2"><i class="fas fa-bullseye text-orange-500 mr-1"></i> 2. เลือกรายวิชา ห้องเรียนเป้าหมาย</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div>
-                            <label class="text-xs text-gray-500 font-bold block mb-2">เลือกรายวิชา</label>
-                            <!-- เมื่อเลือกวิชา จะเรียก onchange เพื่อโหลดหน่วยของวิชานั้นมาใส่ในข้อ 4.1 -->
-                            <select id="assign-subject" onchange="populateUnitDropdownForAssign()" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-teal-500 text-sm bg-gray-50"></select>
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-500 font-bold block mb-2">ห้องเรียนเป้าหมาย</label>
-                            <select id="assign-room" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-teal-500 text-sm bg-gray-50"></select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- แถวที่ 2: ขั้นตอนที่ 3 และ 4 -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- กล่องที่ 3 -->
-                <div class="md:col-span-1 bg-white rounded-xl shadow p-5 border border-indigo-100">
-                    <h3 class="font-bold text-indigo-700 mb-4 border-b border-indigo-100 pb-2"><i class="fas fa-layer-group mr-1"></i> 3. สร้างหน่วยการเรียนรู้</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-xs text-gray-500 font-bold mb-1 block">3.1 เลือกรายวิชา</label>
-                            <select id="unit-subject-select" class="w-full px-3 py-2 border border-indigo-200 rounded-lg focus:ring-indigo-500 text-sm bg-indigo-50/50">
-                                <option value="">-- เลือกวิชาก่อน --</option>
-                            </select>
+                <!-- คอลัมน์ซ้าย: ขั้นตอนที่ 1 และ 3 -->
+                <div class="md:col-span-1 space-y-6">
+                    
+                    <!-- กล่อง 1: เพิ่มวิชา -->
+                    <div class="bg-white rounded-xl shadow p-5 border border-gray-100">
+                        <h3 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-plus-circle text-blue-500 mr-1"></i> 1. เพิ่มรายวิชาใหม่</h3>
+                        <div class="flex space-x-2 mb-4">
+                            <input type="text" id="new-subject" class="w-full px-3 py-2 border rounded-lg focus:ring-teal-500 text-sm" placeholder="เช่น วิทยาศาสตร์ ป.6">
+                            <button onclick="saveSubjectUI()" class="bg-blue-500 text-white px-3 rounded-lg"><i class="fas fa-save"></i></button>
                         </div>
-                        <div>
-                            <label class="text-xs text-gray-500 font-bold mb-1 block">3.2 เพิ่มชื่อหน่วย</label>
-                            <input type="text" id="new-unit-name" class="w-full px-3 py-2 border border-indigo-200 rounded-lg focus:ring-indigo-500 text-sm" placeholder="เช่น หน่วยที่ 1">
+                        <ul id="subject-list-ui" class="space-y-2 text-sm text-gray-600 max-h-32 overflow-y-auto pr-2 no-scrollbar"></ul>
+                    </div>
+
+                    <!-- กล่อง 3: สร้างหน่วยการเรียนรู้ -->
+                    <div class="bg-white rounded-xl shadow p-5 border border-indigo-100">
+                        <h3 class="font-bold text-indigo-700 mb-3 border-b border-indigo-100 pb-2"><i class="fas fa-layer-group mr-1"></i> 3. สร้างหน่วยการเรียนรู้</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-xs text-gray-500 font-bold mb-1 block">3.1 เลือกรายวิชา</label>
+                                <select id="unit-subject-select" class="w-full px-3 py-2 border rounded-lg focus:ring-indigo-500 text-sm bg-gray-50">
+                                    <option value="">-- เลือกวิชาก่อน --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 font-bold mb-1 block">3.2 เพิ่มชื่อหน่วย</label>
+                                <input type="text" id="new-unit-name" class="w-full px-3 py-2 border rounded-lg focus:ring-indigo-500 text-sm" placeholder="เช่น หน่วยที่ 1">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 font-bold mb-1 block">3.3 เพิ่มคะแนนเก็บจริงของหน่วยนี้</label>
+                                <input type="number" id="new-unit-score" class="w-full px-3 py-2 border rounded-lg focus:ring-indigo-500 text-sm" placeholder="คะแนนเก็บ">
+                            </div>
+                            <button onclick="saveUnitUI()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold shadow-sm transition"><i class="fas fa-plus mr-1"></i> เพิ่ม / อัปเดตหน่วย</button>
                         </div>
-                        <div>
-                            <label class="text-xs text-gray-500 font-bold mb-1 block">3.3 เพิ่มคะแนนเก็บจริงของหน่วยนี้</label>
-                            <input type="number" id="new-unit-score" class="w-full px-3 py-2 border border-indigo-200 rounded-lg focus:ring-indigo-500 text-sm" placeholder="คะแนนเก็บ">
-                        </div>
-                        <button onclick="saveUnitUI()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2.5 rounded-lg text-sm font-bold shadow-sm transition mt-2"><i class="fas fa-plus mr-1"></i> เพิ่ม / อัปเดตหน่วย</button>
                     </div>
                 </div>
 
-                <!-- กล่องที่ 4 -->
-                <div class="md:col-span-2 bg-teal-50 rounded-xl shadow p-5 border border-teal-200">
-                    <h3 class="font-bold text-teal-800 mb-4 border-b border-teal-200 pb-2"><i class="fas fa-clipboard-list text-teal-600 mr-1"></i> 4. รายละเอียดชิ้นงาน</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-xs text-teal-700 font-bold block mb-1">4.1 เลือกหน่วยการเรียนรู้</label>
-                            <select id="assign-unit-select" class="w-full px-3 py-2.5 border rounded-lg focus:ring-teal-500 text-sm bg-white font-bold text-teal-800 shadow-sm border-teal-300">
-                                <option value="">-- กรุณาเลือกวิชาในข้อ 2 ก่อน --</option>
-                            </select>
-                            <p class="text-[10px] text-teal-600 mt-1">*(ถ้าไม่มีให้ไปสร้างหน่วยในข้อ 3 ด้านซ้ายก่อน)*</p>
-                        </div>
-
+                <!-- คอลัมน์ขวา: ขั้นตอนที่ 2 และ 4 -->
+                <div class="md:col-span-2 space-y-6">
+                    
+                    <!-- กล่อง 2: เลือกวิชาและห้อง -->
+                    <div class="bg-white rounded-xl shadow p-5 border border-gray-100">
+                        <h3 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-clipboard-list text-orange-500 mr-1"></i> 2. เลือกวิชา / ห้องเรียนเป้าหมาย</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="text-xs text-teal-700 font-bold block mb-1">4.2 เพิ่มชื่อหัวข้องาน</label>
-                                <input type="text" id="assign-task" class="w-full px-3 py-2.5 border border-teal-300 rounded-lg focus:ring-teal-500 text-sm" placeholder="เช่น ใบงานที่ 1">
+                                <label class="text-xs text-gray-500 font-bold block mb-1">เลือกรายวิชา</label>
+                                <!-- โหลดหน่วยอัตโนมัติตามวิชาและห้อง -->
+                                <select id="assign-subject" onchange="populateUnitDropdownForAssign()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 text-sm bg-gray-50"></select>
                             </div>
                             <div>
-                                <label class="text-xs text-teal-700 font-bold block mb-1">4.3 คะแนนดิบของชิ้นงานนี้</label>
-                                <input type="number" id="assign-score" class="w-full px-3 py-2.5 border border-teal-300 rounded-lg focus:ring-teal-500 text-sm font-bold text-teal-700" value="10">
+                                <label class="text-xs text-gray-500 font-bold block mb-1">ห้องเรียนเป้าหมาย</label>
+                                <select id="assign-room" onchange="populateUnitDropdownForAssign()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 text-sm bg-gray-50"></select>
                             </div>
                         </div>
-                        <div class="pt-2">
-                            <button onclick="saveAssignmentUI()" class="w-full bg-teal-600 hover:bg-teal-700 text-white px-4 py-3 rounded-lg font-bold shadow-md transition transform hover:-translate-y-0.5"><i class="fas fa-plus mr-2"></i> เพิ่มรายการงานลงในหน่วย</button>
+                    </div>
+
+                    <!-- กล่อง 4: รายละเอียดชิ้นงาน -->
+                    <div class="bg-teal-50 p-5 rounded-xl shadow-sm border border-teal-200">
+                        <h3 class="font-bold text-teal-800 mb-3 border-b border-teal-200 pb-2"><i class="fas fa-info-circle text-teal-600 mr-1"></i> 4. รายละเอียดชิ้นงาน</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs text-teal-700 font-bold block mb-1">4.1 เลือกหน่วยการเรียนรู้</label>
+                                <select id="assign-unit-select" class="w-full px-3 py-2.5 border border-teal-300 rounded-lg focus:ring-teal-500 text-sm bg-white font-bold text-teal-800 shadow-sm">
+                                    <option value="">-- กรุณาเลือกวิชาและห้องในข้อ 2 ก่อน --</option>
+                                </select>
+                                <p class="text-[10px] text-teal-600 mt-1">*(ถ้าไม่มีให้ไปสร้างหน่วยในข้อ 3 ด้านซ้ายก่อน)*</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs text-teal-700 font-bold block mb-1">4.2 เพิ่มชื่อหัวข้องาน / กิจกรรม</label>
+                                    <input type="text" id="assign-task" class="w-full px-3 py-2.5 border border-teal-300 rounded-lg focus:ring-teal-500 text-sm" placeholder="เช่น ใบงานที่ 1">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-teal-700 font-bold block mb-1">4.3 คะแนนดิบ (เต็ม) ของชิ้นงานนี้</label>
+                                    <input type="number" id="assign-score" class="w-full px-3 py-2.5 border border-teal-300 rounded-lg focus:ring-teal-500 text-sm font-bold text-teal-700 text-center" value="10">
+                                </div>
+                            </div>
+                            <div class="pt-2">
+                                <button onclick="saveAssignmentUI()" class="w-full bg-teal-600 hover:bg-teal-700 text-white px-4 py-3 rounded-lg font-bold shadow-md transition transform hover:-translate-y-0.5"><i class="fas fa-plus mr-2"></i> เพิ่มรายการงานลงในหน่วย</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -687,6 +740,60 @@
             </div>
         </div>
 
+        <!-- NEW View 10: Attendance Report (สถิติเช็คชื่อ) -->
+        <div id="view-attendance-report" class="w-full max-w-5xl hidden-view mt-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
+                <span><i class="fas fa-calendar-check text-blue-600 mr-2"></i>สรุปสถิติการมาเรียน</span>
+                <button onclick="openAttendanceReport()" class="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-bold shadow-sm transition"><i class="fas fa-sync-alt mr-1"></i> ดึงข้อมูลใหม่</button>
+            </h2>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm mb-4 border-t-4 border-blue-500 flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกห้องเรียน</label>
+                    <select id="att-report-room" onchange="renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50"></select>
+                </div>
+                <div class="flex-1">
+                    <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกเดือน (อิงจากวันที่เช็ค)</label>
+                    <select id="att-report-month" onchange="renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50">
+                        <option value="all">ดูทุกเดือน (ทั้งหมด)</option>
+                        <option value="01">มกราคม</option>
+                        <option value="02">กุมภาพันธ์</option>
+                        <option value="03">มีนาคม</option>
+                        <option value="04">เมษายน</option>
+                        <option value="05">พฤษภาคม</option>
+                        <option value="06">มิถุนายน</option>
+                        <option value="07">กรกฎาคม</option>
+                        <option value="08">สิงหาคม</option>
+                        <option value="09">กันยายน</option>
+                        <option value="10">ตุลาคม</option>
+                        <option value="11">พฤศจิกายน</option>
+                        <option value="12">ธันวาคม</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden mt-4 border border-slate-100">
+                <div class="overflow-x-auto max-h-[600px]">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-slate-50 sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider w-16">เลขที่</th>
+                                <th class="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">รหัส</th>
+                                <th class="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">ชื่อ - สกุล</th>
+                                <th class="px-4 py-4 text-center text-xs font-bold text-emerald-600 uppercase tracking-wider">มาเรียน (ครั้ง)</th>
+                                <th class="px-4 py-4 text-center text-xs font-bold text-amber-500 uppercase tracking-wider">ลา (ครั้ง)</th>
+                                <th class="px-4 py-4 text-center text-xs font-bold text-blue-500 uppercase tracking-wider">ป่วย (ครั้ง)</th>
+                                <th class="px-4 py-4 text-center text-xs font-bold text-rose-500 uppercase tracking-wider">ขาดเรียน (ครั้ง)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="att-report-table-body" class="bg-white divide-y divide-gray-100 text-sm">
+                            <tr><td colspan="7" class="text-center py-12 text-slate-400 font-medium">กรุณาเลือกห้องเรียนเพื่อดึงตารางสถิติ</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- View 8: NEW Parent / Student Record Detail (Card Design) -->
         <div id="view-parent-dashboard" class="w-full max-w-4xl hidden-view mt-4">
             <!-- Header Controls with New Select Dropdowns -->
@@ -719,7 +826,6 @@
             
             <!-- Student Profile Header Card -->
             <div class="bg-white rounded-3xl shadow-lg p-8 mb-8 border-t-8 border-teal-500 text-center relative overflow-hidden">
-                <!-- Background Pattern -->
                 <div class="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 rounded-full bg-teal-50 opacity-50 z-0"></div>
                 <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 rounded-full bg-emerald-50 opacity-50 z-0"></div>
                 
@@ -831,6 +937,7 @@
         // Variables for Attendance Scanner
         let attendanceScanner = null;
         let isAttendanceCameraOpen = false;
+        let fullAttendanceData = []; // เก็บสถิติ
 
         // Variables for Charts & Parent View
         let chartSubject = null;
@@ -955,12 +1062,12 @@
 
         function populateRoomDropdowns() {
             const rooms = [...new Set(globalStudents.map(s => s.room))].filter(r => r).sort();
-            const selects = ['assign-room', 'scan-room-filter', 'tool-room-select', 'tracker-room-filter', 'report-filter-room', 'att-room-select', 'usum-room'];
+            const selects = ['assign-room', 'scan-room-filter', 'tool-room-select', 'tracker-room-filter', 'report-filter-room', 'att-room-select', 'usum-room', 'att-report-room'];
             selects.forEach(id => {
                 const el = document.getElementById(id);
                 if(el) {
                     const currentVal = el.value;
-                    const isReport = id === 'report-filter-room';
+                    const isReport = id === 'report-filter-room' || id === 'att-report-room';
                     el.innerHTML = isReport ? '<option value="all">ทุกห้องเรียน</option>' : '<option value="">-- เลือกห้อง --</option>';
                     rooms.forEach(r => el.innerHTML += `<option value="${r}">${r}</option>`);
                     el.value = currentVal || (isReport ? 'all' : '');
@@ -988,7 +1095,7 @@
         }
 
         // ==========================================
-        // ฟังก์ชันใหม่สำหรับจัดการ "หน่วยการเรียนรู้"
+        // ฟังก์ชันจัดการ "หน่วยการเรียนรู้"
         // ==========================================
         function loadUnits() {
             google.script.run.withSuccessHandler(data => {
@@ -999,12 +1106,13 @@
 
         function saveUnitUI() {
             const subject = document.getElementById('unit-subject-select').value;
+            const room = document.getElementById('assign-room').value; // อิงจากห้องที่เลือกในข้อ 2
             const unitName = document.getElementById('new-unit-name').value.trim();
             const unitScore = document.getElementById('new-unit-score').value;
 
-            if(!subject || !unitName || !unitScore) {
-                return Swal.fire('แจ้งเตือน', 'กรุณาระบุ วิชา ชื่อหน่วย และคะแนนเก็บ ให้ครบถ้วน', 'warning');
-            }
+            if(!subject) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกวิชาในข้อ 3.1 ก่อน', 'warning');
+            if(!room) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกห้องเรียนเป้าหมายในข้อ 2 ก่อนสร้างหน่วย เพื่อให้แยกหน่วยตามห้องได้', 'warning');
+            if(!unitName || !unitScore) return Swal.fire('แจ้งเตือน', 'กรุณาระบุชื่อหน่วย และคะแนนเก็บ ให้ครบถ้วน', 'warning');
 
             Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() });
             google.script.run.withSuccessHandler(res => {
@@ -1016,29 +1124,32 @@
                 } else {
                     Swal.fire('ข้อผิดพลาด', res.message, 'error');
                 }
-            }).addUnit(subject, unitName, unitScore);
+            }).addUnit(subject, room, unitName, unitScore);
         }
 
         function populateUnitDropdownForAssign() {
-            const selectedSubject = document.getElementById('assign-subject').value;
-            const unitSelect = document.getElementById('assign-unit-select');
+            const subject = document.getElementById('assign-subject').value;
+            const room = document.getElementById('assign-room').value;
             
+            // ให้ dropdown เลือกวิชาในกล่อง 3 ตรงกับกล่อง 2 เสมอ
+            document.getElementById('unit-subject-select').value = subject;
+            
+            const unitSelect = document.getElementById('assign-unit-select');
             unitSelect.innerHTML = '';
             
-            if(!selectedSubject) {
-                unitSelect.innerHTML = '<option value="">-- กรุณาเลือกวิชาในข้อ 2 ก่อน --</option>';
+            if(!subject || !room) {
+                unitSelect.innerHTML = '<option value="">-- กรุณาเลือกวิชาและห้องในข้อ 2 ก่อน --</option>';
                 return;
             }
 
-            // กรองหาหน่วยเฉพาะของวิชาที่เลือก
-            const unitsForSubject = globalUnits.filter(u => u.subject === selectedSubject);
+            // กรองหาหน่วยเฉพาะของวิชาและห้องที่เลือก
+            const unitsForSubjectRoom = globalUnits.filter(u => u.subject === subject && (u.room === room || u.room === 'All' || !u.room));
             
-            if(unitsForSubject.length === 0) {
-                unitSelect.innerHTML = '<option value="">-- ยังไม่มีหน่วย (สร้างด้านซ้ายก่อน) --</option>';
+            if(unitsForSubjectRoom.length === 0) {
+                unitSelect.innerHTML = '<option value="">-- ยังไม่มีหน่วย (ไปสร้างหน่วยในข้อ 3 ด้านซ้ายก่อน) --</option>';
             } else {
                 unitSelect.innerHTML = '<option value="">-- เลือกหน่วยการเรียนรู้ --</option>';
-                unitsForSubject.forEach(u => {
-                    // เก็บค่า unitMaxScore ไว้ใน value ด้วย เพื่อให้เรียกใช้ตอนบันทึกงานได้ง่าย
+                unitsForSubjectRoom.forEach(u => {
                     unitSelect.innerHTML += `<option value="${u.unitName}|${u.unitMaxScore}">${u.unitName} (เก็บ ${u.unitMaxScore} คะแนน)</option>`;
                 });
             }
@@ -1143,9 +1254,79 @@
             });
         }
 
+        // ==========================================
+        // NEW FEATURE: ATTENDANCE REPORT (สถิติการมาเรียน)
+        // ==========================================
+        function openAttendanceReport() {
+            showView('view-attendance-report');
+            Swal.fire({ title: 'กำลังดึงข้อมูลสถิติ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            google.script.run.withSuccessHandler(res => {
+                fullAttendanceData = res || [];
+                Swal.close();
+                renderAttendanceReport();
+            }).getAttendanceReportData();
+        }
+
+        function renderAttendanceReport() {
+            const room = document.getElementById('att-report-room').value;
+            const month = document.getElementById('att-report-month').value;
+            const tbody = document.getElementById('att-report-table-body');
+
+            if(!room) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-slate-400 font-medium">กรุณาเลือกห้องเรียนเพื่อดึงตารางสถิติ</td></tr>';
+                return;
+            }
+
+            // กรองเด็กตามห้อง
+            const roomStudents = globalStudents.filter(s => room === 'all' || s.room === room);
+            
+            if(roomStudents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-10 text-red-500">ไม่พบรายชื่อนักเรียนในห้องนี้</td></tr>';
+                return;
+            }
+
+            // กรองข้อมูลเช็คชื่อตามเดือนที่เลือก
+            const filteredAtt = fullAttendanceData.filter(att => {
+                if(room !== 'all' && att.room !== room) return false;
+                if(month !== 'all') {
+                    // รูปแบบวันที่ที่เก็บคือ dd/MM/yyyy
+                    const parts = att.date.split('/');
+                    if(parts.length >= 2 && parts[1] !== month) return false;
+                }
+                return true;
+            });
+
+            tbody.innerHTML = '';
+            roomStudents.forEach((std, idx) => {
+                // คำนวณสถิติแต่ละคน
+                let present = 0, leave = 0, sick = 0, absent = 0;
+                
+                filteredAtt.forEach(att => {
+                    if(att.studentId == std.studentId) {
+                        if(att.status === 'มา') present++;
+                        else if(att.status === 'ลา') leave++;
+                        else if(att.status === 'ป่วย') sick++;
+                        else if(att.status === 'ขาด') absent++;
+                    }
+                });
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-blue-50 border-b border-slate-100 transition-colors">
+                        <td class="px-4 py-3 text-center text-sm text-slate-500 font-bold">${idx + 1}</td>
+                        <td class="px-4 py-3 text-xs text-slate-400 font-medium">${std.studentId}</td>
+                        <td class="px-4 py-3 text-sm text-slate-700 font-bold">${std.fullName}</td>
+                        <td class="px-4 py-3 text-center font-bold text-emerald-600 bg-emerald-50/30">${present}</td>
+                        <td class="px-4 py-3 text-center font-bold text-amber-500">${leave}</td>
+                        <td class="px-4 py-3 text-center font-bold text-blue-500">${sick}</td>
+                        <td class="px-4 py-3 text-center font-bold text-rose-500 bg-rose-50/30">${absent}</td>
+                    </tr>
+                `;
+            });
+        }
+
 
         // ==========================================
-        // ATTENDANCE SYSTEM 
+        // ATTENDANCE SYSTEM (เช็คชื่อ)
         // ==========================================
         function openAttendance() {
             showView('view-attendance');
@@ -1301,25 +1482,12 @@
                 return;
             }
 
-            // สั่งติ๊กปุ่ม "มา" ให้คนนั้น
             const radioPresent = document.getElementById(`att-${scannedId}-present`);
             if(radioPresent) radioPresent.checked = true;
 
-            // เอฟเฟกต์กระพริบสีเขียวที่รายชื่อ
             foundRow.classList.add('bg-emerald-100');
             setTimeout(() => foundRow.classList.remove('bg-emerald-100'), 800);
 
-            // เล่นเสียง
-            const soundToggle = document.getElementById('sound-toggle');
-            if(soundToggle && soundToggle.checked) {
-                try {
-                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                    const osc = ctx.createOscillator(); osc.frequency.setValueAtTime(1200, ctx.currentTime);
-                    osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.1);
-                } catch(e){}
-            }
-
-            // แสดงหน้าต่างเด้ง
             Swal.fire({
                 showConfirmButton: false, timer: 800, position: 'top-end', toast: true,
                 icon: 'success', title: `มาเรียน: ${studentName}`
@@ -1415,13 +1583,11 @@
             const task = document.getElementById('assign-task').value.trim();
             const score = document.getElementById('assign-score').value || 10;
             
-            // อ่านค่าจาก Dropdown
             const unitSelection = document.getElementById('assign-unit-select').value;
             
             if(!sub || !room || !task) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกวิชา ห้อง และตั้งชื่องาน', 'warning');
             if(!unitSelection) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกหน่วยการเรียนรู้ (หากไม่มีให้สร้างในข้อ 3 ด้านซ้ายมือก่อน)', 'warning');
             
-            // แยกค่า ชื่อหน่วย และ คะแนนเต็มหน่วย ที่ต่อกันไว้
             const [unitName, unitMax] = unitSelection.split('|');
 
             Swal.fire({ title: 'บันทึก...', didOpen: () => Swal.showLoading() });
@@ -1469,7 +1635,6 @@
             const sub = document.getElementById('scan-subject-filter').value;
             const task = document.getElementById('scan-task').value;
             if(room && sub && task) {
-                // เปลี่ยนจากเดิมที่จะดึงคะแนนเต็มมาใส่ ให้กลายเป็น "ค่าว่าง" เสมอเพื่อรอครูตรวจ
                 document.getElementById('scan-score').value = '';
             }
         }
@@ -1890,12 +2055,10 @@
                 if(res.success) {
                     Swal.close();
                     
-                    // บันทึกข้อมูลใส่ตัวแปร Global เพื่อใช้ในฟังก์ชัน renderParentCards
                     currentParentRecords = res.records;
                     currentParentStudent = res.student;
                     currentParentSubject = sub;
                     
-                    // อัปเดต Dropdown เลือกหน่วยให้ผู้ปกครอง (ดึงเฉพาะหน่วยที่มีในงานที่มอบหมาย)
                     const unitSelect = document.getElementById('parent-dashboard-unit-select');
                     unitSelect.innerHTML = '<option value="all">ดูทุกบทเรียน</option>';
                     const uniqueUnits = new Set();
@@ -1904,7 +2067,6 @@
                         const taskInfo = globalAssignments.find(a => a.subject === r.subject && a.taskName === r.workTitle) || {};
                         const unitName = taskInfo.learningUnit || "ทั่วไป";
                         uniqueUnits.add(unitName);
-                        // แปะชื่อหน่วยเข้าไปในเรคคอร์ดเลย จะได้ filter ง่ายๆ
                         r.unitName = unitName;
                     });
                     
@@ -1912,9 +2074,7 @@
                         unitSelect.innerHTML += `<option value="${u}">${u}</option>`;
                     });
 
-                    // นำข้อมูลไปสร้างการ์ด (แยกตามฟังก์ชันเพื่อรองรับการเลือกหน่วย)
                     renderParentCards();
-                    
                     showView('view-parent-dashboard');
                 } else Swal.fire('ไม่พบข้อมูล', res.message, 'error');
             }).getStudentRecords(id, sub);
@@ -1922,11 +2082,8 @@
 
         function renderParentCards() {
             const selectedUnit = document.getElementById('parent-dashboard-unit-select').value;
-            
-            // กรองเรคคอร์ดตามหน่วยที่เลือก
             const filteredRecords = currentParentRecords.filter(r => selectedUnit === 'all' || r.unitName === selectedUnit);
 
-            // อัปเดตโปรไฟล์ด้านบน
             document.getElementById('p-student-name').innerText = currentParentStudent.fullName;
             document.getElementById('p-student-id').innerText = currentParentStudent.studentId;
             document.getElementById('p-student-room').innerText = currentParentStudent.room;
@@ -1956,7 +2113,6 @@
                         <p class="text-gray-500 font-medium">ไม่พบชิ้นงานในบทเรียนนี้</p>
                     </div>`;
             } else {
-                // จัดกลุ่มตามหน่วยเพื่อให้ดูง่าย แม้จะเลือกหน่วยเฉพาะแล้วก็ตาม
                 const unitGroups = {};
                 
                 filteredRecords.forEach(r => {
@@ -1964,13 +2120,11 @@
                     if(!unitGroups[uName]) unitGroups[uName] = [];
                     unitGroups[uName].push(r);
                     
-                    // คำนวณเฉพาะ "คะแนนดิบ" ตามที่ครูร้องขอ
                     if(r.isSubmitted) totalRaw += (Number(r.score) || 0);
                     maxRaw += (Number(r.maxScore) || 0);
                 });
 
                 Object.keys(unitGroups).forEach(uName => {
-                    // สร้าง Header สำหรับแต่ละหน่วย
                     container.innerHTML += `
                         <div class="col-span-full mt-4 flex items-center justify-between border-b-2 border-teal-100 pb-2 px-2">
                             <h4 class="text-lg font-bold text-teal-800"><i class="fas fa-layer-group mr-2 text-teal-400"></i>${uName}</h4>
@@ -2014,7 +2168,6 @@
                 });
             }
 
-            // อัปเดต Progress Bar โดยใช้คะแนนดิบรวม
             document.getElementById('p-total-score').innerText = totalRaw;
             document.getElementById('p-max-score-label').innerText = `/ ${maxRaw} คะแนนดิบ`;
             document.getElementById('p-task-count').innerText = `${filteredRecords.length} ชิ้นงาน`;
@@ -2040,7 +2193,7 @@
         }
 
         // ==========================================
-        // NEW REPORTING & ANALYTICS DASHBOARD LOGIC
+        // REPORTING & EXPORT DASHBOARD
         // ==========================================
         let fullSubmissionData = []; 
         let fullAssignmentData = []; 
@@ -2360,56 +2513,40 @@
         }
 
         // ==========================================
-        // ฟังก์ชัน: เปลี่ยนเป็น "ส่งแล้ว" ทันทีแบบปลอดภัย (ไม่กระทบปุ่มบันทึก)
+        // ฟังก์ชันอื่นๆ (Safe input etc.)
         // ==========================================
         document.addEventListener('input', function(event) {
             const input = event.target;
-            
             if (input.tagName === 'INPUT' && input.closest('tr') && input.type !== 'hidden') {
                 const scoreVal = input.value.trim();
-                
                 if (scoreVal !== '') {
                     const row = input.closest('tr');
                     const clickableElements = row.querySelectorAll('button, [onclick], .cursor-pointer');
-                    
                     for (let btn of clickableElements) {
                         if (btn.textContent && btn.textContent.includes('ยังไม่ส่ง')) {
-                            btn.click(); 
-                            break; 
+                            btn.click(); break; 
                         }
                     }
                 }
             }
         });
 
-        // ==========================================
-        // ฟังก์ชัน: เลื่อนช่องกรอกคะแนนด้วย Enter และลูกศร ขึ้น/ลง
-        // ==========================================
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Enter' || event.key === 'ArrowDown' || event.key === 'ArrowUp') {
                 const currentInput = document.activeElement;
-                
                 if (currentInput.tagName === 'INPUT' && currentInput.closest('table') && currentInput.type !== 'hidden') {
-                    
                     event.preventDefault(); 
-                    
                     const table = currentInput.closest('table');
                     const allInputs = Array.from(table.querySelectorAll('input:not([type="hidden"]):not([type="checkbox"])'));
                     const currentIndex = allInputs.indexOf(currentInput);
-                    
                     if (currentIndex > -1) {
                         let targetInput = null;
-                        
                         if ((event.key === 'Enter' || event.key === 'ArrowDown') && currentIndex < allInputs.length - 1) {
                             targetInput = allInputs[currentIndex + 1];
                         } else if (event.key === 'ArrowUp' && currentIndex > 0) {
                             targetInput = allInputs[currentIndex - 1];
                         }
-                        
-                        if (targetInput) {
-                            targetInput.focus();
-                            targetInput.select();
-                        }
+                        if (targetInput) { targetInput.focus(); targetInput.select(); }
                     }
                 }
             }
