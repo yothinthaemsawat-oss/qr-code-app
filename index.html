@@ -203,8 +203,9 @@
                     <select id="att-report-room" onchange="renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50"></select>
                 </div>
                 <div class="flex-1">
-                    <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกเดือน (อิงจากวันที่เช็ค)</label>
-                    <select id="att-report-month" onchange="renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50">
+                    <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกเดือน</label>
+                    <!-- เมื่อเลือกเดือน ให้ล้างค่าวันที่ออก -->
+                    <select id="att-report-month" onchange="document.getElementById('att-report-date').value=''; renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50">
                         <option value="all">ดูทุกเดือน (ทั้งหมด)</option>
                         <option value="01">มกราคม</option>
                         <option value="02">กุมภาพันธ์</option>
@@ -219,6 +220,15 @@
                         <option value="11">พฤศจิกายน</option>
                         <option value="12">ธันวาคม</option>
                     </select>
+                </div>
+                <div class="flex-1">
+                    <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">หรือ เลือกวันที่ระบุเจาะจง</label>
+                    <div class="flex items-center gap-2">
+                        <!-- เมื่อเลือกวันที่ ให้รีเซ็ตเดือนเป็น 'ดูทุกเดือน' -->
+                        <input type="date" id="att-report-date" onchange="document.getElementById('att-report-month').value='all'; renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50">
+                        <!-- ปุ่มล้างค่าวันที่ -->
+                        <button onclick="document.getElementById('att-report-date').value=''; renderAttendanceReport()" class="bg-slate-200 hover:bg-slate-300 text-slate-600 px-4 py-2.5 rounded-xl transition shadow-sm font-bold"><i class="fas fa-times"></i></button>
+                    </div>
                 </div>
             </div>
 
@@ -1270,11 +1280,19 @@
         function renderAttendanceReport() {
             const room = document.getElementById('att-report-room').value;
             const month = document.getElementById('att-report-month').value;
+            const dateInput = document.getElementById('att-report-date').value; // ดึงค่าจากช่องเลือกวันที่
             const tbody = document.getElementById('att-report-table-body');
 
             if(!room) {
                 tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-slate-400 font-medium">กรุณาเลือกห้องเรียนเพื่อดึงตารางสถิติ</td></tr>';
                 return;
+            }
+
+            // แปลงรูปแบบวันที่ที่เลือกให้ตรงกับในฐานข้อมูล (dd/MM/yyyy)
+            let filterDateStr = "";
+            if (dateInput) {
+                const d = new Date(dateInput);
+                filterDateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
             }
 
             // กรองเด็กตามห้อง
@@ -1285,11 +1303,15 @@
                 return;
             }
 
-            // กรองข้อมูลเช็คชื่อตามเดือนที่เลือก
+            // กรองข้อมูลเช็คชื่อตามวันที่ หรือ ตามเดือน
             const filteredAtt = fullAttendanceData.filter(att => {
                 if(room !== 'all' && att.room !== room) return false;
-                if(month !== 'all') {
-                    // รูปแบบวันที่ที่เก็บคือ dd/MM/yyyy
+                
+                if (filterDateStr) {
+                    // กรองรายวัน
+                    if (att.date !== filterDateStr) return false;
+                } else if(month !== 'all') {
+                    // กรองรายเดือน
                     const parts = att.date.split('/');
                     if(parts.length >= 2 && parts[1] !== month) return false;
                 }
@@ -1323,7 +1345,6 @@
                 `;
             });
         }
-
 
         // ==========================================
         // ATTENDANCE SYSTEM (เช็คชื่อ)
