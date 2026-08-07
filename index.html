@@ -63,9 +63,10 @@
                     <span id="nav-brand" class="font-bold text-lg md:text-xl text-teal-700 truncate w-24 md:w-auto">ระบบครู</span>
                 </div>
                 <div class="flex items-center space-x-1 md:space-x-2 text-gray-600 overflow-x-auto no-scrollbar">
-                    <button onclick="showView('view-teacher-dashboard')" class="hover:text-teal-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-history"></i><span class="hidden lg:inline ml-1"> ประวัติ</span></button>
-                    <button onclick="openReports()" class="hover:text-teal-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-chart-pie"></i><span class="hidden lg:inline ml-1"> รายงาน</span></button>
+                    <button onclick="showView('view-teacher-dashboard')" class="hover:text-teal-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-history"></i><span class="hidden lg:inline ml-1"> ประวัติส่งงาน</span></button>
+                    <button onclick="openReports()" class="text-teal-700 hover:text-teal-950 font-bold bg-teal-50 px-3 py-1.5 rounded-lg border border-teal-200 text-sm md:text-base whitespace-nowrap"><i class="fas fa-chart-pie mr-1 text-teal-600"></i> สรุปรายงาน</button>
                     <button onclick="openAttendance()" class="bg-blue-500 text-white hover:bg-blue-600 px-3 py-1.5 rounded-lg text-sm font-bold shadow whitespace-nowrap transition-colors"><i class="fas fa-user-check mr-1"></i> เช็คชื่อ</button>
+                    <button onclick="openAttendanceReport()" class="hover:text-blue-600 p-2 text-sm md:text-base whitespace-nowrap font-bold text-blue-600"><i class="fas fa-clipboard-list"></i><span class="hidden lg:inline ml-1"> สถิติเช็คชื่อ</span></button>
                     <button onclick="openScanner()" class="bg-orange-500 text-white hover:bg-orange-600 px-3 py-1.5 rounded-lg text-sm font-bold shadow whitespace-nowrap"><i class="fas fa-qrcode mr-1"></i> สแกน</button>
                     <button onclick="openGradeTracker()" class="hover:text-teal-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-check-double"></i><span class="hidden md:inline ml-1"> ตรวจงาน</span></button>
                     <button onclick="openManageAssignments()" class="hover:text-teal-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-tasks"></i><span class="hidden md:inline ml-1"> สั่งงาน</span></button>
@@ -162,7 +163,7 @@
                         <input type="text" id="manual-att-student-id" onkeypress="if(event.key === 'Enter') processAttendanceManualID()" class="flex-grow px-4 py-2 font-bold text-center focus:outline-none focus:bg-indigo-50 text-sm" placeholder="คลิกที่นี่แล้วยิงสแกนบาร์โค้ด / พิมพ์รหัสเช็คชื่อ (มา)">
                         <button onclick="processAttendanceManualID()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-5 font-bold transition"><i class="fas fa-qrcode"></i></button>
                     </div>
-                    <button onclick="toggleAttendanceCamera()" class="w-full md:w-auto text-sm font-bold text-indigo-700 hover:bg-indigo-100 px-4 py-2 rounded-xl border border-indigo-300 transition whitespace-nowrap"><i class="fas fa-camera mr-1"></i> เปิดกล้องสแกนเช็คชื่อ</button>
+                    <button onclick="toggleAttendanceCamera()" class="w-full md:w-auto text-sm font-bold text-indigo-700 hover:bg-indigo-100 px-4 py-2 rounded-xl border border-indigo-300 transition whitespace-nowrap"><i class="fas fa-camera mr-1"></i> เปิดกล้องมือถือสแกน</button>
                 </div>
                 <div id="attendance-reader-container" class="mt-3 hidden">
                     <div id="attendance-reader" class="w-full max-w-sm mx-auto bg-black rounded-xl overflow-hidden shadow-inner min-h-[250px]"></div>
@@ -187,6 +188,69 @@
                         </thead>
                         <tbody id="attendance-table-body" class="bg-white divide-y divide-gray-100 text-sm">
                             <tr><td colspan="5" class="text-center py-10 text-gray-400">กรุณาเลือกห้องเรียนเพื่อดึงรายชื่อ</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW View: Attendance Report -->
+        <div id="view-attendance-report" class="w-full max-w-6xl hidden-view mt-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
+                <span><i class="fas fa-clipboard-list text-blue-600 mr-2"></i>รายงานประวัติการเช็คชื่อ</span>
+            </h2>
+            
+            <div class="bg-white p-4 rounded-xl shadow-sm mb-4 border-t-4 border-blue-500 flex flex-col md:flex-row gap-3">
+                <div class="flex-1">
+                    <label class="text-xs text-gray-500 font-bold block mb-1">กรองตามห้องเรียน</label>
+                    <select id="att-report-room" onchange="renderAttendanceReport()" class="w-full px-3 py-2 border rounded-lg bg-gray-50 font-bold text-sm">
+                        <option value="all">ทุกห้องเรียน</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label class="text-xs text-gray-500 font-bold block mb-1">กรองตามวันที่ (วว/ดด/ปปปป)</label>
+                    <input type="text" id="att-report-date" oninput="renderAttendanceReport()" class="w-full px-3 py-2 border rounded-lg bg-gray-50 font-bold text-sm" placeholder="เช่น 21/08/2026 หรือปล่อยว่าง">
+                </div>
+                <div class="flex items-end space-x-2 w-full md:w-auto">
+                    <button onclick="fetchAttendanceData()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold shadow-sm flex items-center justify-center"><i class="fas fa-sync-alt mr-2"></i> อัปเดตข้อมูล</button>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-xl text-center shadow-sm">
+                    <div class="text-xs font-bold text-emerald-600 mb-1">มาเรียน</div>
+                    <div id="att-summary-present" class="text-2xl font-black text-emerald-700">0</div>
+                </div>
+                <div class="bg-amber-50 border border-amber-100 p-3 rounded-xl text-center shadow-sm">
+                    <div class="text-xs font-bold text-amber-600 mb-1">ลา</div>
+                    <div id="att-summary-leave" class="text-2xl font-black text-amber-700">0</div>
+                </div>
+                <div class="bg-sky-50 border border-sky-100 p-3 rounded-xl text-center shadow-sm">
+                    <div class="text-xs font-bold text-sky-600 mb-1">ป่วย</div>
+                    <div id="att-summary-sick" class="text-2xl font-black text-sky-700">0</div>
+                </div>
+                <div class="bg-rose-50 border border-rose-100 p-3 rounded-xl text-center shadow-sm">
+                    <div class="text-xs font-bold text-rose-600 mb-1">ขาดเรียน</div>
+                    <div id="att-summary-absent" class="text-2xl font-black text-rose-700">0</div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow overflow-hidden relative border border-gray-100">
+                <div class="overflow-x-auto max-h-[500px]">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100 sticky top-0 z-10">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 w-32">วันที่เช็คชื่อ</th>
+                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 w-24">ห้องเรียน</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 w-24">รหัส</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-500">ชื่อ - สกุล</th>
+                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 w-28">สถานะ</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 w-32">บันทึกเมื่อ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="att-report-table-body" class="bg-white divide-y divide-gray-100 text-sm">
+                            <tr><td colspan="6" class="text-center py-10 text-gray-400">กดปุ่ม อัปเดตข้อมูล เพื่อแสดงประวัติ</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -453,7 +517,7 @@
             </div>
         </div>
 
-        <!-- View 7: NEW REPORTING & EXPORT DASHBOARD -->
+        <!-- View 7: NEW REPORTING & EXPORT DASHBOARD (Requested Feature) -->
         <div id="view-reports" class="w-full max-w-7xl hidden-view mt-4">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
                 <div>
@@ -464,16 +528,6 @@
                         ระบบรายงานวิเคราะห์ & สถิติส่งงาน
                     </h1>
                     <p class="text-sm text-slate-500 mt-1">วิเคราะห์ภาพรวมการส่งงาน คะแนนสอบ และสรุปผลของห้องเรียนและรายวิชา</p>
-                </div>
-                <!-- Export Actions -->
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm font-semibold text-slate-500">ส่งออก:</span>
-                    <button onclick="exportData('xlsx')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-xl shadow-md flex items-center text-sm transition transform hover:-translate-y-0.5">
-                        <i class="fas fa-file-excel mr-2 text-lg"></i> Excel (.xlsx)
-                    </button>
-                    <button onclick="exportData('csv')" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-xl shadow-md flex items-center text-sm transition transform hover:-translate-y-0.5">
-                        <i class="fas fa-file-csv mr-2 text-lg"></i> CSV File
-                    </button>
                 </div>
             </div>
 
@@ -518,42 +572,55 @@
 
             <!-- KPI Cards Row -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <!-- KPI 1 -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                     <div>
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">อัตราการส่งงานเฉลี่ย</span>
                         <span id="kpi-submission-rate" class="text-3xl font-black text-emerald-600 mt-1 block">0%</span>
                         <span class="text-xs text-slate-400 mt-1 block">ของการสั่งงานทั้งหมด</span>
                     </div>
-                    <div class="bg-emerald-50 text-emerald-600 p-4 rounded-2xl"><i class="fas fa-chart-line text-2xl"></i></div>
+                    <div class="bg-emerald-50 text-emerald-600 p-4 rounded-2xl">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
                 </div>
+                <!-- KPI 2 -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                     <div>
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">คะแนนเฉลี่ย</span>
                         <span id="kpi-avg-score" class="text-3xl font-black text-teal-600 mt-1 block">0.0</span>
                         <span class="text-xs text-slate-400 mt-1 block">จากงานที่ตรวจแล้ว</span>
                     </div>
-                    <div class="bg-teal-50 text-teal-600 p-4 rounded-2xl"><i class="fas fa-star text-2xl"></i></div>
+                    <div class="bg-teal-50 text-teal-600 p-4 rounded-2xl">
+                        <i class="fas fa-star text-2xl"></i>
+                    </div>
                 </div>
+                <!-- KPI 3 -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                     <div>
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">จำนวนนักเรียนที่ดูแล</span>
                         <span id="kpi-total-students" class="text-3xl font-black text-blue-600 mt-1 block">0</span>
                         <span class="text-xs text-slate-400 mt-1 block">คนในฐานข้อมูล</span>
                     </div>
-                    <div class="bg-blue-50 text-blue-600 p-4 rounded-2xl"><i class="fas fa-user-friends text-2xl"></i></div>
+                    <div class="bg-blue-50 text-blue-600 p-4 rounded-2xl">
+                        <i class="fas fa-user-friends text-2xl"></i>
+                    </div>
                 </div>
+                <!-- KPI 4 -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                     <div>
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">งานที่มอบหมาย</span>
                         <span id="kpi-total-assignments" class="text-3xl font-black text-orange-500 mt-1 block">0</span>
                         <span class="text-xs text-slate-400 mt-1 block">ชิ้นงาน/กิจกรรม</span>
                     </div>
-                    <div class="bg-orange-50 text-orange-500 p-4 rounded-2xl"><i class="fas fa-clipboard-list text-2xl"></i></div>
+                    <div class="bg-orange-50 text-orange-500 p-4 rounded-2xl">
+                        <i class="fas fa-clipboard-list text-2xl"></i>
+                    </div>
                 </div>
             </div>
 
             <!-- Charts Analysis Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- Subject Submission Success Rate -->
                 <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100">
                     <h3 class="font-bold text-slate-700 text-lg mb-4 flex items-center gap-2">
                         <i class="fas fa-book-reader text-teal-600"></i> สัดส่วนความสำเร็จแยกตามรายวิชา (%)
@@ -562,6 +629,7 @@
                         <canvas id="chart-subject-performance"></canvas>
                     </div>
                 </div>
+                <!-- Monthly Submission Trend -->
                 <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100">
                     <h3 class="font-bold text-slate-700 text-lg mb-4 flex items-center gap-2">
                         <i class="fas fa-calendar-alt text-teal-600"></i> แนวโน้มการส่งงานรายเดือน (ครั้ง)
@@ -575,13 +643,15 @@
             <!-- Classroom comparison list -->
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100 mb-6">
                 <h3 class="font-bold text-slate-700 text-lg mb-4 flex items-center gap-2">
-                    <i class="fas fa-school text-indigo-500"></i> สรุปภาพรวมรายห้องเรียน
+                    <i class="fas fa-school text-indigo-500"></i> สรุปภาพรวมรายห้องเรียน (Classroom Performance Overview)
                 </h3>
                 <div id="classroom-performance-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="p-4 border rounded-xl bg-slate-50 text-center text-slate-400 py-10 col-span-full">กำลังประมวลผลข้อมูล...</div>
+                    <!-- Dynamic Generation of classroom performance cards -->
+                    <div class="p-4 border rounded-xl bg-slate-50 text-center text-slate-400 py-10 col-span-full">กำลังประมวลผลข้อมูลรายห้องเรียน...</div>
                 </div>
             </div>
 
+            <!-- ปุ่มดึงข้อมูลจากชีท (Refresh) -->
             <div class="mt-6 flex justify-end">
                 <button onclick="fetchRawReportData()" class="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl shadow-sm transition-all flex items-center gap-2 focus:ring-2 focus:ring-teal-500 focus:outline-none hover:-translate-y-0.5">
                     <i class="fas fa-sync-alt"></i> อัปเดตข้อมูลจากชีท
@@ -589,14 +659,15 @@
             </div>
         </div>
 
-        <!-- View 8: Parent / Student Record Detail (Card Design) -->
+        <!-- View 8: NEW Parent / Student Record Detail (Card Design) -->
         <div id="view-parent-dashboard" class="w-full max-w-4xl hidden-view mt-4">
-            <!-- Header Controls -->
+            <!-- Header Controls with New Select Dropdown -->
             <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3">
                 <button onclick="showView('view-home')" class="w-full sm:w-auto text-gray-600 bg-white px-5 py-2.5 rounded-full shadow-sm hover:text-gray-900 font-medium transition hover:-translate-x-1 flex items-center justify-center">
                     <i class="fas fa-arrow-left mr-2"></i> กลับหน้าแรก
                 </button>
                 <div class="flex items-center space-x-2 w-full sm:w-auto">
+                    <!-- Dropdown เลือกวิชาในหน้า Dashboard -->
                     <div class="relative flex-grow sm:flex-grow-0">
                         <i class="fas fa-book absolute left-4 top-1/2 transform -translate-y-1/2 text-teal-500"></i>
                         <select id="parent-dashboard-subject-select" onchange="syncAndSearch()" class="w-full bg-white pl-10 pr-8 py-2.5 rounded-full shadow-sm border border-teal-100 text-teal-700 font-bold focus:ring-2 focus:ring-teal-500 outline-none appearance-none cursor-pointer">
@@ -612,6 +683,7 @@
             
             <!-- Student Profile Header Card -->
             <div class="bg-white rounded-3xl shadow-lg p-8 mb-8 border-t-8 border-teal-500 text-center relative overflow-hidden">
+                <!-- Background Pattern -->
                 <div class="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 rounded-full bg-teal-50 opacity-50 z-0"></div>
                 <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 rounded-full bg-emerald-50 opacity-50 z-0"></div>
                 
@@ -654,6 +726,7 @@
                 </div>
             </div>
             
+            <!-- Cards Container for Assignments -->
             <div class="mb-4 flex justify-between items-center px-2">
                 <h3 class="font-extrabold text-gray-700 text-xl flex items-center">
                     <i class="fas fa-tasks text-teal-500 mr-2 bg-teal-50 p-2 rounded-lg"></i> รายการงานที่มอบหมาย
@@ -661,19 +734,28 @@
                 <span id="p-task-count" class="bg-gray-100 text-gray-600 font-bold px-3 py-1 rounded-full text-sm">0 รายการ</span>
             </div>
 
-            <div id="parent-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-10"></div>
+            <!-- Dynamic Cards Grid -->
+            <div id="parent-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-10">
+                <!-- Cards will be injected here by JavaScript -->
+            </div>
         </div>
 
     </main>
 
     <!-- Mock Google Apps Script Server Side Engine -->
     <script>
+        // Set up LocalStorage mock database to allow fully interactive reporting in Preview mode.
+        // If google.script.run is unavailable (e.g. previewing locally), we fall back seamlessly to localStorage mock DB.
         const IS_MOCK_ENV = typeof google === 'undefined' || !google.script || !google.script.run;
+
+        // นำโค้ดนี้ไปวางแทนที่บล็อก if (IS_MOCK_ENV) {...} เดิมทั้งหมด
         if (IS_MOCK_ENV) {
             console.log("Running via GitHub Pages API Bridge");
+            
             // ⚠️ นำ Web App URL ของคุณมาใส่ที่นี่ ⚠️
             const GAS_URL = 'https://script.google.com/macros/s/AKfycby45a_L_ryAbhecMpBRxVhCaZ70eMrUELBDAHtQMqtkbMDIck3xYQx400nHrqpR8FAZ/exec';
             
+            // สร้างตัวจำลองเพื่อดักจับคำสั่ง google.script.run แล้วแปลงเป็นการยิง fetch แบบอัตโนมัติ
             window.google = {
                 script: {
                     run: {
@@ -681,13 +763,18 @@
                             return new Proxy({}, {
                                 get: function(target, prop) {
                                     return function(...args) {
+                                        // ยิง POST Request กลับไปที่ Google Apps Script
                                         fetch(GAS_URL, {
                                             method: 'POST',
-                                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                            headers: {
+                                                'Content-Type': 'text/plain;charset=utf-8',
+                                            },
                                             body: JSON.stringify({ action: prop, params: args })
                                         })
                                         .then(response => response.json())
-                                        .then(data => { if (onSuccess) onSuccess(data); })
+                                        .then(data => {
+                                            if (onSuccess) onSuccess(data);
+                                        })
                                         .catch(error => {
                                             console.error("API Fetch Error:", error);
                                             Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
@@ -709,18 +796,16 @@
         let globalSubjects = [];
         let toolStudents = []; 
         let sessionScans = []; 
-        
         let html5QrcodeScanner = null;
         let isCameraOpen = false;
-        
+
+        // Variables for Attendance Scanner
         let attendanceScanner = null;
         let isAttendanceCameraOpen = false;
 
+        // Variables for Charts
         let chartSubject = null;
         let chartMonthly = null;
-        
-        let currentAttendanceRoom = "";
-        let currentAttendanceDate = "";
 
         window.onload = () => {
             google.script.run.withSuccessHandler(subjects => {
@@ -812,6 +897,7 @@
                 }
                 
                 tbody.innerHTML = '';
+                
                 if(data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-400 font-medium">ยังไม่มีประวัติการส่งงานล่าสุด</td></tr>';
                     return;
@@ -863,7 +949,7 @@
         }
 
         // ==========================================
-        // ATTENDANCE SYSTEM
+        // ATTENDANCE SYSTEM 
         // ==========================================
         function openAttendance() {
             showView('view-attendance');
@@ -907,7 +993,7 @@
                         <td class="px-3 py-2 text-center">
                             <div class="flex justify-center space-x-1 sm:space-x-2">
                                 <div class="relative">
-                                    <input type="radio" name="att-${std.studentId}" id="att-${std.studentId}-present" value="มา" class="att-radio hidden" checked>
+                                    <input type="radio" name="att-${std.studentId}" id="att-${std.studentId}-present" value="มา" class="att-radio hidden">
                                     <label for="att-${std.studentId}-present" class="att-present cursor-pointer border border-gray-300 text-gray-500 px-2 sm:px-3 py-1 rounded-lg text-xs font-bold transition">มา</label>
                                 </div>
                                 <div class="relative">
@@ -919,7 +1005,7 @@
                                     <label for="att-${std.studentId}-sick" class="att-sick cursor-pointer border border-gray-300 text-gray-500 px-2 sm:px-3 py-1 rounded-lg text-xs font-bold transition">ป่วย</label>
                                 </div>
                                 <div class="relative">
-                                    <input type="radio" name="att-${std.studentId}" id="att-${std.studentId}-absent" value="ขาด" class="att-radio hidden">
+                                    <input type="radio" name="att-${std.studentId}" id="att-${std.studentId}-absent" value="ขาด" class="att-radio hidden" checked>
                                     <label for="att-${std.studentId}-absent" class="att-absent cursor-pointer border border-gray-300 text-gray-500 px-2 sm:px-3 py-1 rounded-lg text-xs font-bold transition">ขาด</label>
                                 </div>
                             </div>
@@ -1022,10 +1108,9 @@
             foundRow.classList.add('bg-emerald-100');
             setTimeout(() => foundRow.classList.remove('bg-emerald-100'), 800);
 
-            // Play sound if any scanner sound is enabled
             try {
                 const soundToggle = document.getElementById('sound-toggle');
-                if(soundToggle && soundToggle.checked) {
+                if(!soundToggle || soundToggle.checked) { 
                     const ctx = new (window.AudioContext || window.webkitAudioContext)();
                     const osc = ctx.createOscillator(); osc.frequency.setValueAtTime(1200, ctx.currentTime);
                     osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.1);
@@ -1073,7 +1158,80 @@
         }
 
         // ==========================================
-        // ASSIGNMENTS & SCANNING
+        // ATTENDANCE REPORT DASHBOARD
+        // ==========================================
+        let globalAttendanceReport = [];
+
+        function openAttendanceReport() {
+            showView('view-attendance-report');
+            fetchAttendanceData();
+        }
+
+        function fetchAttendanceData() {
+            Swal.fire({ title: 'กำลังดึงข้อมูล...', didOpen: () => Swal.showLoading() });
+            google.script.run.withSuccessHandler(data => {
+                Swal.close();
+                globalAttendanceReport = Array.isArray(data) ? data : [];
+                populateAttReportRooms();
+                renderAttendanceReport();
+            }).getAttendanceReportData();
+        }
+
+        function populateAttReportRooms() {
+            const select = document.getElementById('att-report-room');
+            const current = select.value;
+            const rooms = [...new Set(globalStudents.map(s => s.room))].filter(r => r).sort();
+            select.innerHTML = '<option value="all">ทุกห้องเรียน</option>';
+            rooms.forEach(r => select.innerHTML += `<option value="${r}">${r}</option>`);
+            select.value = current || 'all';
+        }
+
+        function renderAttendanceReport() {
+            const roomFilter = document.getElementById('att-report-room').value;
+            const dateFilter = document.getElementById('att-report-date').value.trim();
+            const tbody = document.getElementById('att-report-table-body');
+            
+            let filtered = globalAttendanceReport;
+            
+            if (roomFilter !== 'all') filtered = filtered.filter(r => r.room === roomFilter);
+            if (dateFilter) filtered = filtered.filter(r => r.date.includes(dateFilter));
+            
+            tbody.innerHTML = '';
+            
+            let cPresent = 0, cLeave = 0, cSick = 0, cAbsent = 0;
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-gray-400">ไม่พบประวัติการเช็คชื่อตามเงื่อนไข</td></tr>';
+            } else {
+                filtered.forEach(r => {
+                    let badge = '';
+                    if (r.status === 'มา') { badge = '<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-bold border border-emerald-200"><i class="fas fa-check mr-1"></i>มา</span>'; cPresent++; }
+                    else if (r.status === 'ลา') { badge = '<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-xs font-bold border border-amber-200">ลา</span>'; cLeave++; }
+                    else if (r.status === 'ป่วย') { badge = '<span class="bg-sky-100 text-sky-700 px-2 py-1 rounded-full text-xs font-bold border border-sky-200">ป่วย</span>'; cSick++; }
+                    else { badge = '<span class="bg-rose-100 text-rose-700 px-2 py-1 rounded-full text-xs font-bold border border-rose-200"><i class="fas fa-times mr-1"></i>ขาด</span>'; cAbsent++; }
+                    
+                    let ts = new Date(r.timestamp);
+                    let timeStr = !isNaN(ts) ? `${String(ts.getHours()).padStart(2,'0')}:${String(ts.getMinutes()).padStart(2,'0')}` : r.timestamp;
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-blue-50 transition">
+                            <td class="px-4 py-2 font-bold text-gray-700">${r.date}</td>
+                            <td class="px-4 py-2 text-center text-xs font-bold text-indigo-600"><span class="bg-indigo-50 px-2 py-1 rounded">${r.room}</span></td>
+                            <td class="px-4 py-2 text-xs font-bold text-gray-500">${r.studentId}</td>
+                            <td class="px-4 py-2 text-sm font-medium text-gray-800">${r.studentName}</td>
+                            <td class="px-4 py-2 text-center">${badge}</td>
+                            <td class="px-4 py-2 text-xs text-gray-400"><i class="far fa-clock"></i> ${timeStr}</td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            document.getElementById('att-summary-present').innerText = cPresent;
+            document.getElementById('att-summary-leave').innerText = cLeave;
+            document.getElementById('att-summary-sick').innerText = cSick;
+            document.getElementById('att-summary-absent').innerText = cAbsent;
+        }
+
         // ==========================================
         function openManageAssignments() { showView('view-manage-assignments'); }
 
@@ -1247,6 +1405,7 @@
                 ).then(() => { 
                     isCameraOpen = true; html5QrcodeScanner.isPaused = false; 
                 }).catch(err => {
+                    console.log("ไม่มีกล้องหลัง กำลังลองกล้องหน้า/Webcam...");
                     html5QrcodeScanner.start({ facingMode: "user" }, config,
                         (text) => {
                             if(html5QrcodeScanner.isPaused) return;
@@ -1257,17 +1416,18 @@
                          isCameraOpen = true; html5QrcodeScanner.isPaused = false;
                     }).catch(finalErr => {
                         readerContainer.classList.add('hidden');
-                        Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเปิดกล้องได้', 'error');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'ไม่สามารถเปิดกล้องได้',
+                            html: 'ระบบไม่ได้รับอนุญาตให้ใช้กล้อง หรือไม่พบกล้องในอุปกรณ์นี้<br><br><span class="text-sm text-red-500 font-bold">วิธีแก้: โปรดกดเครื่องหมายตกใจหรือรูปกุญแจที่แถบ URL ด้านบน เพื่อ "อนุญาต (Allow)" การใช้กล้อง แล้วรีเฟรชหน้าเว็บใหม่</span>',
+                            confirmButtonColor: '#0f766e'
+                        });
                     });
                 });
             }
         }
-        
         function stopScanner() { if(html5QrcodeScanner && isCameraOpen) { html5QrcodeScanner.stop().then(() => { isCameraOpen = false; document.getElementById('reader-container').classList.add('hidden'); }); } }
 
-        // ==========================================
-        // GRADE TRACKER
-        // ==========================================
         function openGradeTracker() { showView('view-grade-tracker'); }
 
         function filterTasksForTracker() {
@@ -1424,9 +1584,6 @@
             }).updateScoresBulk(sub, room, task, updates);
         }
 
-        // ==========================================
-        // TOOLS
-        // ==========================================
         function openTools() { showView('view-tools'); }
         function loadStudentsForTools() {
             const room = document.getElementById('tool-room-select').value;
@@ -1556,9 +1713,6 @@
             }
         }
 
-        // ==========================================
-        // PARENT DASHBOARD & SYNC
-        // ==========================================
         function syncAndSearch() {
             const dashSub = document.getElementById('parent-dashboard-subject-select').value;
             document.getElementById('parent-subject-select').value = dashSub;
@@ -1615,6 +1769,7 @@
                         let isDone = r.isSubmitted;
                         let statusColor = isDone ? 'emerald' : 'rose';
                         let statusIcon = isDone ? 'fa-check-circle' : 'fa-times-circle';
+                        let statusText = isDone ? 'ส่งงานแล้ว' : 'ยังไม่ส่งงาน';
                         
                         let scoreDisplay = isDone 
                             ? `<span class="text-3xl font-black text-${statusColor}-600">${r.score}</span><span class="text-sm text-gray-400 font-medium ml-1">/ ${r.maxScore}</span>` 
@@ -1623,6 +1778,7 @@
                         container.innerHTML += `
                             <div class="st-card bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group" style="animation-delay: ${index * 0.05}s">
                                 <div class="absolute top-0 left-0 w-1.5 h-full bg-${statusColor}-500"></div>
+                                
                                 <div class="flex justify-between items-start mb-3 ml-2">
                                     <div>
                                         <span class="inline-block px-2.5 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-lg uppercase tracking-wider mb-2">${r.subject}</span>
@@ -1632,6 +1788,7 @@
                                         <i class="fas ${statusIcon} text-xl"></i>
                                     </div>
                                 </div>
+                                
                                 <div class="mt-4 ml-2 pt-4 border-t border-slate-50 flex justify-between items-end">
                                     <div>
                                         <p class="text-xs text-slate-400 font-medium mb-1"><i class="far fa-clock mr-1"></i>อัปเดตล่าสุด</p>
@@ -1675,9 +1832,6 @@
             }).getStudentRecords(id, sub);
         }
 
-        // ==========================================
-        // REPORTS DASHBOARD
-        // ==========================================
         let fullSubmissionData = []; 
         let fullAssignmentData = []; 
         let filteredReportData = [];
@@ -1996,16 +2150,16 @@
             }
         }
 
-        // ==========================================
-        // KEYBOARD & AUTO-STATUS EVENTS
-        // ==========================================
         document.addEventListener('input', function(event) {
             const input = event.target;
+            
             if (input.tagName === 'INPUT' && input.closest('tr') && input.type !== 'hidden') {
                 const scoreVal = input.value.trim();
+                
                 if (scoreVal !== '') {
                     const row = input.closest('tr');
                     const clickableElements = row.querySelectorAll('button, [onclick], .cursor-pointer');
+                    
                     for (let btn of clickableElements) {
                         if (btn.textContent && btn.textContent.includes('ยังไม่ส่ง')) {
                             btn.click(); 
@@ -2019,18 +2173,24 @@
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Enter' || event.key === 'ArrowDown' || event.key === 'ArrowUp') {
                 const currentInput = document.activeElement;
+                
                 if (currentInput.tagName === 'INPUT' && currentInput.closest('table') && currentInput.type !== 'hidden') {
+                    
                     event.preventDefault(); 
+                    
                     const table = currentInput.closest('table');
                     const allInputs = Array.from(table.querySelectorAll('input:not([type="hidden"]):not([type="checkbox"])'));
                     const currentIndex = allInputs.indexOf(currentInput);
+                    
                     if (currentIndex > -1) {
                         let targetInput = null;
+                        
                         if ((event.key === 'Enter' || event.key === 'ArrowDown') && currentIndex < allInputs.length - 1) {
                             targetInput = allInputs[currentIndex + 1];
                         } else if (event.key === 'ArrowUp' && currentIndex > 0) {
                             targetInput = allInputs[currentIndex - 1];
                         }
+                        
                         if (targetInput) {
                             targetInput.focus();
                             targetInput.select();
