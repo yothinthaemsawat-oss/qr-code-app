@@ -108,10 +108,16 @@
                     <button onclick="handleParentSearch()" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-4 rounded-lg shadow-md"><i class="fas fa-search mr-2"></i> ดูผลการเรียน</button>
                 </div>
 
-                <div id="form-teacher" class="p-6 hidden">
+               <div id="form-teacher" class="p-6 hidden">
                     <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">เลือกชื่อคุณครู</label>
-                        <select id="username" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 bg-gray-50 font-bold text-teal-700">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-gray-700 text-sm font-bold">เลือกชื่อคุณครู</label>
+                            <!-- ปุ่มดึงฐานข้อมูลใหม่ -->
+                            <button onclick="refreshTeacherList()" type="button" class="text-xs bg-teal-50 text-teal-700 hover:bg-teal-100 px-3 py-1 rounded-full border border-teal-200 transition font-bold shadow-sm flex items-center">
+                                <i class="fas fa-sync-alt mr-1"></i> ดึงฐานข้อมูล
+                            </button>
+                        </div>
+                        <select id="username" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 bg-gray-50 font-bold text-teal-700 transition">
                             <option value="">-- กำลังโหลดรายชื่อ... --</option>
                         </select>
                     </div>
@@ -121,8 +127,6 @@
                     </div>
                     <button onclick="handleLogin()" class="w-full bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-lg shadow-md">เข้าสู่ระบบจัดการ</button>
                 </div>
-            </div>
-        </div>
 
         <div id="view-attendance" class="w-full max-w-5xl hidden-view mt-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
@@ -986,6 +990,30 @@
             }).verifyLogin(user, pass);
         }
 
+        // ฟังก์ชันสำหรับปุ่ม ดึงฐานข้อมูล (รีเฟรชรายชื่อครู)
+        function refreshTeacherList() {
+            const select = document.getElementById('username');
+            select.innerHTML = '<option value="">-- กำลังดึงฐานข้อมูล... --</option>';
+            select.classList.add('animate-pulse'); // เพิ่มเอฟเฟกต์กะพริบตอนโหลด
+            
+            google.script.run.withSuccessHandler(teachers => {
+                select.classList.remove('animate-pulse');
+                select.innerHTML = '<option value="">-- เลือกชื่อของคุณครู --</option>';
+                
+                if(teachers && teachers.length > 0) {
+                    teachers.forEach(t => { select.innerHTML += `<option value="${t.username}">${t.name}</option>`; });
+                    // โชว์แจ้งเตือนมุมขวาบนว่าดึงสำเร็จ
+                    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'อัปเดตฐานข้อมูลครูสำเร็จ', showConfirmButton: false, timer: 1500 });
+                } else {
+                    select.innerHTML = '<option value="">-- ไม่พบรายชื่อครูในฐานข้อมูล --</option>';
+                }
+            }).withFailureHandler(err => {
+                select.classList.remove('animate-pulse');
+                select.innerHTML = '<option value="">-- โหลดข้อมูลล้มเหลว --</option>';
+                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถดึงข้อมูลได้: ' + err.message, 'error');
+            }).getTeacherList();
+        }
+        
         function logout() {
             document.getElementById('username').value = ''; document.getElementById('password').value = '';
             showView('view-home'); switchLoginTab('parent');
