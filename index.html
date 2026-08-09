@@ -55,6 +55,7 @@
 </head>
 <body class="text-gray-800 antialiased h-screen flex flex-col bg-slate-50">
 
+    <!-- Navigation panel -->
     <nav id="navbar" class="bg-white shadow-md border-b border-green-100 hidden-view">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -81,6 +82,7 @@
 
     <main class="flex-grow flex flex-col items-center justify-start p-3 md:p-6 w-full max-w-7xl mx-auto relative overflow-y-auto">
         
+        <!-- View 1: Home and Logins -->
         <div id="view-home" class="w-full max-w-md mt-10">
             <div class="glass-panel rounded-2xl shadow-xl overflow-hidden border border-gray-100">
                 <div class="bg-gradient-to-r from-teal-500 to-green-600 p-6 text-center text-white">
@@ -108,16 +110,10 @@
                     <button onclick="handleParentSearch()" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-4 rounded-lg shadow-md"><i class="fas fa-search mr-2"></i> ดูผลการเรียน</button>
                 </div>
 
-               <div id="form-teacher" class="p-6 hidden">
+                <div id="form-teacher" class="p-6 hidden">
                     <div class="mb-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="block text-gray-700 text-sm font-bold">เลือกชื่อคุณครู</label>
-                            <!-- ปุ่มดึงฐานข้อมูลใหม่ -->
-                            <button onclick="refreshTeacherList()" type="button" class="text-xs bg-teal-50 text-teal-700 hover:bg-teal-100 px-3 py-1 rounded-full border border-teal-200 transition font-bold shadow-sm flex items-center">
-                                <i class="fas fa-sync-alt mr-1"></i> ดึงฐานข้อมูล
-                            </button>
-                        </div>
-                        <select id="username" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 bg-gray-50 font-bold text-teal-700 transition">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">เลือกชื่อคุณครู</label>
+                        <select id="username" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 bg-gray-50 font-bold text-teal-700">
                             <option value="">-- กำลังโหลดรายชื่อ... --</option>
                         </select>
                     </div>
@@ -127,7 +123,10 @@
                     </div>
                     <button onclick="handleLogin()" class="w-full bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-lg shadow-md">เข้าสู่ระบบจัดการ</button>
                 </div>
+            </div>
+        </div>
 
+        <!-- NEW View: Attendance System -->
         <div id="view-attendance" class="w-full max-w-5xl hidden-view mt-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
                 <span><i class="fas fa-user-check text-blue-500 mr-2"></i>ระบบเช็คชื่อเข้าเรียน</span>
@@ -149,6 +148,7 @@
                 </div>
             </div>
 
+            <!-- แถบเครื่องมือจัดการกลุ่ม และระบบสแกนเช็คชื่อ -->
             <div class="bg-blue-50 p-3 rounded-xl shadow-sm mb-4 flex flex-wrap gap-3 items-center justify-between border border-blue-100">
                 <div class="text-sm font-bold text-blue-800">
                     เครื่องมือจัดการกลุ่ม:
@@ -159,6 +159,7 @@
                 </div>
             </div>
 
+            <!-- กล่องสแกนเนอร์สำหรับเช็คชื่อ -->
             <div class="bg-indigo-50 p-3 rounded-xl shadow-sm mb-4 border border-indigo-100">
                 <div class="flex flex-col md:flex-row gap-3 items-center">
                     <div class="flex-grow flex shadow-sm rounded-xl overflow-hidden border border-gray-300 bg-white w-full">
@@ -196,6 +197,7 @@
             </div>
         </div>
 
+        <!-- NEW View: Attendance Report (สถิติเช็คชื่อ) -->
         <div id="view-attendance-report" class="w-full max-w-5xl hidden-view mt-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
                 <span><i class="fas fa-calendar-check text-blue-600 mr-2"></i>สถิติการมาเรียน</span>
@@ -209,6 +211,7 @@
                 </div>
                 <div class="flex-1">
                     <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกเดือน</label>
+                    <!-- เมื่อเลือกเดือน ให้ล้างค่าวันที่ออก -->
                     <select id="att-report-month" onchange="document.getElementById('att-report-date').value=''; renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50">
                         <option value="all">ดูทุกเดือน (ทั้งหมด)</option>
                         <option value="01">มกราคม</option>
@@ -228,7 +231,9 @@
                 <div class="flex-1">
                     <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">หรือ เลือกวันที่ระบุเจาะจง</label>
                     <div class="flex items-center gap-2">
+                        <!-- เมื่อเลือกวันที่ ให้รีเซ็ตเดือนเป็น 'ดูทุกเดือน' -->
                         <input type="date" id="att-report-date" onchange="document.getElementById('att-report-month').value='all'; renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50">
+                        <!-- ปุ่มล้างค่าวันที่ -->
                         <button onclick="document.getElementById('att-report-date').value=''; renderAttendanceReport()" class="bg-slate-200 hover:bg-slate-300 text-slate-600 px-4 py-2.5 rounded-xl transition shadow-sm font-bold"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
@@ -249,13 +254,14 @@
                             </tr>
                         </thead>
                         <tbody id="att-report-table-body" class="bg-white divide-y divide-gray-100 text-sm">
-                            <tr><td colspan="7" class="text-center py-12 text-slate-400 font-medium">กำลังโหลดข้อมูล...</td></tr>
+                            <tr><td colspan="7" class="text-center py-12 text-slate-400 font-medium">กรุณาเลือกห้องเรียนเพื่อดึงตารางสถิติ</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
+        <!-- View 2: Manage Assignments (RESTRUCTURED LAYOUT 1,2,3,4) -->
         <div id="view-manage-assignments" class="w-full max-w-5xl hidden-view mt-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
                 <span><i class="fas fa-book text-teal-600 mr-2"></i>จัดการรายวิชา หน่วยฯ & งาน</span>
@@ -263,7 +269,10 @@
             </h2>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- คอลัมน์ซ้าย: ขั้นตอนที่ 1 และ 3 -->
                 <div class="md:col-span-1 space-y-6">
+                    
+                    <!-- กล่อง 1: เพิ่มวิชา -->
                     <div class="bg-white rounded-xl shadow p-5 border border-gray-100">
                         <h3 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-plus-circle text-blue-500 mr-1"></i> 1. เพิ่มรายวิชาใหม่</h3>
                         <div class="flex space-x-2 mb-4">
@@ -273,6 +282,7 @@
                         <ul id="subject-list-ui" class="space-y-2 text-sm text-gray-600 max-h-32 overflow-y-auto pr-2 no-scrollbar"></ul>
                     </div>
 
+                   <!-- กล่อง 3: สร้างหน่วยการเรียนรู้ -->
                     <div class="bg-white rounded-xl shadow p-5 border border-indigo-100">
                         <h3 class="font-bold text-indigo-700 mb-3 border-b border-indigo-100 pb-2"><i class="fas fa-layer-group mr-1"></i> 3. สร้างหน่วยการเรียนรู้</h3>
                         <div class="space-y-3">
@@ -286,6 +296,8 @@
                                 <label class="text-xs text-gray-500 font-bold mb-1 block">3.2 เพิ่มชื่อหน่วย</label>
                                 <input type="text" id="new-unit-name" class="w-full px-3 py-2 border rounded-lg focus:ring-indigo-500 text-sm" placeholder="เช่น หน่วยที่ 1">
                             </div>
+                            
+                            <!-- เพิ่มส่วนเลือกเทอมตรงนี้ -->
                             <div>
                                 <label class="text-xs text-indigo-600 font-bold mb-1 block">3.3 ภาคเรียน (เทอม)</label>
                                 <select id="new-unit-term" class="w-full px-3 py-2 border border-indigo-200 rounded-lg focus:ring-indigo-500 text-sm bg-indigo-50 font-bold text-indigo-700">
@@ -293,6 +305,7 @@
                                     <option value="2">เทอม 2</option>
                                 </select>
                             </div>
+
                             <div>
                                 <label class="text-xs text-gray-500 font-bold mb-1 block">3.4 เพิ่มคะแนนเก็บจริงของหน่วยนี้</label>
                                 <input type="number" id="new-unit-score" class="w-full px-3 py-2 border rounded-lg focus:ring-indigo-500 text-sm" placeholder="คะแนนเก็บ">
@@ -302,12 +315,16 @@
                     </div>
                 </div>
 
+                <!-- คอลัมน์ขวา: ขั้นตอนที่ 2 และ 4 -->
                 <div class="md:col-span-2 space-y-6">
+                    
+                    <!-- กล่อง 2: เลือกวิชาและห้อง -->
                     <div class="bg-white rounded-xl shadow p-5 border border-gray-100">
                         <h3 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-clipboard-list text-orange-500 mr-1"></i> 2. เลือกวิชา / ห้องเรียนเป้าหมาย</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="text-xs text-gray-500 font-bold block mb-1">เลือกรายวิชา</label>
+                                <!-- โหลดหน่วยอัตโนมัติตามวิชาและห้อง -->
                                 <select id="assign-subject" onchange="populateUnitDropdownForAssign()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 text-sm bg-gray-50"></select>
                             </div>
                             <div>
@@ -317,6 +334,7 @@
                         </div>
                     </div>
 
+                    <!-- กล่อง 4: รายละเอียดชิ้นงาน -->
                     <div class="bg-teal-50 p-5 rounded-xl shadow-sm border border-teal-200">
                         <h3 class="font-bold text-teal-800 mb-3 border-b border-teal-200 pb-2"><i class="fas fa-info-circle text-teal-600 mr-1"></i> 4. รายละเอียดชิ้นงาน</h3>
                         <div class="space-y-4">
@@ -346,6 +364,7 @@
                 </div>
             </div>
 
+            <!-- ส่วนตารางแสดงข้อมูลงาน -->
             <div class="bg-white rounded-xl shadow overflow-hidden mt-6 border border-gray-100">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -364,6 +383,7 @@
             </div>
         </div>
 
+        <!-- View 3: Scanner UI -->
         <div id="view-scanner" class="w-full max-w-3xl hidden-view mt-2">
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
                 <div class="bg-teal-600 p-4 text-white flex justify-between items-center relative">
@@ -414,6 +434,7 @@
             </div>
         </div>
 
+        <!-- View 4: Grade Tracker and Student Selection -->
         <div id="view-grade-tracker" class="w-full max-w-5xl hidden-view mt-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
                 <span><i class="fas fa-check-double text-teal-600 mr-2"></i>ตรวจสอบการส่งงาน & กรอกคะแนน</span>
@@ -432,6 +453,7 @@
                 <button onclick="loadTrackerData()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-bold shadow-sm"><i class="fas fa-search mr-1"></i> ดึงข้อมูล/รีเฟรช</button>
             </div>
 
+            <!-- แถบเครื่องมือจัดการคะแนนแบบกลุ่ม -->
             <div class="bg-blue-50 p-3 rounded-xl shadow-sm mb-4 flex flex-wrap gap-3 items-center justify-between border border-blue-100">
                 <div class="flex items-center">
                     <button onclick="markAllAsSubmitted()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm"><i class="fas fa-check-double mr-1"></i> เปลี่ยนทุกคนเป็นส่งแล้ว</button>
@@ -468,11 +490,13 @@
             </div>
         </div>
 
+        <!-- View 5: Student Gamification Tools -->
         <div id="view-tools" class="w-full max-w-4xl hidden-view mt-2">
             <div class="bg-white p-4 rounded-xl shadow-sm mb-4 border-l-4 border-purple-500 flex flex-col md:flex-row justify-between items-center gap-3">
                 <div class="flex items-center text-purple-700 font-bold">
                     <i class="fas fa-users-cog text-xl mr-2"></i> ตั้งค่าห้องเรียนสำหรับกิจกรรม
                 </div>
+                <!-- ปุ่มระบบเก็บเข้ากรุขึ้นเทอมใหม่ -->
                 <button onclick="startNewTerm()" class="ml-4 bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow transition flex items-center">
                     <i class="fas fa-box-open mr-1"></i> ปิดเทอม / ขึ้นเทอมใหม่
                 </button>
@@ -536,7 +560,7 @@
                     </div>
                     <div id="group-result" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto p-2"></div>
                 </div>
-                
+                <!-- เครื่องมือใหม่: สร้าง QR Code -->
                 <div id="tool-qrcode" class="tool-section w-full hidden">
                     <div class="flex justify-between items-end mb-4">
                         <p class="text-slate-500 text-sm font-bold">บัตร QR Code ประจำตัวนักเรียน (สแกนเพื่อเช็คชื่อ/ส่งงาน)</p>
@@ -549,6 +573,7 @@
             </div>
         </div>
 
+        <!-- View 6: Scan Log History -->
         <div id="view-teacher-dashboard" class="w-full hidden-view mt-4">
             <div class="flex justify-between items-end mb-4">
                 <h2 class="text-xl font-bold text-gray-700"><i class="fas fa-history mr-2 text-teal-600"></i>ประวัติการส่งงานล่าสุด 50 รายการ</h2>
@@ -572,7 +597,9 @@
             </div>
         </div>
 
+        <!-- View 7: NEW REPORTING & EXPORT DASHBOARD -->
         <div id="view-reports" class="w-full max-w-7xl hidden-view mt-4">
+            <!-- Title & Quick Actions -->
             <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
                 <div>
                     <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center">
@@ -583,6 +610,7 @@
                     </h1>
                     <p class="text-sm text-slate-500 mt-1">วิเคราะห์ภาพรวมการส่งงาน คะแนนสอบ และสรุปผลของห้องเรียนและรายวิชา</p>
                 </div>
+                <!-- Export Actions -->
                 <div class="flex items-center space-x-2">
                     <span class="text-sm font-semibold text-slate-500">ส่งออก:</span>
                     <button onclick="exportData('xlsx')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-xl shadow-md flex items-center text-sm transition transform hover:-translate-y-0.5">
@@ -594,6 +622,7 @@
                 </div>
             </div>
 
+            <!-- Advanced Filter Panel -->
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100 mb-6 flex flex-col md:flex-row gap-4">
                 <div class="flex-1">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">ตัวกรองห้องเรียน</label>
@@ -632,7 +661,9 @@
                 </div>
             </div>
 
+            <!-- KPI Cards Row -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <!-- KPI 1 -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                     <div>
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">อัตราการส่งงานเฉลี่ย</span>
@@ -643,6 +674,7 @@
                         <i class="fas fa-chart-line text-2xl"></i>
                     </div>
                 </div>
+                <!-- KPI 2 -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                     <div>
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">คะแนนเฉลี่ย</span>
@@ -653,6 +685,7 @@
                         <i class="fas fa-star text-2xl"></i>
                     </div>
                 </div>
+                <!-- KPI 3 -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                     <div>
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">จำนวนนักเรียนที่ดูแล</span>
@@ -663,6 +696,7 @@
                         <i class="fas fa-user-friends text-2xl"></i>
                     </div>
                 </div>
+                <!-- KPI 4 -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                     <div>
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">งานที่มอบหมาย</span>
@@ -675,7 +709,9 @@
                 </div>
             </div>
 
+            <!-- Charts Analysis Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- Subject Submission Success Rate -->
                 <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100">
                     <h3 class="font-bold text-slate-700 text-lg mb-4 flex items-center gap-2">
                         <i class="fas fa-book-reader text-teal-600"></i> สัดส่วนความสำเร็จแยกตามรายวิชา (%)
@@ -684,6 +720,7 @@
                         <canvas id="chart-subject-performance"></canvas>
                     </div>
                 </div>
+                <!-- Monthly Submission Trend -->
                 <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100">
                     <h3 class="font-bold text-slate-700 text-lg mb-4 flex items-center gap-2">
                         <i class="fas fa-calendar-alt text-teal-600"></i> แนวโน้มการส่งงานรายเดือน (ครั้ง)
@@ -694,15 +731,18 @@
                 </div>
             </div>
 
+            <!-- Classroom comparison list -->
             <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100 mb-6">
                 <h3 class="font-bold text-slate-700 text-lg mb-4 flex items-center gap-2">
                     <i class="fas fa-school text-indigo-500"></i> สรุปภาพรวมรายห้องเรียน (Classroom Performance Overview)
                 </h3>
                 <div id="classroom-performance-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Dynamic Generation of classroom performance cards -->
                     <div class="p-4 border rounded-xl bg-slate-50 text-center text-slate-400 py-10 col-span-full">กำลังประมวลผลข้อมูลรายห้องเรียน...</div>
                 </div>
             </div>
 
+            <!-- ปุ่มดึงข้อมูลจากชีท (Refresh) -->
             <div class="mt-6 flex justify-end">
                 <button onclick="fetchRawReportData()" class="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl shadow-sm transition-all flex items-center gap-2 focus:ring-2 focus:ring-teal-500 focus:outline-none hover:-translate-y-0.5">
                     <i class="fas fa-sync-alt"></i> อัปเดตข้อมูลจากชีท
@@ -710,6 +750,7 @@
             </div>
         </div>
 
+      <!-- NEW View 9: Unit Summary (สรุปคะแนนเฉลี่ยแต่ละบท) -->
         <div id="view-unit-summary" class="w-full max-w-7xl hidden-view mt-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
                 <span><i class="fas fa-list-ol text-teal-600 mr-2"></i>สรุปคะแนนเก็บแต่ละบทเรียน (รายห้อง)</span>
@@ -725,6 +766,7 @@
                     <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกรายวิชา</label>
                     <select id="usum-subject" onchange="renderUnitSummaryTable()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 text-sm font-semibold text-slate-700 bg-slate-50"></select>
                 </div>
+                <!-- เพิ่มตัวกรองภาคเรียน -->
                 <div class="w-full lg:w-48">
                     <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">ภาคเรียน</label>
                     <select id="usum-term" onchange="renderUnitSummaryTable()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 text-sm font-semibold text-slate-700 bg-slate-50">
@@ -732,6 +774,7 @@
                         <option value="2">เทอม 2</option>
                     </select>
                 </div>
+                <!-- ปุ่มส่งออก Excel -->
                 <div class="flex items-end">
                     <button onclick="exportUnitSummaryToExcel()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-2 transform hover:-translate-y-0.5">
                         <i class="fas fa-file-excel text-lg"></i> ส่งออก Excel
@@ -743,6 +786,7 @@
                 <div class="overflow-x-auto max-h-[600px]">
                     <table class="min-w-full divide-y divide-gray-200" id="table-unit-summary-export">
                         <thead id="usum-table-head" class="bg-slate-50 sticky top-0 z-10 shadow-sm">
+                            <!-- header will be generated -->
                         </thead>
                         <tbody id="usum-table-body" class="bg-white divide-y divide-gray-100 text-sm">
                             <tr><td class="text-center py-12 text-slate-400 font-medium">กรุณาเลือกห้องเรียน, รายวิชา และภาคเรียน ด้านบน เพื่อดึงตารางสรุปคะแนน</td></tr>
@@ -752,6 +796,7 @@
             </div>
         </div>
 
+        <!-- NEW View 11: ระบบติดตามงานค้าง -->
         <div id="view-missing-work" class="w-full max-w-5xl hidden-view mt-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
                 <span><i class="fas fa-search-minus text-rose-500 mr-2"></i>ระบบติดตามงานค้าง (รายบุคคล)</span>
@@ -781,12 +826,15 @@
             </div>
         </div>
 
+        <!-- View 8: NEW Parent / Student Record Detail (Card Design) -->
         <div id="view-parent-dashboard" class="w-full max-w-4xl hidden-view mt-4">
+            <!-- Header Controls with New Select Dropdowns -->
             <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3">
                 <button onclick="showView('view-home')" class="w-full sm:w-auto text-gray-600 bg-white px-5 py-2.5 rounded-full shadow-sm hover:text-gray-900 font-medium transition hover:-translate-x-1 flex items-center justify-center">
                     <i class="fas fa-arrow-left mr-2"></i> กลับหน้าแรก
                 </button>
                 <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+                    <!-- Dropdown เลือกวิชา -->
                     <div class="relative w-full sm:w-auto">
                         <i class="fas fa-book absolute left-4 top-1/2 transform -translate-y-1/2 text-teal-500"></i>
                         <select id="parent-dashboard-subject-select" onchange="syncAndSearch()" class="w-full sm:w-48 bg-white pl-10 pr-8 py-2.5 rounded-full shadow-sm border border-teal-100 text-teal-700 font-bold focus:ring-2 focus:ring-teal-500 outline-none appearance-none cursor-pointer">
@@ -794,6 +842,7 @@
                         </select>
                         <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-teal-500 pointer-events-none text-xs"></i>
                     </div>
+                    <!-- Dropdown เลือกหน่วย (ใหม่) -->
                     <div class="relative w-full sm:w-auto">
                         <i class="fas fa-layer-group absolute left-4 top-1/2 transform -translate-y-1/2 text-teal-500"></i>
                         <select id="parent-dashboard-unit-select" onchange="renderParentCards()" class="w-full sm:w-48 bg-white pl-10 pr-8 py-2.5 rounded-full shadow-sm border border-teal-100 text-teal-700 font-bold focus:ring-2 focus:ring-teal-500 outline-none appearance-none cursor-pointer">
@@ -807,6 +856,7 @@
                 </div>
             </div>
             
+            <!-- Student Profile Header Card -->
             <div class="bg-white rounded-3xl shadow-lg p-8 mb-8 border-t-8 border-teal-500 text-center relative overflow-hidden">
                 <div class="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 rounded-full bg-teal-50 opacity-50 z-0"></div>
                 <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 rounded-full bg-emerald-50 opacity-50 z-0"></div>
@@ -830,6 +880,7 @@
                         </span>
                     </div>
 
+                    <!-- Progress Bar Summary (เปลี่ยนเป็นแสดงคะแนนดิบ) -->
                     <div class="mt-8 max-w-lg mx-auto bg-slate-50 rounded-2xl p-5 border border-slate-100">
                         <div class="flex justify-between items-end mb-2">
                             <div class="text-left">
@@ -851,6 +902,10 @@
                 </div>
             </div>
 
+            <!-- 🚨 กล่องแจ้งเตือนงานค้าง 🚨 -->
+            <div id="p-missing-alert-container" class="block w-full mb-6 hidden"></div>
+
+            <!-- Header รายการงานที่มอบหมาย (ดีไซน์ใหม่) -->
             <div class="block w-full border-b-2 border-teal-500 pb-3 mb-6 mt-4">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 px-2">
                     <h3 class="font-extrabold text-slate-800 text-xl md:text-2xl flex items-center">
@@ -863,71 +918,53 @@
                 </div>
             </div>
 
+            <!-- กล่องใส่การ์ดงาน (Grid) -->
             <div id="parent-cards-container" class="w-full grid grid-cols-1 md:grid-cols-2 gap-5 pb-12">
+                <!-- Javascript จะนำการ์ดมาใส่ตรงนี้ -->
             </div>
         </div>
 
     </main>
 
-   <!-- Mock Google Apps Script Server Side Engine -->
+    <!-- Mock Google Apps Script Server Side Engine -->
     <script>
         const IS_MOCK_ENV = typeof google === 'undefined' || !google.script || !google.script.run;
 
         if (IS_MOCK_ENV) {
             console.log("Running via GitHub Pages API Bridge");
             
-            // ⚠️ URL ของคุณครู ⚠️
-            const GAS_URL = 'https://script.google.com/macros/s/AKfycbynUCiLB1gJ-DN65ZSj5Z9KiGyRHGyFJCps-gtcfOo13r_JHQT5nZxMoc2TDUvIMLc/exec';
+            // ⚠️ นำ Web App URL ของคุณมาใส่ที่นี่ ⚠️
+            const GAS_URL = 'https://script.google.com/macros/s/AKfycbyDBynS3f356iI0NhulplEiGjKV7lsbjXQ291MQS94z79Xy7Xp7_LErh4tnNXfSswM/exec';
             
             window.google = {
                 script: {
                     run: {
                         withSuccessHandler: function(onSuccess) {
-                            this._onSuccess = onSuccess;
-                            return this;
-                        },
-                        withFailureHandler: function(onFailure) {
-                            this._onFailure = onFailure;
-                            return this;
+                            return new Proxy({}, {
+                                get: function(target, prop) {
+                                    return function(...args) {
+                                        fetch(GAS_URL, {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                            body: JSON.stringify({ action: prop, params: args })
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => { if (onSuccess) onSuccess(data); })
+                                        .catch(error => {
+                                            console.error("API Fetch Error:", error);
+                                            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
+                                        });
+                                    }
+                                }
+                            });
                         }
                     }
                 }
             };
-
-            window.google.script.run = new Proxy(window.google.script.run, {
-                get: function(target, prop) {
-                    if (prop === 'withSuccessHandler') {
-                        return function(fn) { target._onSuccess = fn; return target; };
-                    }
-                    if (prop === 'withFailureHandler') {
-                        return function(fn) { target._onFailure = fn; return target; };
-                    }
-                    return function(...args) {
-                        const onSuccess = target._onSuccess;
-                        const onFailure = target._onFailure;
-                        target._onSuccess = null;
-                        target._onFailure = null;
-
-                        fetch(GAS_URL, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                            body: JSON.stringify({ action: prop, params: args })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (onSuccess) onSuccess(data);
-                        })
-                        .catch(error => {
-                            console.error("API Fetch Error:", error);
-                            if (onFailure) onFailure(error);
-                            else Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
-                        });
-                    }
-                }
-            });
         }
     </script>
 
+    <!-- Front-End Client Logic -->
     <script>
         let globalStudents = []; 
         let globalAssignments = [];
@@ -937,10 +974,12 @@
         let html5QrcodeScanner = null;
         let isCameraOpen = false;
 
+        // Variables for Attendance Scanner
         let attendanceScanner = null;
         let isAttendanceCameraOpen = false;
-        let fullAttendanceData = [];
+        let fullAttendanceData = []; // เก็บสถิติ
 
+        // Variables for Charts & Parent View
         let chartSubject = null;
         let chartMonthly = null;
         let globalUnits = [];
@@ -954,6 +993,7 @@
                 updateSubjectDropdowns();
             }).getSubjects();
             
+            // โหลดข้อมูลหน่วยเมื่อเริ่มต้น
             loadUnits();
             
             google.script.run.withSuccessHandler(teachers => {
@@ -1004,7 +1044,7 @@
                 if(res && res.success) {
                     Swal.close();
                     document.getElementById('nav-brand').innerText = `${res.name}`;
-                    openReports();
+                    openReports(); // Direct educators into the premium Reporting & Export view
                     loadTeacherData();
                 } else {
                     Swal.fire('เกิดข้อผิดพลาด', res ? res.message : 'ไม่สามารถเข้าสู่ระบบได้', 'error');
@@ -1012,27 +1052,6 @@
             }).verifyLogin(user, pass);
         }
 
-      // ฟังก์ชันสำหรับปุ่ม ดึงฐานข้อมูล (รีเฟรชรายชื่อครู)
-        function refreshTeacherList() {
-            const select = document.getElementById('username');
-            select.innerHTML = '<option value="">-- กำลังดึงฐานข้อมูล... --</option>';
-            select.classList.add('animate-pulse');
-            
-            google.script.run.withSuccessHandler(teachers => {
-                select.classList.remove('animate-pulse');
-                
-                if(Array.isArray(teachers) && teachers.length > 0) {
-                    select.innerHTML = '<option value="">-- เลือกชื่อของคุณครู --</option>';
-                    teachers.forEach(t => { 
-                        select.innerHTML += `<option value="${t.username}">${t.name}</option>`; 
-                    });
-                    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'อัปเดตฐานข้อมูลครูสำเร็จ', showConfirmButton: false, timer: 1500 });
-                } else {
-                    select.innerHTML = '<option value="">-- ไม่พบรายชื่อครูในฐานข้อมูล --</option>';
-                }
-            }).getTeacherList();
-        }
-        
         function logout() {
             document.getElementById('username').value = ''; document.getElementById('password').value = '';
             showView('view-home'); switchLoginTab('parent');
@@ -1114,6 +1133,9 @@
             populateUnitDropdownForAssign();
         }
 
+        // ==========================================
+        // NEW FEATURE: MISSING WORK (ติดตามงานค้าง)
+        // ==========================================
         function openMissingWork() {
             showView('view-missing-work');
             Swal.fire({ title: 'กำลังประมวลผลงานค้าง...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -1243,6 +1265,9 @@
             });
         }
 
+        // ==========================================
+        // ฟังก์ชันจัดการ "หน่วยการเรียนรู้"
+        // ==========================================
         function loadUnits() {
             google.script.run.withSuccessHandler(data => {
                 globalUnits = Array.isArray(data) ? data : [];
@@ -1316,6 +1341,9 @@
             }
         }
 
+        // ==========================================
+        // NEW FEATURE: UNIT SUMMARY (สรุปรายหน่วย)
+        // ==========================================
         function openUnitSummary() {
             showView('view-unit-summary');
             Swal.fire({ title: 'กำลังคำนวณสถิติ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -1478,6 +1506,9 @@
             }
         }
 
+        // ==========================================
+        // ATTENDANCE REPORT & SCANNER
+        // ==========================================
         function openAttendanceReport() {
             showView('view-attendance-report');
             Swal.fire({ title: 'กำลังดึงข้อมูลสถิติ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -1755,6 +1786,9 @@
             }).saveAttendanceRecords(formattedDate, room, records);
         }
 
+        // ==========================================
+        // ASSIGNMENTS & SCANNER
+        // ==========================================
         function openManageAssignments() { showView('view-manage-assignments'); }
 
         function saveSubjectUI() {
@@ -1969,6 +2003,9 @@
         }
         function stopScanner() { if(html5QrcodeScanner && isCameraOpen) { html5QrcodeScanner.stop().then(() => { isCameraOpen = false; document.getElementById('reader-container').classList.add('hidden'); }); } }
 
+        // ==========================================
+        // GRADE TRACKER
+        // ==========================================
         function openGradeTracker() { showView('view-grade-tracker'); }
 
         function filterTasksForTracker() {
@@ -2142,7 +2179,11 @@
             }).updateScoresBulk(sub, room, task, updates);
         }
 
+        // ==========================================
+        // TOOLS & GAMIFICATION
+        // ==========================================
         function openTools() { showView('view-tools'); }
+        
         function loadStudentsForTools() {
             const room = document.getElementById('tool-room-select').value;
             toolStudents = globalStudents.filter(s => s.room === room);
@@ -2308,6 +2349,9 @@
             }
         }
 
+        // ==========================================
+        // PARENT VIEW & UNIT DASHBOARD
+        // ==========================================
         function syncAndSearch() {
             const dashSub = document.getElementById('parent-dashboard-subject-select').value;
             document.getElementById('parent-subject-select').value = dashSub;
@@ -2377,12 +2421,13 @@
             
             let totalRaw = 0;
             let maxRaw = 0;
+            let missingTasks = []; 
 
             if(filteredRecords.length === 0) {
                 container.innerHTML = `
-                    <div class="col-span-full bg-white rounded-2xl p-10 text-center border border-dashed border-gray-300">
-                        <i class="fas fa-folder-open text-gray-300 text-4xl mb-3"></i>
-                        <p class="text-gray-500 font-medium">ไม่พบชิ้นงานในบทเรียนนี้</p>
+                    <div class="col-span-full bg-white rounded-2xl p-10 text-center border border-dashed border-slate-300">
+                        <i class="fas fa-folder-open text-slate-300 text-5xl mb-4"></i>
+                        <p class="text-slate-500 font-bold text-lg">ไม่พบชิ้นงานในบทเรียนนี้</p>
                     </div>`;
             } else {
                 const unitGroups = {};
@@ -2392,14 +2437,18 @@
                     if(!unitGroups[uName]) unitGroups[uName] = [];
                     unitGroups[uName].push(r);
                     
-                    if(r.isSubmitted) totalRaw += (Number(r.score) || 0);
+                    if(r.isSubmitted) {
+                        totalRaw += (Number(r.score) || 0);
+                    } else {
+                        missingTasks.push(r);
+                    }
                     maxRaw += (Number(r.maxScore) || 0);
                 });
 
                 Object.keys(unitGroups).forEach(uName => {
                     container.innerHTML += `
-                        <div class="col-span-full mt-4 flex items-center justify-between border-b-2 border-teal-100 pb-2 px-2">
-                            <h4 class="text-lg font-bold text-teal-800"><i class="fas fa-layer-group mr-2 text-teal-400"></i>${uName}</h4>
+                        <div class="col-span-full w-full mt-6 mb-2 flex items-center justify-between border-b-2 border-teal-200 pb-2 px-2">
+                            <h4 class="text-lg font-extrabold text-teal-800"><i class="fas fa-layer-group mr-2 text-teal-500"></i>${uName}</h4>
                         </div>
                     `;
                     
@@ -2409,8 +2458,8 @@
                         let statusIcon = isDone ? 'fa-check-circle' : 'fa-times-circle';
                         
                         let scoreDisplay = isDone 
-                            ? `<span class="text-3xl font-black text-${statusColor}-600">${r.score}</span><span class="text-sm text-gray-400 font-medium ml-1">/ ${r.maxScore}</span>` 
-                            : `<span class="text-3xl font-black text-gray-300">-</span><span class="text-sm text-gray-400 font-medium ml-1">/ ${r.maxScore}</span>`;
+                            ? `<span class="text-3xl font-black text-${statusColor}-600">${r.score}</span><span class="text-sm text-slate-400 font-medium ml-1">/ ${r.maxScore}</span>` 
+                            : `<span class="text-3xl font-black text-slate-300">-</span><span class="text-sm text-slate-400 font-medium ml-1">/ ${r.maxScore}</span>`;
 
                         container.innerHTML += `
                             <div class="st-card bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
@@ -2418,7 +2467,7 @@
                                 <div class="flex justify-between items-start mb-3 ml-2">
                                     <div>
                                         <span class="inline-block px-2.5 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-lg uppercase tracking-wider mb-2">${r.subject}</span>
-                                        <h4 class="text-gray-800 font-bold text-base leading-tight group-hover:text-teal-600 transition-colors">${r.workTitle}</h4>
+                                        <h4 class="text-slate-800 font-bold text-base leading-tight group-hover:text-teal-600 transition-colors">${r.workTitle}</h4>
                                     </div>
                                     <div class="bg-${statusColor}-50 text-${statusColor}-600 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 shadow-inner">
                                         <i class="fas ${statusIcon} text-xl"></i>
@@ -2426,7 +2475,7 @@
                                 </div>
                                 <div class="mt-4 ml-2 pt-4 border-t border-slate-50 flex justify-between items-end">
                                     <div>
-                                        <p class="text-xs text-slate-400 font-medium mb-1"><i class="far fa-clock mr-1"></i>อัปเดตล่าสุด</p>
+                                        <p class="text-[10px] text-slate-400 font-bold uppercase mb-1"><i class="far fa-clock mr-1"></i>อัปเดตล่าสุด</p>
                                         <p class="text-sm font-bold text-slate-700">${r.date !== '-' ? r.date : 'รอการส่งงาน'}</p>
                                     </div>
                                     <div class="text-right bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
@@ -2440,6 +2489,43 @@
                 });
             }
 
+            const alertContainer = document.getElementById('p-missing-alert-container');
+            if(alertContainer) {
+                if (missingTasks.length > 0) {
+                    let alertHtml = `
+                        <div class="bg-rose-50 border border-rose-200 p-5 rounded-2xl shadow-sm relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-rose-500 opacity-5 rounded-full transform translate-x-8 -translate-y-8"></div>
+                            <div class="flex items-center mb-4">
+                                <div class="bg-rose-500 text-white rounded-full w-10 h-10 flex items-center justify-center mr-3 shadow-md">
+                                    <i class="fas fa-exclamation-triangle text-lg animate-pulse"></i>
+                                </div>
+                                <h3 class="text-rose-800 font-bold text-lg">แจ้งเตือน: มีงานค้างส่ง ${missingTasks.length} ชิ้น</h3>
+                            </div>
+                            <ul class="list-disc list-inside text-rose-700 text-sm pl-2 space-y-2 font-medium ml-12">
+                    `;
+                    missingTasks.forEach(task => {
+                        alertHtml += `<li>วิชา${task.subject} : <span class="font-bold underline decoration-rose-300 underline-offset-4">${task.workTitle}</span> <span class="text-rose-500 opacity-75 text-[10px] ml-1 bg-rose-100 px-2 py-0.5 rounded-full">${task.unitName}</span></li>`;
+                    });
+                    alertHtml += `
+                            </ul>
+                        </div>
+                    `;
+                    alertContainer.innerHTML = alertHtml;
+                    alertContainer.classList.remove('hidden');
+                } else if (filteredRecords.length > 0) {
+                    alertContainer.innerHTML = `
+                        <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl shadow-sm flex items-center justify-center">
+                            <i class="fas fa-star text-emerald-500 text-2xl mr-3 animate-bounce"></i>
+                            <span class="text-emerald-800 font-bold text-lg">ยอดเยี่ยม! ส่งงานครบทุกชิ้นแล้ว</span>
+                        </div>
+                    `;
+                    alertContainer.classList.remove('hidden');
+                } else {
+                    alertContainer.innerHTML = '';
+                    alertContainer.classList.add('hidden');
+                }
+            }
+
             document.getElementById('p-total-score').innerText = totalRaw;
             document.getElementById('p-max-score-label').innerText = `/ ${maxRaw} คะแนนดิบ`;
             document.getElementById('p-task-count').innerText = `${filteredRecords.length} ชิ้นงาน`;
@@ -2449,21 +2535,26 @@
             
             setTimeout(() => {
                 const pb = document.getElementById('p-progress-bar');
-                pb.style.width = `${percent}%`;
-                document.getElementById('p-percent-label').innerText = `คิดเป็น ${percent}%`;
-                if(percent < 50) {
-                    pb.className = "h-3 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-rose-400 to-rose-500";
-                    document.getElementById('p-percent-label').className = "text-right text-xs font-bold text-rose-500 mt-1";
-                } else if(percent < 80) {
-                    pb.className = "h-3 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-amber-400 to-amber-500";
-                    document.getElementById('p-percent-label').className = "text-right text-xs font-bold text-amber-500 mt-1";
-                } else {
-                    pb.className = "h-3 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-teal-400 to-emerald-500";
-                    document.getElementById('p-percent-label').className = "text-right text-xs font-bold text-teal-600 mt-1";
+                if(pb) {
+                    pb.style.width = `${percent}%`;
+                    document.getElementById('p-percent-label').innerText = `คิดเป็น ${percent}%`;
+                    if(percent < 50) {
+                        pb.className = "h-3 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-rose-400 to-rose-500";
+                        document.getElementById('p-percent-label').className = "text-right text-xs font-bold text-rose-500 mt-1";
+                    } else if(percent < 80) {
+                        pb.className = "h-3 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-amber-400 to-amber-500";
+                        document.getElementById('p-percent-label').className = "text-right text-xs font-bold text-amber-500 mt-1";
+                    } else {
+                        pb.className = "h-3 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-teal-400 to-emerald-500";
+                        document.getElementById('p-percent-label').className = "text-right text-xs font-bold text-teal-600 mt-1";
+                    }
                 }
             }, 100);
         }
 
+        // ==========================================
+        // AUTO-SAVE / UTILS
+        // ==========================================
         document.addEventListener('input', function(event) {
             const input = event.target;
             if (input.tagName === 'INPUT' && input.classList.contains('tracker-score-input')) {
