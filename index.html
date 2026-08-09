@@ -254,14 +254,13 @@
                             </tr>
                         </thead>
                         <tbody id="att-report-table-body" class="bg-white divide-y divide-gray-100 text-sm">
-                            <tr><td colspan="7" class="text-center py-12 text-slate-400 font-medium">กำลังโหลดข้อมูล...</td></tr>
+                            <tr><td colspan="7" class="text-center py-12 text-slate-400 font-medium">กรุณาเลือกห้องเรียนเพื่อดึงตารางสถิติ</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- View 2: Manage Assignments (RESTRUCTURED LAYOUT 1,2,3,4) -->
         <!-- View 2: Manage Assignments (RESTRUCTURED LAYOUT 1,2,3,4) -->
         <div id="view-manage-assignments" class="w-full max-w-5xl hidden-view mt-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
@@ -797,68 +796,6 @@
             </div>
         </div>
 
-        <!-- NEW View 10: Attendance Report (สถิติเช็คชื่อ) -->
-        <div id="view-attendance-report" class="w-full max-w-5xl hidden-view mt-4">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
-                <span><i class="fas fa-calendar-check text-blue-600 mr-2"></i>สรุปสถิติการมาเรียน</span>
-                <button onclick="openAttendanceReport()" class="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-bold shadow-sm transition"><i class="fas fa-sync-alt mr-1"></i> ดึงข้อมูลใหม่</button>
-            </h2>
-
-            <div class="bg-white p-5 rounded-2xl shadow-sm mb-4 border-t-4 border-blue-500 flex flex-col md:flex-row gap-4">
-                <div class="flex-1">
-                    <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกห้องเรียน</label>
-                    <select id="att-report-room" onchange="renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50"></select>
-                </div>
-                <div class="flex-1">
-                    <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกเดือน (อิงจากวันที่เช็ค)</label>
-                    <select id="att-report-month" onchange="renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50">
-                        <option value="all">ดูทุกเดือน (ทั้งหมด)</option>
-                        <option value="01">มกราคม</option>
-                        <option value="02">กุมภาพันธ์</option>
-                        <option value="03">มีนาคม</option>
-                        <option value="04">เมษายน</option>
-                        <option value="05">พฤษภาคม</option>
-                        <option value="06">มิถุนายน</option>
-                        <option value="07">กรกฎาคม</option>
-                        <option value="08">สิงหาคม</option>
-                        <option value="09">กันยายน</option>
-                        <option value="10">ตุลาคม</option>
-                        <option value="11">พฤศจิกายน</option>
-                        <option value="12">ธันวาคม</option>
-                    </select>
-                </div>
-                <div class="flex-1">
-                    <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">หรือ เลือกวันที่ระบุเจาะจง</label>
-                    <div class="flex items-center gap-2">
-                        <!-- เมื่อเลือกวันที่ ให้รีเซ็ตเดือนเป็น 'ดูทุกเดือน' -->
-                        <input type="date" id="att-report-date" onchange="document.getElementById('att-report-month').value='all'; renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50">
-                        <!-- ปุ่มล้างค่าวันที่ -->
-                        <button onclick="document.getElementById('att-report-date').value=''; renderAttendanceReport()" class="bg-slate-200 hover:bg-slate-300 text-slate-600 px-4 py-2.5 rounded-xl transition shadow-sm font-bold"><i class="fas fa-times"></i></button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-md overflow-hidden mt-4 border border-slate-100">
-                <div class="overflow-x-auto max-h-[600px]">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-slate-50 sticky top-0 z-10 shadow-sm">
-                            <tr>
-                                <th class="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider w-16">เลขที่</th>
-                                <th class="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">รหัส</th>
-                                <th class="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">ชื่อ - สกุล</th>
-                                <th class="px-4 py-4 text-center text-xs font-bold text-emerald-600 uppercase tracking-wider">มาเรียน (ครั้ง)</th>
-                                <th class="px-4 py-4 text-center text-xs font-bold text-amber-500 uppercase tracking-wider">ลา (ครั้ง)</th>
-                                <th class="px-4 py-4 text-center text-xs font-bold text-blue-500 uppercase tracking-wider">ป่วย (ครั้ง)</th>
-                                <th class="px-4 py-4 text-center text-xs font-bold text-rose-500 uppercase tracking-wider">ขาดเรียน (ครั้ง)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="att-report-table-body" class="bg-white divide-y divide-gray-100 text-sm">
-                            <tr><td colspan="7" class="text-center py-12 text-slate-400 font-medium">กรุณาเลือกห้องเรียนเพื่อดึงตารางสถิติ</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
         <!-- NEW View 11: ระบบติดตามงานค้าง -->
         <div id="view-missing-work" class="w-full max-w-5xl hidden-view mt-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
@@ -888,7 +825,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- View 8: NEW Parent / Student Record Detail (Card Design) -->
         <div id="view-parent-dashboard" class="w-full max-w-4xl hidden-view mt-4">
             <!-- Header Controls with New Select Dropdowns -->
@@ -964,13 +901,8 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Student Profile Header Card (โค้ดเดิมด้านบน) -->
-            <div class="bg-white rounded-3xl shadow-lg p-8 mb-8 border-t-8 border-teal-500 text-center relative overflow-hidden">
-                <!-- ... (โค้ดเดิมของกล่องโปรไฟล์เด็ก) ... -->
-            </div>
 
-          <!-- 🚨 กล่องแจ้งเตือนงานค้าง 🚨 -->
+            <!-- 🚨 กล่องแจ้งเตือนงานค้าง 🚨 -->
             <div id="p-missing-alert-container" class="block w-full mb-6 hidden"></div>
 
             <!-- Header รายการงานที่มอบหมาย (ดีไซน์ใหม่) -->
@@ -1168,9 +1100,8 @@
             }).getDashboardData();
         }
 
-     function populateRoomDropdowns() {
+        function populateRoomDropdowns() {
             const rooms = [...new Set(globalStudents.map(s => s.room))].filter(r => r).sort();
-            // เพิ่ม 'mw-room' ลงไปในลิสต์นี้
             const selects = ['assign-room', 'scan-room-filter', 'tool-room-select', 'tracker-room-filter', 'report-filter-room', 'att-room-select', 'usum-room', 'att-report-room', 'mw-room'];
             selects.forEach(id => {
                 const el = document.getElementById(id);
@@ -1185,7 +1116,6 @@
         }
 
         function updateSubjectDropdowns() {
-            // เพิ่ม 'mw-subject' ลงไปในลิสต์นี้
             const selects = ['parent-subject-select', 'assign-subject', 'scan-subject-filter', 'tracker-subject-filter', 'report-filter-subject', 'parent-dashboard-subject-select', 'unit-subject-select', 'usum-subject', 'mw-subject'];
             selects.forEach(id => {
                 const el = document.getElementById(id);
@@ -1249,7 +1179,6 @@
             studentsInRoom.forEach(std => {
                 let missingTasks = [];
                 
-                // ตรวจสอบงานทีละชิ้นว่ามีใน Submissions ไหม
                 assigns.forEach(task => {
                     const isSubmitted = fullSubmissionData.some(sub => 
                         sub.studentId === std.studentId && 
@@ -1322,7 +1251,7 @@
             if(count === 0) return Swal.fire('ข้อมูล', 'ไม่มีนักเรียนค้างงานให้คัดลอก', 'info');
             
             text += `----------------------------------\n`;
-            text += `รบกวนผู้ปกครองช่วยติดตามให้นักเรียนส่งงานให้ครบถ้วนด้วยนะครับ ขอบคุณครับ 🙏`;
+            text += `รบกวนคุณครูช่วยติดตามนักเรียนให้ส่งงานให้ครบถ้วนด้วยนะครับ 🙏`;
 
             navigator.clipboard.writeText(text).then(() => {
                 Swal.fire({
@@ -1346,10 +1275,6 @@
             }).getUnits();
         }
 
-        // ==========================================
-        // อัปเดตหน้าต่าง UI ฝั่งสั่งงาน (เพิ่มช่องเลือกเทอม)
-        // ==========================================
-        // แทรกช่องเลือกเทอมลงใน HTML ฝั่งสั่งงาน (คุณครูสามารถเอาโค้ด HTML กล่อง 3 สร้างหน่วย ไปวางทับใน View 2 ได้เลย หรือจะให้ Javascript ช่วยเพิ่มก็ได้)
         document.addEventListener("DOMContentLoaded", function() {
             const unitScoreInput = document.getElementById('new-unit-score').parentElement;
             if(unitScoreInput && !document.getElementById('new-unit-term')) {
@@ -1362,14 +1287,13 @@
                         </select>
                     </div>`;
                 unitScoreInput.insertAdjacentHTML('beforebegin', termHtml);
-                // เปลี่ยนข้อความ label ของคะแนนให้เป็น 3.4
                 unitScoreInput.querySelector('label').innerText = "3.4 เพิ่มคะแนนเก็บจริงของหน่วยนี้";
             }
         });
 
-     function saveUnitUI() {
+        function saveUnitUI() {
             const subject = document.getElementById('unit-subject-select').value;
-            const room = document.getElementById('assign-room').value; // อิงจากห้องที่เลือกในข้อ 2
+            const room = document.getElementById('assign-room').value; 
             const unitName = document.getElementById('new-unit-name').value.trim();
             const unitScore = document.getElementById('new-unit-score').value;
             const term = document.getElementById('new-unit-term') ? document.getElementById('new-unit-term').value : "1";
@@ -1384,7 +1308,7 @@
                     Swal.fire({ icon: 'success', title: 'สำเร็จ', text: res.message, timer: 1500, showConfirmButton: false });
                     document.getElementById('new-unit-name').value = '';
                     document.getElementById('new-unit-score').value = '';
-                    loadUnits(); // โหลดหน่วยใหม่มาอัปเดต
+                    loadUnits();
                 } else {
                     Swal.fire('ข้อผิดพลาด', res.message, 'error');
                 }
@@ -1412,7 +1336,6 @@
             } else {
                 unitSelect.innerHTML = '<option value="">-- เลือกหน่วยการเรียนรู้ --</option>';
                 unitsForSubjectRoom.forEach(u => {
-                    // ส่งค่าเทอม (u.term) เข้าไปใน value ด้วย และแสดงเทอมให้ครูเห็น
                     unitSelect.innerHTML += `<option value="${u.unitName}|${u.unitMaxScore}|${u.term || '1'}">[เทอม ${u.term || '1'}] ${u.unitName} (เก็บ ${u.unitMaxScore} คะแนน)</option>`;
                 });
             }
@@ -1435,10 +1358,10 @@
             }).getReportData();
         }
 
-      function renderUnitSummaryTable() {
+        function renderUnitSummaryTable() {
             const room = document.getElementById('usum-room').value;
             const subject = document.getElementById('usum-subject').value;
-            const term = document.getElementById('usum-term').value; // ดึงค่าเทอม
+            const term = document.getElementById('usum-term').value; 
             const tbody = document.getElementById('usum-table-body');
             const thead = document.getElementById('usum-table-head');
 
@@ -1451,14 +1374,12 @@
             const roomStudents = globalStudents.filter(s => s.room === room);
             const roomAssigns = globalAssignments.filter(a => a.targetRoom === room && a.subject === subject);
 
-            // ⚠️ กรองดึงเฉพาะ "หน่วย" ของห้องเรียน, วิชา และ "เทอม" ที่เลือกเท่านั้น
             const targetUnits = globalUnits.filter(u => u.subject === subject && (u.room === room || u.room === 'All' || !u.room) && (u.term === term || (!u.term && term === '1')));
             
             const unitMap = {}; 
             targetUnits.forEach(u => { unitMap[u.unitName] = Number(u.unitMaxScore); });
             const unitNames = Object.keys(unitMap);
 
-            // สร้างหัวตาราง (Thead)
             let theadHtml = `<tr>
                 <th class="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider w-16">เลขที่</th>
                 <th class="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">รหัส</th>
@@ -1472,7 +1393,6 @@
             theadHtml += `<th class="px-4 py-4 text-center text-xs font-bold text-indigo-600 uppercase tracking-wider">รวมคะแนน<br><span class="text-[10px] text-indigo-400 font-medium">(เก็บ ${grandMax})</span></th></tr>`;
             thead.innerHTML = theadHtml;
 
-            // สร้างเนื้อหาตาราง (Tbody)
             tbody.innerHTML = '';
             if(roomStudents.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="${3 + unitNames.length + 1}" class="text-center py-10 text-red-500">ไม่พบรายชื่อนักเรียนในห้องนี้</td></tr>`;
@@ -1503,7 +1423,6 @@
                         if(sub) { rawSum += Number(sub.score || 0); }
                     });
 
-                    // เทียบบัญญัติไตรยางศ์
                     let scaledScore = 0;
                     if(rawMaxSum > 0) { scaledScore = (rawSum / rawMaxSum) * unitMap[uName]; }
                     scaledScore = Math.round(scaledScore * 10) / 10;
@@ -1517,9 +1436,7 @@
                 tbody.innerHTML += tr;
             });
         }
-        // ==========================================
-        // NEW: ฟังก์ชันส่งออก Excel สำหรับหน้าสรุปหน่วย
-        // ==========================================
+
         function exportUnitSummaryToExcel() {
             const room = document.getElementById('usum-room').value;
             const subject = document.getElementById('usum-subject').value;
@@ -1539,7 +1456,6 @@
 
             const exportData = [];
 
-            // คำนวณคะแนนและสร้างแถวข้อมูลสำหรับ Excel
             roomStudents.forEach((std, idx) => {
                 let row = {
                     'เลขที่': idx + 1,
@@ -1567,7 +1483,6 @@
                     totalScaledScore += scaledScore;
                     grandMax += unitMap[uName];
 
-                    // สร้างคอลัมน์ชื่อหน่วยพร้อมวงเล็บบอกคะแนนเต็ม
                     row[`${uName} (เต็ม ${unitMap[uName]})`] = scaledScore;
                 });
 
@@ -1578,12 +1493,10 @@
             });
 
             try {
-                // สร้างไฟล์ Excel จากข้อมูล Array JSON
                 const worksheet = XLSX.utils.json_to_sheet(exportData);
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, `สรุปคะแนนเทอม${term}`);
 
-                // ตั้งชื่อไฟล์
                 const fileName = `สรุปคะแนน_${subject}_ห้อง_${room}_เทอม_${term}`.replace(/ /g, '_') + '.xlsx';
                 XLSX.writeFile(workbook, fileName);
                 
@@ -1594,7 +1507,7 @@
         }
 
         // ==========================================
-        // NEW FEATURE: ATTENDANCE REPORT (สถิติการมาเรียน)
+        // ATTENDANCE REPORT & SCANNER
         // ==========================================
         function openAttendanceReport() {
             showView('view-attendance-report');
@@ -1609,7 +1522,7 @@
         function renderAttendanceReport() {
             const room = document.getElementById('att-report-room').value;
             const month = document.getElementById('att-report-month').value;
-            const dateInput = document.getElementById('att-report-date').value; // ดึงค่าจากช่องเลือกวันที่
+            const dateInput = document.getElementById('att-report-date').value; 
             const tbody = document.getElementById('att-report-table-body');
 
             if(!room) {
@@ -1617,14 +1530,12 @@
                 return;
             }
 
-            // แปลงรูปแบบวันที่ที่เลือกให้ตรงกับในฐานข้อมูล (dd/MM/yyyy)
             let filterDateStr = "";
             if (dateInput) {
                 const d = new Date(dateInput);
                 filterDateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
             }
 
-            // กรองเด็กตามห้อง
             const roomStudents = globalStudents.filter(s => room === 'all' || s.room === room);
             
             if(roomStudents.length === 0) {
@@ -1632,15 +1543,12 @@
                 return;
             }
 
-            // กรองข้อมูลเช็คชื่อตามวันที่ หรือ ตามเดือน
             const filteredAtt = fullAttendanceData.filter(att => {
                 if(room !== 'all' && att.room !== room) return false;
                 
                 if (filterDateStr) {
-                    // กรองรายวัน
                     if (att.date !== filterDateStr) return false;
                 } else if(month !== 'all') {
-                    // กรองรายเดือน
                     const parts = att.date.split('/');
                     if(parts.length >= 2 && parts[1] !== month) return false;
                 }
@@ -1649,7 +1557,6 @@
 
             tbody.innerHTML = '';
             roomStudents.forEach((std, idx) => {
-                // คำนวณสถิติแต่ละคน
                 let present = 0, leave = 0, sick = 0, absent = 0;
                 
                 filteredAtt.forEach(att => {
@@ -1675,9 +1582,6 @@
             });
         }
 
-        // ==========================================
-        // ATTENDANCE SYSTEM (เช็คชื่อ)
-        // ==========================================
         function openAttendance() {
             showView('view-attendance');
             if(!document.getElementById('att-date').value) {
@@ -1883,6 +1787,8 @@
         }
 
         // ==========================================
+        // ASSIGNMENTS & SCANNER
+        // ==========================================
         function openManageAssignments() { showView('view-manage-assignments'); }
 
         function saveSubjectUI() {
@@ -1903,7 +1809,7 @@
             }).getAssignments();
         }
 
-      function renderAssignmentTable() {
+        function renderAssignmentTable() {
             const tbody = document.getElementById('assign-table-body');
             tbody.innerHTML = '';
             if(globalAssignments.length === 0) {
@@ -1928,7 +1834,7 @@
             }
         }
 
-       function saveAssignmentUI() {
+        function saveAssignmentUI() {
             const sub = document.getElementById('assign-subject').value;
             const room = document.getElementById('assign-room').value;
             const task = document.getElementById('assign-task').value.trim();
@@ -1939,7 +1845,6 @@
             if(!sub || !room || !task) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกวิชา ห้อง และตั้งชื่องาน', 'warning');
             if(!unitSelection) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกหน่วยการเรียนรู้ (หากไม่มีให้สร้างในข้อ 3 ด้านซ้ายมือก่อน)', 'warning');
             
-            // แยกค่า ชื่อหน่วย, คะแนนเต็มหน่วย และ เทอม ที่ต่อกันไว้ออกมา
             const [unitName, unitMax, term] = unitSelection.split('|');
 
             Swal.fire({ title: 'บันทึก...', didOpen: () => Swal.showLoading() });
@@ -1982,7 +1887,7 @@
             });
         }
 
-       function updateDefaultScoreUI() {
+        function updateDefaultScoreUI() {
             const room = document.getElementById('scan-room-filter').value;
             const sub = document.getElementById('scan-subject-filter').value;
             const task = document.getElementById('scan-task').value;
@@ -2042,7 +1947,7 @@
             if(fromCamera) setTimeout(() => html5QrcodeScanner.resume(), 1600);
         }
 
-       function renderRecentScans() {
+        function renderRecentScans() {
             const list = document.getElementById('recent-scan-list');
             list.innerHTML = sessionScans.map(s => {
                 let scoreDisplay = s.score !== "" ? `คะแนน: ${s.score}` : "รอตรวจ";
@@ -2098,6 +2003,9 @@
         }
         function stopScanner() { if(html5QrcodeScanner && isCameraOpen) { html5QrcodeScanner.stop().then(() => { isCameraOpen = false; document.getElementById('reader-container').classList.add('hidden'); }); } }
 
+        // ==========================================
+        // GRADE TRACKER
+        // ==========================================
         function openGradeTracker() { showView('view-grade-tracker'); }
 
         function filterTasksForTracker() {
@@ -2136,7 +2044,6 @@
                 }
                 
                 data.forEach((std, index) => {
-                    // --- ระบบ Auto-Save Backup ---
                     const draftKey = `draft_${std.studentId}_${sub}_${task}`;
                     const draftScore = localStorage.getItem(draftKey);
                     
@@ -2144,11 +2051,10 @@
                     let isSubmitted = std.status === "ส่งแล้ว";
                     let isDraft = false;
                     
-                    // ถ้าพบคะแนนที่ค้างอยู่ในเครื่อง และไม่ตรงกับในฐานข้อมูล
                     if (draftScore !== null && draftScore !== String(std.score)) {
                         displayScore = draftScore;
                         isDraft = true;
-                        isSubmitted = true; // บังคับเปลี่ยนสถานะเป็นส่งแล้ว
+                        isSubmitted = true;
                     }
                     
                     let statusHtml = `
@@ -2164,7 +2070,6 @@
                     
                     let photoHtml = std.photo ? `<img src="${std.photo}" class="w-10 h-10 rounded-full object-cover mx-auto border border-gray-200">` : `<div class="w-10 h-10 rounded-full bg-gray-200 mx-auto flex items-center justify-center text-gray-400"><i class="fas fa-user"></i></div>`;
                     
-                    // ใส่สีส้มแจ้งเตือนถ้าเป็นคะแนนที่ยังไม่ได้เซฟ
                     const inputClass = isDraft ? "border-amber-400 bg-amber-50 text-amber-700" : "border-gray-300 bg-white text-teal-700";
 
                     tbody.innerHTML += `
@@ -2259,9 +2164,8 @@
             
             Swal.fire({ title: 'กำลังบันทึกข้อมูล...', text: 'กรุณารอสักครู่', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             
-           google.script.run.withSuccessHandler(res => {
+            google.script.run.withSuccessHandler(res => {
                 if(res.success) {
-                    // เคลียร์ความจำ Local Storage สำหรับงานนี้
                     updates.forEach(u => {
                         localStorage.removeItem(`draft_${u.studentId}_${sub}_${task}`);
                     });
@@ -2275,14 +2179,17 @@
             }).updateScoresBulk(sub, room, task, updates);
         }
 
+        // ==========================================
+        // TOOLS & GAMIFICATION
+        // ==========================================
         function openTools() { showView('view-tools'); }
-       function loadStudentsForTools() {
+        
+        function loadStudentsForTools() {
             const room = document.getElementById('tool-room-select').value;
             toolStudents = globalStudents.filter(s => s.room === room);
-            drawWheel(); renderCards(); generateQRCodes(); // เรียกใช้คำสั่งวาด QR
+            drawWheel(); renderCards(); generateQRCodes();
         }
 
-        // ฟังก์ชันวาดรูป QR Code
         function generateQRCodes() {
             const container = document.getElementById('qr-print-area');
             container.innerHTML = '';
@@ -2443,11 +2350,10 @@
         }
 
         // ==========================================
-        // Parent View & Unit Dashboard UI
+        // PARENT VIEW & UNIT DASHBOARD
         // ==========================================
         function syncAndSearch() {
             const dashSub = document.getElementById('parent-dashboard-subject-select').value;
-            // อัปเดตวิชาในหน้าหลักให้ตรงกัน
             document.getElementById('parent-subject-select').value = dashSub;
             handleParentSearch();
         }
@@ -2474,11 +2380,10 @@
                     unitSelect.innerHTML = '<option value="all">ดูทุกบทเรียน</option>';
                     const uniqueUnits = new Set();
                     
-                    // แก้ไข: ดึง unitName ตรงๆ จากที่ส่งมาจากหลังบ้าน
                     currentParentRecords.forEach(r => {
                         const unitName = r.unitName || "ทั่วไป";
                         uniqueUnits.add(unitName);
-                        r.unitName = unitName; // แปะค่าไว้ให้ renderParentCards ใช้งาน
+                        r.unitName = unitName; 
                     });
                     
                     uniqueUnits.forEach(u => {
@@ -2491,7 +2396,7 @@
             }).getStudentRecords(id, sub);
         }
 
-      function renderParentCards() {
+        function renderParentCards() {
             const selectedUnit = document.getElementById('parent-dashboard-unit-select').value;
             const filteredRecords = currentParentRecords.filter(r => selectedUnit === 'all' || r.unitName === selectedUnit);
 
@@ -2647,392 +2552,9 @@
             }, 100);
         }
 
-            // 🚨 ระบบสร้าง UI กล่องแจ้งเตือนงานค้าง 🚨
-            const alertContainer = document.getElementById('p-missing-alert-container');
-            if (missingTasks.length > 0) {
-                let alertHtml = `
-                    <div class="bg-rose-50 border border-rose-200 p-5 rounded-2xl shadow-sm relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-rose-500 opacity-5 rounded-full transform translate-x-8 -translate-y-8"></div>
-                        <div class="flex items-center mb-3">
-                            <div class="bg-rose-500 text-white rounded-full w-10 h-10 flex items-center justify-center mr-3 shadow-md">
-                                <i class="fas fa-exclamation-triangle text-lg animate-pulse"></i>
-                            </div>
-                            <h3 class="text-rose-800 font-bold text-lg">แจ้งเตือน: มีงานค้างส่ง ${missingTasks.length} ชิ้น</h3>
-                        </div>
-                        <ul class="list-disc list-inside text-rose-700 text-sm pl-2 space-y-1.5 font-medium ml-12">
-                `;
-                missingTasks.forEach(task => {
-                    alertHtml += `<li>วิชา${task.subject} : <span class="font-bold underline decoration-rose-300 underline-offset-4">${task.workTitle}</span> <span class="text-rose-500 opacity-75 text-xs ml-1">(หน่วย: ${task.unitName})</span></li>`;
-                });
-                alertHtml += `
-                        </ul>
-                    </div>
-                `;
-                alertContainer.innerHTML = alertHtml;
-                alertContainer.classList.remove('hidden');
-            } else if (filteredRecords.length > 0) {
-                // ถ้าไม่มีงานค้างเลย โชว์ป้ายคำชม
-                alertContainer.innerHTML = `
-                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl shadow-sm flex items-center justify-center">
-                        <i class="fas fa-star text-emerald-500 text-2xl mr-3 animate-bounce"></i>
-                        <span class="text-emerald-800 font-bold text-lg">ยอดเยี่ยม! ส่งงานครบทุกชิ้นแล้ว</span>
-                    </div>
-                `;
-                alertContainer.classList.remove('hidden');
-            } else {
-                alertContainer.innerHTML = '';
-                alertContainer.classList.add('hidden');
-            }
-
-            // อัปเดต Progress Bar
-            document.getElementById('p-total-score').innerText = totalRaw;
-            document.getElementById('p-max-score-label').innerText = `/ ${maxRaw} คะแนนดิบ`;
-            document.getElementById('p-task-count').innerText = `${filteredRecords.length} ชิ้นงาน`;
-            
-            let percent = 0;
-            if (maxRaw > 0) percent = Math.round((totalRaw / maxRaw) * 100);
-            
-            setTimeout(() => {
-                const pb = document.getElementById('p-progress-bar');
-                pb.style.width = `${percent}%`;
-                document.getElementById('p-percent-label').innerText = `คิดเป็น ${percent}%`;
-                if(percent < 50) {
-                    pb.className = "h-3 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-rose-400 to-rose-500";
-                    document.getElementById('p-percent-label').className = "text-right text-xs font-bold text-rose-500 mt-1";
-                } else if(percent < 80) {
-                    pb.className = "h-3 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-amber-400 to-amber-500";
-                    document.getElementById('p-percent-label').className = "text-right text-xs font-bold text-amber-500 mt-1";
-                } else {
-                    pb.className = "h-3 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-teal-400 to-emerald-500";
-                    document.getElementById('p-percent-label').className = "text-right text-xs font-bold text-teal-600 mt-1";
-                }
-            }, 100);
-        }
-
         // ==========================================
-        // REPORTING & EXPORT DASHBOARD
+        // AUTO-SAVE / UTILS
         // ==========================================
-        let fullSubmissionData = []; 
-        let fullAssignmentData = []; 
-        let filteredReportData = [];
-
-        function openReports() {
-            showView('view-reports');
-            fetchRawReportData();
-        }
-
-        function fetchRawReportData() {
-            Swal.fire({ title: 'กำลังดึงฐานสถิติ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            google.script.run.withSuccessHandler(res => {
-                if(res && res.submissions) {
-                    fullSubmissionData = res.submissions;
-                    fullAssignmentData = res.assignments;
-                    Swal.close();
-                    applyReportFilters();
-                } else {
-                    Swal.fire('ข้อผิดพลาด', 'รูปแบบข้อมูลที่ตอบกลับมาไม่ถูกต้อง', 'error');
-                }
-            }).getReportData();
-        }
-
-        function resetReportFilters() {
-            document.getElementById('report-filter-room').value = 'all';
-            document.getElementById('report-filter-subject').value = 'all';
-            document.getElementById('report-filter-month').value = 'all';
-            applyReportFilters();
-        }
-
-        function applyReportFilters() {
-            const filterRoom = document.getElementById('report-filter-room').value;
-            const filterSubject = document.getElementById('report-filter-subject').value;
-            const filterMonth = document.getElementById('report-filter-month').value;
-
-            filteredReportData = fullSubmissionData.filter(row => {
-                if (filterRoom !== 'all' && row.room !== filterRoom) return false;
-                if (filterSubject !== 'all' && row.subject !== filterSubject) return false;
-                if (filterMonth !== 'all') {
-                    const dateObj = new Date(row.Timestamp);
-                    const monthStr = dateObj.getMonth().toString().padStart(2, '0');
-                    if (monthStr !== filterMonth) return false;
-                }
-                return true;
-            });
-
-            updateKPICards(filterRoom, filterSubject, filterMonth);
-            renderCharts(filterRoom, filterSubject, filterMonth);
-            renderClassroomPerformanceOverview();
-        }
-
-        function updateKPICards(room, subject, month) {
-            let activeStudents = globalStudents;
-            if (room !== 'all') activeStudents = globalStudents.filter(s => s.room === room);
-            document.getElementById('kpi-total-students').innerText = activeStudents.length;
-
-            let activeAssignments = fullAssignmentData;
-            if (room !== 'all') activeAssignments = activeAssignments.filter(a => a.targetRoom === room);
-            if (subject !== 'all') activeAssignments = activeAssignments.filter(a => a.subject === subject);
-            document.getElementById('kpi-total-assignments').innerText = activeAssignments.length;
-
-            let totalPossibleSubmissions = 0;
-            if(room === 'all') {
-                const roomsList = [...new Set(globalStudents.map(s => s.room))];
-                roomsList.forEach(r => {
-                    const stdInRoom = globalStudents.filter(s => s.room === r).length;
-                    let assignInRoom = fullAssignmentData.filter(a => a.targetRoom === r);
-                    if(subject !== 'all') assignInRoom = assignInRoom.filter(a => a.subject === subject);
-                    totalPossibleSubmissions += (stdInRoom * assignInRoom.length);
-                });
-            } else {
-                totalPossibleSubmissions = activeStudents.length * activeAssignments.length;
-            }
-
-            const actualSubmissionsCount = filteredReportData.length;
-            let rate = 0;
-            if (totalPossibleSubmissions > 0) {
-                rate = Math.round((actualSubmissionsCount / totalPossibleSubmissions) * 100);
-            }
-            document.getElementById('kpi-submission-rate').innerText = `${rate}%`;
-
-            let scoreSum = 0;
-            filteredReportData.forEach(s => scoreSum += Number(s.score || 0));
-            let avgScore = filteredReportData.length > 0 ? (scoreSum / filteredReportData.length).toFixed(1) : '0.0';
-            document.getElementById('kpi-avg-score').innerText = avgScore;
-        }
-
-        function renderClassroomPerformanceOverview() {
-            const container = document.getElementById('classroom-performance-grid');
-            container.innerHTML = '';
-            
-            const rooms = [...new Set(globalStudents.map(s => s.room))].filter(r => r).sort();
-            
-            rooms.forEach(room => {
-                const studentsInRoom = globalStudents.filter(s => s.room === room);
-                const assignmentsInRoom = fullAssignmentData.filter(a => a.targetRoom === room);
-                
-                const submissionsInRoom = fullSubmissionData.filter(sub => sub.room === room);
-                const totalPossible = studentsInRoom.length * assignmentsInRoom.length;
-                const totalSubmitted = submissionsInRoom.length;
-                
-                let completionRate = 0;
-                if (totalPossible > 0) {
-                    completionRate = Math.round((totalSubmitted / totalPossible) * 100);
-                }
-                
-                let colorClass = 'emerald';
-                if(completionRate < 50) colorClass = 'rose';
-                else if(completionRate < 80) colorClass = 'amber';
-
-                container.innerHTML += `
-                    <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-md transition">
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <h4 class="font-extrabold text-slate-800 text-base">ห้องเรียน ${room}</h4>
-                                <span class="bg-${colorClass}-50 text-${colorClass}-700 text-xs px-2 py-0.5 rounded-full font-bold border border-${colorClass}-200">${completionRate}% ส่งแล้ว</span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 mt-2 py-2 border-y border-slate-50 text-xs">
-                                <div>
-                                    <span class="text-slate-400 block">นักเรียนทั้งหมด</span>
-                                    <span class="font-bold text-slate-700 text-sm">${studentsInRoom.length} คน</span>
-                                </div>
-                                <div>
-                                    <span class="text-slate-400 block">งานที่สั่งสอน</span>
-                                    <span class="font-bold text-slate-700 text-sm">${assignmentsInRoom.length} ชิ้น</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <div class="w-full bg-slate-100 rounded-full h-2">
-                                <div class="bg-${colorClass}-500 h-2 rounded-full" style="width: ${completionRate}%"></div>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        function renderCharts(room, subject, month) {
-            const subjectStats = {};
-            globalSubjects.forEach(sub => {
-                subjectStats[sub] = { possible: 0, actual: 0 };
-            });
-
-            globalStudents.forEach(std => {
-                if (room !== 'all' && std.room !== room) return;
-                
-                const roomAssignments = fullAssignmentData.filter(a => a.targetRoom === std.room);
-                roomAssignments.forEach(assign => {
-                    if (subject !== 'all' && assign.subject !== subject) return;
-                    
-                    if (subjectStats[assign.subject]) {
-                        subjectStats[assign.subject].possible++;
-                        
-                        const hasSubmitted = fullSubmissionData.some(sub => 
-                            sub.studentId === std.studentId && 
-                            sub.subject === assign.subject && 
-                            sub.workTitle === assign.taskName
-                        );
-                        if (hasSubmitted) subjectStats[assign.subject].actual++;
-                    }
-                });
-            });
-
-            const subLabels = [];
-            const subRates = [];
-            Object.keys(subjectStats).forEach(k => {
-                const s = subjectStats[k];
-                if (s.possible > 0) {
-                    subLabels.push(k);
-                    subRates.push(Math.round((s.actual / s.possible) * 100));
-                }
-            });
-
-            if (chartSubject) chartSubject.destroy();
-            const ctxSub = document.getElementById('chart-subject-performance').getContext('2d');
-            chartSubject = new Chart(ctxSub, {
-                type: 'bar',
-                data: {
-                    labels: subLabels,
-                    datasets: [{
-                        label: 'อัตราการส่งงานสำเร็จ (%)',
-                        data: subRates,
-                        backgroundColor: ['rgba(20, 184, 166, 0.7)', 'rgba(59, 130, 246, 0.7)', 'rgba(236, 72, 153, 0.7)', 'rgba(245, 158, 11, 0.7)'],
-                        borderColor: ['#14b8a6', '#3b82f6', '#ec4899', '#f59e0b'],
-                        borderWidth: 1.5,
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, max: 100 }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-
-            const monthsNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-            const monthCounts = Array(12).fill(0);
-
-            filteredReportData.forEach(sub => {
-                const dateObj = new Date(sub.Timestamp);
-                const m = dateObj.getMonth();
-                monthCounts[m]++;
-            });
-
-            const activeMonthLabels = [];
-            const activeMonthData = [];
-            for (let i = 4; i <= 7; i++) { 
-                activeMonthLabels.push(monthsNames[i]);
-                activeMonthData.push(monthCounts[i]);
-            }
-
-            if (chartMonthly) chartMonthly.destroy();
-            const ctxMonth = document.getElementById('chart-monthly-trend').getContext('2d');
-            chartMonthly = new Chart(ctxMonth, {
-                type: 'line',
-                data: {
-                    labels: activeMonthLabels,
-                    datasets: [{
-                        label: 'สถิติการส่งงาน (จำนวนครั้ง)',
-                        data: activeMonthData,
-                        borderColor: '#6366f1',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#4f46e5',
-                        pointRadius: 6,
-                        tension: 0.3,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 5 } }
-                    }
-                }
-            });
-        }
-
-        function exportData(type) {
-            if (filteredReportData.length === 0) {
-                return Swal.fire('เกิดข้อผิดพลาด', 'ไม่มีข้อมูลการส่งงานที่จะส่งออก กรุณาเลือกตัวกรองที่มีรายการ', 'warning');
-            }
-
-            const formattedData = filteredReportData.map((row, index) => {
-                const dt = new Date(row.Timestamp);
-                const dateStr = `${dt.getDate().toString().padStart(2, '0')}/${(dt.getMonth()+1).toString().padStart(2, '0')}/${dt.getFullYear()} ${dt.getHours().toString().padStart(2, '0')}:${dt.getMinutes().toString().padStart(2, '0')}`;
-                
-                return {
-                    'ลำดับ': index + 1,
-                    'วันเวลาที่ส่ง': dateStr,
-                    'รหัสนักเรียน': row.studentId,
-                    'ชื่อ-นามสกุล': row.studentName,
-                    'ห้องเรียน': row.room,
-                    'รายวิชา': row.subject,
-                    'หัวข้องานที่มอบหมาย': row.workTitle,
-                    'คะแนนที่ได้': row.score,
-                    'วิธีบันทึก': row.ScanType || 'QR Scan'
-                };
-            });
-
-            const activeRoom = document.getElementById('report-filter-room').value;
-            const activeSubject = document.getElementById('report-filter-subject').value;
-            const fileName = `รายงานการส่งงาน_ห้อง_${activeRoom}_วิชา_${activeSubject}`.replace(/ /g, '_');
-
-            if (type === 'xlsx') {
-                try {
-                    const worksheet = XLSX.utils.json_to_sheet(formattedData);
-                    const workbook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(workbook, worksheet, "สถิติการส่งงาน");
-                    
-                    const max_len = [10, 20, 15, 25, 12, 20, 30, 12, 15];
-                    worksheet['!cols'] = max_len.map(w => ({ wch: w }));
-
-                    XLSX.writeFile(workbook, `${fileName}.xlsx`);
-                    Swal.fire({ icon: 'success', title: 'ส่งออกข้อมูลสำเร็จ!', text: `บันทึกไฟล์เป็น ${fileName}.xlsx แล้ว`, timer: 1500, showConfirmButton: false });
-                } catch(e) {
-                    Swal.fire('ข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ Excel ได้: ' + e.message, 'error');
-                }
-            } else if (type === 'csv') {
-                try {
-                    const headers = Object.keys(formattedData[0]);
-                    const csvRows = [];
-                    
-                    csvRows.push('\uFEFF' + headers.join(','));
-
-                    for (const row of formattedData) {
-                        const values = headers.map(header => {
-                            const escaped = ('' + row[header]).replace(/"/g, '\\"');
-                            return `"${escaped}"`;
-                        });
-                        csvRows.push(values.join(','));
-                    }
-
-                    const csvContent = csvRows.join('\n');
-                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                    const url = URL.createObjectURL(blob);
-                    
-                    const link = document.createElement("a");
-                    link.setAttribute("href", url);
-                    link.setAttribute("download", `${fileName}.csv`);
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    
-                    Swal.fire({ icon: 'success', title: 'ส่งออกข้อมูลสำเร็จ!', text: `บันทึกไฟล์เป็น ${fileName}.csv แล้ว`, timer: 1500, showConfirmButton: false });
-                } catch(e) {
-                    Swal.fire('ข้อผิดพลาด', 'ไม่สามารถส่งออก CSV ได้: ' + e.message, 'error');
-                }
-            }
-        }
-
-        // ==========================================
-        // ฟังก์ชันอื่นๆ (Safe input etc.)
-        // ==========================================
-       // ระบบตรวจจับการพิมพ์คะแนน และ Auto-Save ลงเครื่อง
         document.addEventListener('input', function(event) {
             const input = event.target;
             if (input.tagName === 'INPUT' && input.classList.contains('tracker-score-input')) {
@@ -3043,7 +2565,6 @@
                 const task = document.getElementById('tracker-task').value;
                 const draftKey = `draft_${studentId}_${sub}_${task}`;
 
-                // ถ้ากรอกคะแนน ให้เซฟลงเครื่อง และเปลี่ยนกรอบเป็นสีส้ม
                 if (scoreVal !== '') {
                     localStorage.setItem(draftKey, scoreVal);
                     input.classList.remove('border-gray-300', 'bg-white', 'text-teal-700');
@@ -3052,7 +2573,7 @@
                     const row = input.closest('tr');
                     const badge = document.getElementById(`status-badge-${studentId}`);
                     if (badge && badge.getAttribute('data-status') !== 'submitted') {
-                        badge.click(); // เปลี่ยนสถานะเป็นส่งแล้วให้อัตโนมัติ
+                        badge.click(); 
                     }
                 } else {
                     localStorage.removeItem(draftKey);
@@ -3082,9 +2603,7 @@
                 }
             }
         });
-        // ==========================================
-        // ระบบปิดเทอม / ขึ้นเทอมใหม่ (Auto-Archive)
-        // ==========================================
+
         function startNewTerm() {
             Swal.fire({
                 title: 'คุณต้องการปิดเทอม ใช่หรือไม่?',
@@ -3105,7 +2624,7 @@
                     google.script.run.withSuccessHandler(res => {
                         if(res.success) {
                             Swal.fire('ปิดเทอมสำเร็จ!', res.message, 'success').then(() => {
-                                window.location.reload(); // รีเฟรชเว็บใหม่เพื่อเริ่มเทอมใหม่
+                                window.location.reload();
                             });
                         } else {
                             Swal.fire('ข้อผิดพลาด', res.message, 'error');
