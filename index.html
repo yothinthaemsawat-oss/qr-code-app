@@ -965,6 +965,20 @@
                 </div>
             </div>
             
+            <!-- Student Profile Header Card (โค้ดเดิมด้านบน) -->
+            <div class="bg-white rounded-3xl shadow-lg p-8 mb-8 border-t-8 border-teal-500 text-center relative overflow-hidden">
+                <!-- ... (โค้ดเดิมของกล่องโปรไฟล์เด็ก) ... -->
+            </div>
+
+            <!-- 🚨 เพิ่มโค้ด กล่องแจ้งเตือนงานค้าง (ใหม่) ตรงนี้ 🚨 -->
+            <div id="p-missing-alert-container" class="mb-8 hidden">
+                <!-- เนื้อหาจะถูกสร้างโดย Javascript -->
+            </div>
+            <!-- ============================================== -->
+            
+            <!-- Cards Container for Assignments (โค้ดเดิมด้านล่าง) -->
+            <div class="mb-4 flex justify-between items-center px-2">
+            
             <!-- Cards Container for Assignments -->
             <div class="mb-4 flex justify-between items-center px-2">
                 <h3 class="font-extrabold text-gray-700 text-xl flex items-center">
@@ -2478,7 +2492,7 @@
             }).getStudentRecords(id, sub);
         }
 
-        function renderParentCards() {
+       function renderParentCards() {
             const selectedUnit = document.getElementById('parent-dashboard-unit-select').value;
             const filteredRecords = currentParentRecords.filter(r => selectedUnit === 'all' || r.unitName === selectedUnit);
 
@@ -2503,6 +2517,7 @@
             
             let totalRaw = 0;
             let maxRaw = 0;
+            let missingTasks = []; // อาเรย์สำหรับเก็บ "งานค้าง"
 
             if(filteredRecords.length === 0) {
                 container.innerHTML = `
@@ -2518,7 +2533,12 @@
                     if(!unitGroups[uName]) unitGroups[uName] = [];
                     unitGroups[uName].push(r);
                     
-                    if(r.isSubmitted) totalRaw += (Number(r.score) || 0);
+                    if(r.isSubmitted) {
+                        totalRaw += (Number(r.score) || 0);
+                    } else {
+                        // ถ้ายานยังไม่ส่ง ให้เก็บเข้าลิสต์งานค้าง
+                        missingTasks.push(r);
+                    }
                     maxRaw += (Number(r.maxScore) || 0);
                 });
 
@@ -2566,6 +2586,44 @@
                 });
             }
 
+            // 🚨 ระบบสร้าง UI กล่องแจ้งเตือนงานค้าง 🚨
+            const alertContainer = document.getElementById('p-missing-alert-container');
+            if (missingTasks.length > 0) {
+                let alertHtml = `
+                    <div class="bg-rose-50 border border-rose-200 p-5 rounded-2xl shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-rose-500 opacity-5 rounded-full transform translate-x-8 -translate-y-8"></div>
+                        <div class="flex items-center mb-3">
+                            <div class="bg-rose-500 text-white rounded-full w-10 h-10 flex items-center justify-center mr-3 shadow-md">
+                                <i class="fas fa-exclamation-triangle text-lg animate-pulse"></i>
+                            </div>
+                            <h3 class="text-rose-800 font-bold text-lg">แจ้งเตือน: มีงานค้างส่ง ${missingTasks.length} ชิ้น</h3>
+                        </div>
+                        <ul class="list-disc list-inside text-rose-700 text-sm pl-2 space-y-1.5 font-medium ml-12">
+                `;
+                missingTasks.forEach(task => {
+                    alertHtml += `<li>วิชา${task.subject} : <span class="font-bold underline decoration-rose-300 underline-offset-4">${task.workTitle}</span> <span class="text-rose-500 opacity-75 text-xs ml-1">(หน่วย: ${task.unitName})</span></li>`;
+                });
+                alertHtml += `
+                        </ul>
+                    </div>
+                `;
+                alertContainer.innerHTML = alertHtml;
+                alertContainer.classList.remove('hidden');
+            } else if (filteredRecords.length > 0) {
+                // ถ้าไม่มีงานค้างเลย โชว์ป้ายคำชม
+                alertContainer.innerHTML = `
+                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl shadow-sm flex items-center justify-center">
+                        <i class="fas fa-star text-emerald-500 text-2xl mr-3 animate-bounce"></i>
+                        <span class="text-emerald-800 font-bold text-lg">ยอดเยี่ยม! ส่งงานครบทุกชิ้นแล้ว</span>
+                    </div>
+                `;
+                alertContainer.classList.remove('hidden');
+            } else {
+                alertContainer.innerHTML = '';
+                alertContainer.classList.add('hidden');
+            }
+
+            // อัปเดต Progress Bar
             document.getElementById('p-total-score').innerText = totalRaw;
             document.getElementById('p-max-score-label').innerText = `/ ${maxRaw} คะแนนดิบ`;
             document.getElementById('p-task-count').innerText = `${filteredRecords.length} ชิ้นงาน`;
