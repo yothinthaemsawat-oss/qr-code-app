@@ -869,40 +869,62 @@
 
     </main>
 
+   <!-- Mock Google Apps Script Server Side Engine -->
     <script>
         const IS_MOCK_ENV = typeof google === 'undefined' || !google.script || !google.script.run;
 
         if (IS_MOCK_ENV) {
             console.log("Running via GitHub Pages API Bridge");
             
-            // ⚠️ นำ Web App URL ของคุณมาใส่ที่นี่ ⚠️
-            const GAS_URL = 'https://script.google.com/macros/s/AKfycbwgAIUk030QcR7kTixizdZ8f_6AnYyjAxPfbvBLPzF6cZfVoIPkiLvtQ7vG6UHoEQRC/exec';
+            // ⚠️ URL ของคุณครู ⚠️
+            const GAS_URL = 'https://script.google.com/macros/s/AKfycbynUCiLB1gJ-DN65ZSj5Z9KiGyRHGyFJCps-gtcfOo13r_JHQT5nZxMoc2TDUvIMLc/exec';
             
             window.google = {
                 script: {
                     run: {
                         withSuccessHandler: function(onSuccess) {
-                            return new Proxy({}, {
-                                get: function(target, prop) {
-                                    return function(...args) {
-                                        fetch(GAS_URL, {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                                            body: JSON.stringify({ action: prop, params: args })
-                                        })
-                                        .then(response => response.json())
-                                        .then(data => { if (onSuccess) onSuccess(data); })
-                                        .catch(error => {
-                                            console.error("API Fetch Error:", error);
-                                            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
-                                        });
-                                    }
-                                }
-                            });
+                            this._onSuccess = onSuccess;
+                            return this;
+                        },
+                        withFailureHandler: function(onFailure) {
+                            this._onFailure = onFailure;
+                            return this;
                         }
                     }
                 }
             };
+
+            window.google.script.run = new Proxy(window.google.script.run, {
+                get: function(target, prop) {
+                    if (prop === 'withSuccessHandler') {
+                        return function(fn) { target._onSuccess = fn; return target; };
+                    }
+                    if (prop === 'withFailureHandler') {
+                        return function(fn) { target._onFailure = fn; return target; };
+                    }
+                    return function(...args) {
+                        const onSuccess = target._onSuccess;
+                        const onFailure = target._onFailure;
+                        target._onSuccess = null;
+                        target._onFailure = null;
+
+                        fetch(GAS_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                            body: JSON.stringify({ action: prop, params: args })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (onSuccess) onSuccess(data);
+                        })
+                        .catch(error => {
+                            console.error("API Fetch Error:", error);
+                            if (onFailure) onFailure(error);
+                            else Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
+                        });
+                    }
+                }
+            });
         }
     </script>
 
@@ -990,27 +1012,24 @@
             }).verifyLogin(user, pass);
         }
 
-        // ฟังก์ชันสำหรับปุ่ม ดึงฐานข้อมูล (รีเฟรชรายชื่อครู)
+      // ฟังก์ชันสำหรับปุ่ม ดึงฐานข้อมูล (รีเฟรชรายชื่อครู)
         function refreshTeacherList() {
             const select = document.getElementById('username');
             select.innerHTML = '<option value="">-- กำลังดึงฐานข้อมูล... --</option>';
-            select.classList.add('animate-pulse'); // เพิ่มเอฟเฟกต์กะพริบตอนโหลด
+            select.classList.add('animate-pulse');
             
             google.script.run.withSuccessHandler(teachers => {
                 select.classList.remove('animate-pulse');
-                select.innerHTML = '<option value="">-- เลือกชื่อของคุณครู --</option>';
                 
-                if(teachers && teachers.length > 0) {
-                    teachers.forEach(t => { select.innerHTML += `<option value="${t.username}">${t.name}</option>`; });
-                    // โชว์แจ้งเตือนมุมขวาบนว่าดึงสำเร็จ
+                if(Array.isArray(teachers) && teachers.length > 0) {
+                    select.innerHTML = '<option value="">-- เลือกชื่อของคุณครู --</option>';
+                    teachers.forEach(t => { 
+                        select.innerHTML += `<option value="${t.username}">${t.name}</option>`; 
+                    });
                     Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'อัปเดตฐานข้อมูลครูสำเร็จ', showConfirmButton: false, timer: 1500 });
                 } else {
                     select.innerHTML = '<option value="">-- ไม่พบรายชื่อครูในฐานข้อมูล --</option>';
                 }
-            }).withFailureHandler(err => {
-                select.classList.remove('animate-pulse');
-                select.innerHTML = '<option value="">-- โหลดข้อมูลล้มเหลว --</option>';
-                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถดึงข้อมูลได้: ' + err.message, 'error');
             }).getTeacherList();
         }
         
