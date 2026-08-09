@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -43,6 +44,13 @@
         .att-radio:checked + label.att-leave { background-color: #f59e0b; color: white; border-color: #f59e0b; }
         .att-radio:checked + label.att-sick { background-color: #3b82f6; color: white; border-color: #3b82f6; }
         .att-radio:checked + label.att-absent { background-color: #ef4444; color: white; border-color: #ef4444; }
+        /* Print QR Code Styles */
+        @media print {
+            body * { visibility: hidden; }
+            #qr-print-area, #qr-print-area * { visibility: visible; }
+            #qr-print-area { position: absolute; left: 0; top: 0; width: 100%; display: grid; grid-template-columns: repeat(4, 1fr) !important; gap: 10px; margin: 0; padding: 10px; overflow: visible; height: auto; border: none; background: white; }
+            .print-card { border: 1px solid #64748b !important; box-shadow: none !important; page-break-inside: avoid; }
+        }
     </style>
 </head>
 <body class="text-gray-800 antialiased h-screen flex flex-col bg-slate-50">
@@ -490,6 +498,10 @@
                 <div class="flex items-center text-purple-700 font-bold">
                     <i class="fas fa-users-cog text-xl mr-2"></i> ตั้งค่าห้องเรียนสำหรับกิจกรรม
                 </div>
+                <!-- ปุ่มระบบเก็บเข้ากรุขึ้นเทอมใหม่ -->
+                <button onclick="startNewTerm()" class="ml-4 bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow transition flex items-center">
+                    <i class="fas fa-box-open mr-1"></i> ปิดเทอม / ขึ้นเทอมใหม่
+                </button>
                 <div class="flex space-x-2 w-full md:w-auto">
                     <select id="tool-room-select" onchange="loadStudentsForTools()" class="px-4 py-2 border rounded-lg bg-gray-50 font-bold w-full md:w-48">
                         <option value="">-- เลือกห้อง --</option>
@@ -504,6 +516,7 @@
                 <button onclick="switchTool('card')" id="btn-tool-card" class="tool-btn flex-shrink-0 px-4 py-2 rounded-full border border-gray-300 bg-white font-medium text-sm"><i class="fas fa-th-large mr-1"></i> เปิดการ์ด</button>
                 <button onclick="switchTool('face')" id="btn-tool-face" class="tool-btn flex-shrink-0 px-4 py-2 rounded-full border border-gray-300 bg-white font-medium text-sm"><i class="fas fa-user-circle mr-1"></i> สุ่มใบหน้า</button>
                 <button onclick="switchTool('group')" id="btn-tool-group" class="tool-btn flex-shrink-0 px-4 py-2 rounded-full border border-gray-300 bg-white font-medium text-sm"><i class="fas fa-users mr-1"></i> จัดกลุ่ม</button>
+                <button onclick="switchTool('qrcode')" id="btn-tool-qrcode" class="tool-btn flex-shrink-0 px-4 py-2 rounded-full border border-gray-300 bg-white font-medium text-sm"><i class="fas fa-qrcode mr-1"></i> พิมพ์บัตร QR</button>
             </div>
 
             <div class="bg-white rounded-2xl shadow-lg p-6 min-h-[450px] flex flex-col items-center justify-center relative border border-gray-100">
@@ -548,6 +561,16 @@
                         <button onclick="generateGroups()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-blue-700 mb-1">แบ่งกลุ่ม</button>
                     </div>
                     <div id="group-result" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto p-2"></div>
+                </div>
+                <!-- เครื่องมือใหม่: สร้าง QR Code -->
+                <div id="tool-qrcode" class="tool-section w-full hidden">
+                    <div class="flex justify-between items-end mb-4">
+                        <p class="text-slate-500 text-sm font-bold">บัตร QR Code ประจำตัวนักเรียน (สแกนเพื่อเช็คชื่อ/ส่งงาน)</p>
+                        <button onclick="window.print()" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-lg font-bold shadow-md transition transform hover:-translate-y-0.5"><i class="fas fa-print mr-2"></i> สั่งพิมพ์บัตร (A4)</button>
+                    </div>
+                    <div id="qr-print-area" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200 max-h-[500px] overflow-y-auto">
+                        <div class="col-span-full text-center py-10 text-slate-400 font-medium">กรุณาเลือกห้องเรียนด้านบน ระบบจะสร้างบัตร QR อัตโนมัติ</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2086,7 +2109,6 @@
             const room = document.getElementById('tracker-room-filter').value;
             const sub = document.getElementById('tracker-subject-filter').value;
             const task = document.getElementById('tracker-task').value;
-            
             if(!room || !sub || !task) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกข้อมูลให้ครบถ้วน', 'warning');
             
             Swal.fire({ title: 'กำลังดึงข้อมูล...', didOpen: () => Swal.showLoading() });
@@ -2102,7 +2124,20 @@
                 }
                 
                 data.forEach((std, index) => {
+                    // --- ระบบ Auto-Save Backup ---
+                    const draftKey = `draft_${std.studentId}_${sub}_${task}`;
+                    const draftScore = localStorage.getItem(draftKey);
+                    
+                    let displayScore = std.score;
                     let isSubmitted = std.status === "ส่งแล้ว";
+                    let isDraft = false;
+                    
+                    // ถ้าพบคะแนนที่ค้างอยู่ในเครื่อง และไม่ตรงกับในฐานข้อมูล
+                    if (draftScore !== null && draftScore !== String(std.score)) {
+                        displayScore = draftScore;
+                        isDraft = true;
+                        isSubmitted = true; // บังคับเปลี่ยนสถานะเป็นส่งแล้ว
+                    }
                     
                     let statusHtml = `
                         <div id="status-badge-${std.studentId}" 
@@ -2110,13 +2145,16 @@
                              data-status="${isSubmitted ? 'submitted' : 'not_submitted'}"
                              class="cursor-pointer inline-flex flex-col items-center justify-center transition-all hover:scale-105 group select-none">
                             ${isSubmitted 
-                                ? `<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-bold border border-green-200 group-hover:bg-green-200"><i class="fas fa-check mr-1"></i>ส่งแล้ว</span><div class="text-[10px] text-gray-400 mt-1 time-label">${std.time}</div>` 
+                                ? `<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-bold border border-green-200 group-hover:bg-green-200"><i class="fas fa-check mr-1"></i>ส่งแล้ว</span><div class="text-[10px] text-gray-400 mt-1 time-label">${std.time !== '-' ? std.time : (isDraft ? 'ยังไม่บันทึก' : '')}</div>` 
                                 : `<span class="bg-red-50 text-red-500 text-xs px-2 py-1 rounded-full font-bold border border-red-100 group-hover:bg-red-100"><i class="fas fa-times mr-1"></i>ยังไม่ส่ง</span><div class="text-[10px] text-gray-400 mt-1 time-label hidden">-</div>`
                             }
                         </div>`;
                     
                     let photoHtml = std.photo ? `<img src="${std.photo}" class="w-10 h-10 rounded-full object-cover mx-auto border border-gray-200">` : `<div class="w-10 h-10 rounded-full bg-gray-200 mx-auto flex items-center justify-center text-gray-400"><i class="fas fa-user"></i></div>`;
                     
+                    // ใส่สีส้มแจ้งเตือนถ้าเป็นคะแนนที่ยังไม่ได้เซฟ
+                    const inputClass = isDraft ? "border-amber-400 bg-amber-50 text-amber-700" : "border-gray-300 bg-white text-teal-700";
+
                     tbody.innerHTML += `
                         <tr class="hover:bg-teal-50 transition">
                             <td class="px-4 py-2 text-center text-sm font-bold text-gray-600">${index + 1}</td>
@@ -2124,8 +2162,9 @@
                             <td class="px-4 py-2 text-xs font-bold text-gray-500">${std.studentId}</td>
                             <td class="px-4 py-2 text-sm font-medium text-gray-800">${std.studentName}</td>
                             <td class="px-4 py-2 text-center">${statusHtml}</td>
-                            <td class="px-4 py-2 text-center">
-                                <input type="number" id="score-input-${std.studentId}" data-name="${std.studentName}" value="${std.score}" class="tracker-score-input w-16 px-2 py-2 border border-gray-300 rounded-lg text-center font-bold text-teal-700 focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white shadow-inner transition-colors" placeholder="0">
+                            <td class="px-4 py-2 text-center relative">
+                                ${isDraft ? '<i class="fas fa-exclamation-circle text-amber-500 absolute -top-1 -right-1 text-xs"></i>' : ''}
+                                <input type="number" id="score-input-${std.studentId}" data-name="${std.studentName}" value="${displayScore}" class="tracker-score-input w-16 px-2 py-2 border rounded-lg text-center font-bold focus:ring-2 focus:ring-teal-500 focus:outline-none shadow-inner transition-colors ${inputClass}" placeholder="0">
                             </td>
                         </tr>
                     `;
@@ -2208,8 +2247,13 @@
             
             Swal.fire({ title: 'กำลังบันทึกข้อมูล...', text: 'กรุณารอสักครู่', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             
-            google.script.run.withSuccessHandler(res => {
+           google.script.run.withSuccessHandler(res => {
                 if(res.success) {
+                    // เคลียร์ความจำ Local Storage สำหรับงานนี้
+                    updates.forEach(u => {
+                        localStorage.removeItem(`draft_${u.studentId}_${sub}_${task}`);
+                    });
+                    
                     Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', timer: 1500, showConfirmButton: false });
                     loadTrackerData(); 
                     loadDashboardData(); 
@@ -2220,10 +2264,48 @@
         }
 
         function openTools() { showView('view-tools'); }
-        function loadStudentsForTools() {
+       function loadStudentsForTools() {
             const room = document.getElementById('tool-room-select').value;
             toolStudents = globalStudents.filter(s => s.room === room);
-            drawWheel(); renderCards();
+            drawWheel(); renderCards(); generateQRCodes(); // เรียกใช้คำสั่งวาด QR
+        }
+
+        // ฟังก์ชันวาดรูป QR Code
+        function generateQRCodes() {
+            const container = document.getElementById('qr-print-area');
+            container.innerHTML = '';
+            if(toolStudents.length === 0) { 
+                container.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 font-medium">กรุณาเลือกห้องเรียนด้านบน</div>'; 
+                return; 
+            }
+            
+            toolStudents.forEach(std => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center print-card";
+                
+                const qrDiv = document.createElement('div');
+                qrDiv.className = "mb-3 p-2 bg-white rounded-lg";
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = "font-bold text-sm text-slate-800 line-clamp-1 mb-1";
+                nameDiv.innerText = std.fullName;
+                
+                const idDiv = document.createElement('div');
+                idDiv.className = "text-xs font-semibold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full";
+                idDiv.innerText = `รหัส: ${std.studentId} | ห้อง: ${std.room}`;
+                
+                card.appendChild(qrDiv);
+                card.appendChild(nameDiv);
+                card.appendChild(idDiv);
+                container.appendChild(card);
+                
+                new QRCode(qrDiv, {
+                    text: String(std.studentId),
+                    width: 110, height: 110,
+                    colorDark : "#0f766e", colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            });
         }
 
         function switchTool(toolId) {
@@ -2832,18 +2914,32 @@
         // ==========================================
         // ฟังก์ชันอื่นๆ (Safe input etc.)
         // ==========================================
+       // ระบบตรวจจับการพิมพ์คะแนน และ Auto-Save ลงเครื่อง
         document.addEventListener('input', function(event) {
             const input = event.target;
-            if (input.tagName === 'INPUT' && input.closest('tr') && input.type !== 'hidden') {
+            if (input.tagName === 'INPUT' && input.classList.contains('tracker-score-input')) {
                 const scoreVal = input.value.trim();
+                const studentId = input.id.replace('score-input-', '');
+                
+                const sub = document.getElementById('tracker-subject-filter').value;
+                const task = document.getElementById('tracker-task').value;
+                const draftKey = `draft_${studentId}_${sub}_${task}`;
+
+                // ถ้ากรอกคะแนน ให้เซฟลงเครื่อง และเปลี่ยนกรอบเป็นสีส้ม
                 if (scoreVal !== '') {
+                    localStorage.setItem(draftKey, scoreVal);
+                    input.classList.remove('border-gray-300', 'bg-white', 'text-teal-700');
+                    input.classList.add('border-amber-400', 'bg-amber-50', 'text-amber-700');
+                    
                     const row = input.closest('tr');
-                    const clickableElements = row.querySelectorAll('button, [onclick], .cursor-pointer');
-                    for (let btn of clickableElements) {
-                        if (btn.textContent && btn.textContent.includes('ยังไม่ส่ง')) {
-                            btn.click(); break; 
-                        }
+                    const badge = document.getElementById(`status-badge-${studentId}`);
+                    if (badge && badge.getAttribute('data-status') !== 'submitted') {
+                        badge.click(); // เปลี่ยนสถานะเป็นส่งแล้วให้อัตโนมัติ
                     }
+                } else {
+                    localStorage.removeItem(draftKey);
+                    input.classList.remove('border-amber-400', 'bg-amber-50', 'text-amber-700');
+                    input.classList.add('border-gray-300', 'bg-white', 'text-teal-700');
                 }
             }
         });
@@ -2868,6 +2964,38 @@
                 }
             }
         });
+        // ==========================================
+        // ระบบปิดเทอม / ขึ้นเทอมใหม่ (Auto-Archive)
+        // ==========================================
+        function startNewTerm() {
+            Swal.fire({
+                title: 'คุณต้องการปิดเทอม ใช่หรือไม่?',
+                html: '<span class="text-sm text-gray-500">ระบบจะนำข้อมูลงาน คะแนน และเช็คชื่อของเทอมนี้ <b>แพ็คเก็บไว้เป็นประวัติ</b> ใน Google Sheets และล้างตารางในเว็บนี้ให้ว่างเปล่า เพื่อเตรียมรับเทอมใหม่ (ข้อมูลเก่าไม่หาย)</span><br><br><span class="text-sm font-bold text-teal-600">กรุณาตั้งชื่อข้อมูลประวัติชุดนี้:</span>',
+                input: 'text',
+                inputPlaceholder: 'ตัวอย่าง: ปพ68_เทอม1',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: '<i class="fas fa-box"></i> ยืนยันแพ็คข้อมูล',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if(!result.value.trim()) return Swal.fire('แจ้งเตือน', 'กรุณาระบุชื่อก่อนกดยืนยัน', 'warning');
+                    
+                    Swal.fire({ title: 'กำลังแพ็คข้อมูลเก็บเข้ากรุ...', html:'ขั้นตอนนี้อาจใช้เวลาสักครู่ ห้ามปิดหน้าต่าง', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    
+                    google.script.run.withSuccessHandler(res => {
+                        if(res.success) {
+                            Swal.fire('ปิดเทอมสำเร็จ!', res.message, 'success').then(() => {
+                                window.location.reload(); // รีเฟรชเว็บใหม่เพื่อเริ่มเทอมใหม่
+                            });
+                        } else {
+                            Swal.fire('ข้อผิดพลาด', res.message, 'error');
+                        }
+                    }).archiveTermData(result.value.trim());
+                }
+            });
+        }
     </script>
 </body>
 </html>
