@@ -60,7 +60,7 @@
                     <!-- ปุ่ม สรุปรายหน่วย และ สถิติเช็คชื่อ -->
                     <button onclick="openUnitSummary()" class="hover:text-indigo-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-th-list"></i><span class="hidden md:inline ml-1"> สรุปรายหน่วย</span></button>
                     <button onclick="openAttendanceReport()" class="hover:text-blue-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-calendar-check"></i><span class="hidden md:inline ml-1"> สถิติเช็คชื่อ</span></button>
-                    
+                    <button onclick="openMissingWork()" class="hover:text-rose-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-search-minus"></i><span class="hidden md:inline ml-1"> ติดตามงานค้าง</span></button>
                     <button onclick="openReports()" class="text-teal-700 hover:text-teal-950 font-bold bg-teal-50 px-3 py-1.5 rounded-lg border border-teal-200 text-sm md:text-base whitespace-nowrap"><i class="fas fa-chart-pie mr-1 text-teal-600"></i> สรุปรายงาน</button>
                     <button onclick="openAttendance()" class="bg-blue-500 text-white hover:bg-blue-600 px-3 py-1.5 rounded-lg text-sm font-bold shadow whitespace-nowrap transition-colors"><i class="fas fa-user-check mr-1"></i> เช็คชื่อ</button>
                     <button onclick="openScanner()" class="bg-orange-500 text-white hover:bg-orange-600 px-3 py-1.5 rounded-lg text-sm font-bold shadow whitespace-nowrap"><i class="fas fa-qrcode mr-1"></i> สแกน</button>
@@ -837,7 +837,36 @@
                 </div>
             </div>
         </div>
-            
+        <!-- NEW View 11: ระบบติดตามงานค้าง -->
+        <div id="view-missing-work" class="w-full max-w-5xl hidden-view mt-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
+                <span><i class="fas fa-search-minus text-rose-500 mr-2"></i>ระบบติดตามงานค้าง (รายบุคคล)</span>
+                <button onclick="openMissingWork()" class="text-sm bg-rose-50 hover:bg-rose-100 text-rose-700 px-4 py-2 rounded-lg font-bold shadow-sm transition"><i class="fas fa-sync-alt mr-1"></i> ดึงข้อมูลใหม่</button>
+            </h2>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm mb-4 border-t-4 border-rose-500 flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกห้องเรียน</label>
+                    <select id="mw-room" onchange="renderMissingWork()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 text-sm font-semibold text-slate-700 bg-slate-50"></select>
+                </div>
+                <div class="flex-1">
+                    <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกรายวิชา</label>
+                    <select id="mw-subject" onchange="renderMissingWork()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 text-sm font-semibold text-slate-700 bg-slate-50"></select>
+                </div>
+                <div class="flex items-end">
+                    <button onclick="copyMissingWorkText()" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-bold px-6 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-2 transform hover:-translate-y-0.5">
+                        <i class="fas fa-copy text-lg"></i> คัดลอกข้อความทวงงาน
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden mt-4 border border-slate-100">
+                <div class="overflow-x-auto max-h-[600px] p-4" id="mw-content">
+                    <div class="text-center py-12 text-slate-400 font-medium">กรุณาเลือกห้องเรียนและรายวิชาด้านบน เพื่อตรวจสอบงานค้าง</div>
+                </div>
+            </div>
+        </div>
+        
         <!-- View 8: NEW Parent / Student Record Detail (Card Design) -->
         <div id="view-parent-dashboard" class="w-full max-w-4xl hidden-view mt-4">
             <!-- Header Controls with New Select Dropdowns -->
@@ -1104,14 +1133,15 @@
             }).getDashboardData();
         }
 
-        function populateRoomDropdowns() {
+     function populateRoomDropdowns() {
             const rooms = [...new Set(globalStudents.map(s => s.room))].filter(r => r).sort();
-            const selects = ['assign-room', 'scan-room-filter', 'tool-room-select', 'tracker-room-filter', 'report-filter-room', 'att-room-select', 'usum-room', 'att-report-room'];
+            // เพิ่ม 'mw-room' ลงไปในลิสต์นี้
+            const selects = ['assign-room', 'scan-room-filter', 'tool-room-select', 'tracker-room-filter', 'report-filter-room', 'att-room-select', 'usum-room', 'att-report-room', 'mw-room'];
             selects.forEach(id => {
                 const el = document.getElementById(id);
                 if(el) {
                     const currentVal = el.value;
-                    const isReport = id === 'report-filter-room' || id === 'att-report-room';
+                    const isReport = id === 'report-filter-room' || id === 'att-report-room' || id === 'mw-room';
                     el.innerHTML = isReport ? '<option value="all">ทุกห้องเรียน</option>' : '<option value="">-- เลือกห้อง --</option>';
                     rooms.forEach(r => el.innerHTML += `<option value="${r}">${r}</option>`);
                     el.value = currentVal || (isReport ? 'all' : '');
@@ -1120,12 +1150,13 @@
         }
 
         function updateSubjectDropdowns() {
-            const selects = ['parent-subject-select', 'assign-subject', 'scan-subject-filter', 'tracker-subject-filter', 'report-filter-subject', 'parent-dashboard-subject-select', 'unit-subject-select', 'usum-subject'];
+            // เพิ่ม 'mw-subject' ลงไปในลิสต์นี้
+            const selects = ['parent-subject-select', 'assign-subject', 'scan-subject-filter', 'tracker-subject-filter', 'report-filter-subject', 'parent-dashboard-subject-select', 'unit-subject-select', 'usum-subject', 'mw-subject'];
             selects.forEach(id => {
                 const el = document.getElementById(id);
                 if(el) {
                     const currentVal = el.value;
-                    const isParentOrReport = id === 'parent-subject-select' || id === 'report-filter-subject' || id === 'parent-dashboard-subject-select';
+                    const isParentOrReport = id === 'parent-subject-select' || id === 'report-filter-subject' || id === 'parent-dashboard-subject-select' || id === 'mw-subject';
                     el.innerHTML = isParentOrReport ? '<option value="all">ดูทุกรายวิชา</option>' : '<option value="">-- เลือกวิชา --</option>';
                     globalSubjects.forEach(s => el.innerHTML += `<option value="${s}">${s}</option>`);
                     el.value = currentVal || (isParentOrReport ? 'all' : '');
@@ -1134,8 +1165,140 @@
             const ul = document.getElementById('subject-list-ui');
             if(ul) ul.innerHTML = globalSubjects.map(s => `<li class="bg-gray-50 px-3 py-2 rounded flex justify-between border-b border-gray-100"><span class="font-bold text-teal-700">${s}</span></li>`).join('');
             
-            // เรียกอัปเดต dropdown ของหน่วยในหน้าสั่งงานด้วย เผื่อมีการโหลดวิชามาใหม่
             populateUnitDropdownForAssign();
+        }
+
+        // ==========================================
+        // NEW FEATURE: MISSING WORK (ติดตามงานค้าง)
+        // ==========================================
+        function openMissingWork() {
+            showView('view-missing-work');
+            Swal.fire({ title: 'กำลังประมวลผลงานค้าง...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            google.script.run.withSuccessHandler(res => {
+                if(res && res.submissions) {
+                    fullSubmissionData = res.submissions;
+                    fullAssignmentData = res.assignments;
+                    Swal.close();
+                    renderMissingWork();
+                } else {
+                    Swal.fire('ข้อผิดพลาด', 'ดึงข้อมูลไม่สำเร็จ', 'error');
+                }
+            }).getReportData();
+        }
+
+        function renderMissingWork() {
+            const room = document.getElementById('mw-room').value;
+            const subject = document.getElementById('mw-subject').value;
+            const content = document.getElementById('mw-content');
+
+            if(!room || room === 'all' || !subject || subject === 'all') {
+                content.innerHTML = '<div class="text-center py-12 text-slate-400 font-medium">กรุณาเลือก "ห้องเรียนที่ระบุเจาะจง" และ "รายวิชา" เพื่อตรวจสอบงานค้าง</div>';
+                return;
+            }
+
+            const studentsInRoom = globalStudents.filter(s => s.room === room);
+            const assigns = fullAssignmentData.filter(a => a.targetRoom === room && a.subject === subject);
+            
+            if(studentsInRoom.length === 0) {
+                content.innerHTML = '<div class="text-center py-12 text-rose-500 font-medium">ไม่พบรายชื่อนักเรียนในห้องนี้</div>';
+                return;
+            }
+            if(assigns.length === 0) {
+                content.innerHTML = '<div class="text-center py-12 text-slate-400 font-medium">ยังไม่มีการสั่งงานในวิชานี้สำหรับห้องเรียนดังกล่าว</div>';
+                return;
+            }
+
+            let html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">';
+            let hasAnyMissing = false;
+
+            studentsInRoom.forEach(std => {
+                let missingTasks = [];
+                
+                // ตรวจสอบงานทีละชิ้นว่ามีใน Submissions ไหม
+                assigns.forEach(task => {
+                    const isSubmitted = fullSubmissionData.some(sub => 
+                        sub.studentId === std.studentId && 
+                        sub.subject === subject && 
+                        sub.workTitle === task.taskName
+                    );
+                    if(!isSubmitted) {
+                        missingTasks.push(task.taskName);
+                    }
+                });
+
+                if(missingTasks.length > 0) {
+                    hasAnyMissing = true;
+                    html += `
+                    <div class="border border-rose-100 bg-rose-50/30 rounded-xl p-4 flex flex-col gap-2 shadow-sm transition hover:shadow-md">
+                        <div class="flex justify-between items-center border-b border-rose-100 pb-2">
+                            <span class="font-bold text-slate-800 text-sm"><i class="fas fa-user-circle text-rose-400 mr-1"></i> ${std.studentId} ${std.fullName}</span>
+                            <span class="bg-rose-500 text-white text-[10px] px-2 py-1 rounded-full font-bold">ค้าง ${missingTasks.length} งาน</span>
+                        </div>
+                        <ul class="text-xs text-rose-700 list-disc list-inside pl-2 space-y-1 mt-1">
+                            ${missingTasks.map(t => `<li>${t}</li>`).join('')}
+                        </ul>
+                    </div>`;
+                }
+            });
+
+            html += '</div>';
+
+            if(!hasAnyMissing) {
+                content.innerHTML = `
+                    <div class="text-center py-16 bg-emerald-50 rounded-2xl border border-emerald-100">
+                        <i class="fas fa-check-circle text-6xl text-emerald-500 mb-4 animate-bounce"></i>
+                        <div class="text-emerald-700 font-bold text-xl">ยอดเยี่ยมมาก!</div>
+                        <div class="text-emerald-600 mt-1">ไม่มีนักเรียนค้างงานในวิชานี้เลย</div>
+                    </div>`;
+            } else {
+                content.innerHTML = html;
+            }
+        }
+        
+        function copyMissingWorkText() {
+            const room = document.getElementById('mw-room').value;
+            const subject = document.getElementById('mw-subject').value;
+            if(!room || room === 'all' || !subject || subject === 'all') return Swal.fire('แจ้งเตือน', 'กรุณาเลือกห้องและวิชาก่อนคัดลอก', 'warning');
+
+            const studentsInRoom = globalStudents.filter(s => s.room === room);
+            const assigns = fullAssignmentData.filter(a => a.targetRoom === room && a.subject === subject);
+            
+            let text = `📢 แจ้งเตือนงานค้าง วิชา${subject} ห้อง ${room}\n`;
+            text += `📅 อัปเดตข้อมูล ณ วันที่: ${new Date().toLocaleDateString('th-TH')}\n`;
+            text += `----------------------------------\n\n`;
+            
+            let count = 0;
+            
+            studentsInRoom.forEach(std => {
+                let missingTasks = [];
+                assigns.forEach(task => {
+                    const isSubmitted = fullSubmissionData.some(sub => sub.studentId === std.studentId && sub.subject === subject && sub.workTitle === task.taskName);
+                    if(!isSubmitted) missingTasks.push(task.taskName);
+                });
+                
+                if(missingTasks.length > 0) {
+                    count++;
+                    text += `${count}. ${std.fullName} (ค้าง ${missingTasks.length} งาน)\n`;
+                    missingTasks.forEach(t => text += `   ❌ ${t}\n`);
+                    text += `\n`;
+                }
+            });
+
+            if(count === 0) return Swal.fire('ข้อมูล', 'ไม่มีนักเรียนค้างงานให้คัดลอก', 'info');
+            
+            text += `----------------------------------\n`;
+            text += `รบกวนผู้ปกครองช่วยติดตามให้นักเรียนส่งงานให้ครบถ้วนด้วยนะครับ ขอบคุณครับ 🙏`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                Swal.fire({
+                    icon: 'success', 
+                    title: 'คัดลอกข้อความสำเร็จ!', 
+                    text: 'สามารถนำไปกด "วาง" ในแชท LINE กลุ่มผู้ปกครองได้เลยครับ', 
+                    confirmButtonColor: '#0f766e'
+                });
+            }).catch(err => {
+                Swal.fire('ข้อผิดพลาด', 'เบราว์เซอร์ไม่รองรับการคัดลอกอัตโนมัติ', 'error');
+            });
         }
 
         // ==========================================
