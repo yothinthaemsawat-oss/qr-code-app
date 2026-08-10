@@ -763,7 +763,7 @@
             console.log("Running via GitHub Pages API Bridge");
             
             // ⚠️ นำ Web App URL ของคุณมาใส่ที่นี่ ⚠️
-            const GAS_URL = 'วางลิงก์_GAS_URL_ของคุณตรงนี้';
+            const GAS_URL = 'https://script.google.com/macros/s/AKfycbwgAIUk030QcR7kTixizdZ8f_6AnYyjAxPfbvBLPzF6cZfVoIPkiLvtQ7vG6UHoEQRC/exec';
             
             window.google = {
                 script: {
@@ -774,7 +774,6 @@
                                     return function(...args) {
                                         fetch(GAS_URL, {
                                             method: 'POST',
-                                            redirect: 'follow',
                                             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                                             body: JSON.stringify({ action: prop, params: args })
                                         })
@@ -809,9 +808,7 @@
         let isAttendanceCameraOpen = false;
         let fullAttendanceData = []; // เก็บสถิติ
 
-        // Variables for Charts & Parent View & Reporting
-        let fullSubmissionData = [];
-        let fullAssignmentData = [];
+        // Variables for Charts & Parent View
         let globalUnits = [];
         let currentParentRecords = [];
         let currentParentStudent = null;
