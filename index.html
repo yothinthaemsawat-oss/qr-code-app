@@ -65,7 +65,6 @@
                 </div>
                 <div class="flex items-center space-x-1 md:space-x-2 text-gray-600 overflow-x-auto no-scrollbar">
                     <button onclick="showView('view-teacher-dashboard')" class="hover:text-teal-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-history"></i><span class="hidden md:inline ml-1"> ประวัติส่งงาน</span></button>
-                    <button onclick="openReports()" class="text-teal-700 hover:text-teal-950 font-bold bg-teal-50 px-3 py-1.5 rounded-lg border border-teal-200 text-sm md:text-base whitespace-nowrap"><i class="fas fa-chart-pie mr-1 text-teal-600"></i> สรุปรายงาน</button>
                     <button onclick="openUnitSummary()" class="hover:text-indigo-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-th-list"></i><span class="hidden md:inline ml-1"> สรุปรายหน่วย</span></button>
                     <button onclick="openAttendance()" class="bg-blue-500 text-white hover:bg-blue-600 px-3 py-1.5 rounded-lg text-sm font-bold shadow whitespace-nowrap transition-colors"><i class="fas fa-user-check mr-1"></i> เช็คชื่อ</button>
                     <button onclick="openAttendanceReport()" class="hover:text-blue-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-calendar-check"></i><span class="hidden md:inline ml-1"> สถิติเช็คชื่อ</span></button>
@@ -148,7 +147,6 @@
                 </div>
             </div>
 
-            <!-- แถบเครื่องมือจัดการกลุ่ม และระบบสแกนเช็คชื่อ -->
             <div class="bg-blue-50 p-3 rounded-xl shadow-sm mb-4 flex flex-wrap gap-3 items-center justify-between border border-blue-100">
                 <div class="text-sm font-bold text-blue-800">
                     เครื่องมือจัดการกลุ่ม:
@@ -159,7 +157,6 @@
                 </div>
             </div>
 
-            <!-- กล่องสแกนเนอร์สำหรับเช็คชื่อ -->
             <div class="bg-indigo-50 p-3 rounded-xl shadow-sm mb-4 border border-indigo-100">
                 <div class="flex flex-col md:flex-row gap-3 items-center">
                     <div class="flex-grow flex shadow-sm rounded-xl overflow-hidden border border-gray-300 bg-white w-full">
@@ -211,7 +208,6 @@
                 </div>
                 <div class="flex-1">
                     <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">เลือกเดือน</label>
-                    <!-- เมื่อเลือกเดือน ให้ล้างค่าวันที่ออก -->
                     <select id="att-report-month" onchange="document.getElementById('att-report-date').value=''; renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50">
                         <option value="all">ดูทุกเดือน (ทั้งหมด)</option>
                         <option value="01">มกราคม</option>
@@ -231,9 +227,7 @@
                 <div class="flex-1">
                     <label class="text-xs text-gray-500 font-bold block mb-1 uppercase tracking-wider">หรือ เลือกวันที่ระบุเจาะจง</label>
                     <div class="flex items-center gap-2">
-                        <!-- เมื่อเลือกวันที่ ให้รีเซ็ตเดือนเป็น 'ดูทุกเดือน' -->
                         <input type="date" id="att-report-date" onchange="document.getElementById('att-report-month').value='all'; renderAttendanceReport()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-semibold text-slate-700 bg-slate-50">
-                        <!-- ปุ่มล้างค่าวันที่ -->
                         <button onclick="document.getElementById('att-report-date').value=''; renderAttendanceReport()" class="bg-slate-200 hover:bg-slate-300 text-slate-600 px-4 py-2.5 rounded-xl transition shadow-sm font-bold"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
@@ -261,7 +255,7 @@
             </div>
         </div>
 
-        <!-- View 2: Manage Assignments (RESTRUCTURED LAYOUT 1,2,3,4) -->
+        <!-- View 2: Manage Assignments -->
         <div id="view-manage-assignments" class="w-full max-w-5xl hidden-view mt-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
                 <span><i class="fas fa-book text-teal-600 mr-2"></i>จัดการรายวิชา หน่วยฯ & งาน</span>
@@ -272,7 +266,6 @@
                 <!-- คอลัมน์ซ้าย: ขั้นตอนที่ 1 และ 3 -->
                 <div class="md:col-span-1 space-y-6">
                     
-                    <!-- กล่อง 1: เพิ่มวิชา -->
                     <div class="bg-white rounded-xl shadow p-5 border border-gray-100">
                         <h3 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-plus-circle text-blue-500 mr-1"></i> 1. เพิ่มรายวิชาใหม่</h3>
                         <div class="flex space-x-2 mb-4">
@@ -282,7 +275,6 @@
                         <ul id="subject-list-ui" class="space-y-2 text-sm text-gray-600 max-h-32 overflow-y-auto pr-2 no-scrollbar"></ul>
                     </div>
 
-                   <!-- กล่อง 3: สร้างหน่วยการเรียนรู้ -->
                     <div class="bg-white rounded-xl shadow p-5 border border-indigo-100">
                         <h3 class="font-bold text-indigo-700 mb-3 border-b border-indigo-100 pb-2"><i class="fas fa-layer-group mr-1"></i> 3. สร้างหน่วยการเรียนรู้</h3>
                         <div class="space-y-3">
@@ -296,8 +288,6 @@
                                 <label class="text-xs text-gray-500 font-bold mb-1 block">3.2 เพิ่มชื่อหน่วย</label>
                                 <input type="text" id="new-unit-name" class="w-full px-3 py-2 border rounded-lg focus:ring-indigo-500 text-sm" placeholder="เช่น หน่วยที่ 1">
                             </div>
-                            
-                            <!-- เพิ่มส่วนเลือกเทอมตรงนี้ -->
                             <div>
                                 <label class="text-xs text-indigo-600 font-bold mb-1 block">3.3 ภาคเรียน (เทอม)</label>
                                 <select id="new-unit-term" class="w-full px-3 py-2 border border-indigo-200 rounded-lg focus:ring-indigo-500 text-sm bg-indigo-50 font-bold text-indigo-700">
@@ -305,7 +295,6 @@
                                     <option value="2">เทอม 2</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="text-xs text-gray-500 font-bold mb-1 block">3.4 เพิ่มคะแนนเก็บจริงของหน่วยนี้</label>
                                 <input type="number" id="new-unit-score" class="w-full px-3 py-2 border rounded-lg focus:ring-indigo-500 text-sm" placeholder="คะแนนเก็บ">
@@ -317,14 +306,11 @@
 
                 <!-- คอลัมน์ขวา: ขั้นตอนที่ 2 และ 4 -->
                 <div class="md:col-span-2 space-y-6">
-                    
-                    <!-- กล่อง 2: เลือกวิชาและห้อง -->
                     <div class="bg-white rounded-xl shadow p-5 border border-gray-100">
                         <h3 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fas fa-clipboard-list text-orange-500 mr-1"></i> 2. เลือกวิชา / ห้องเรียนเป้าหมาย</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="text-xs text-gray-500 font-bold block mb-1">เลือกรายวิชา</label>
-                                <!-- โหลดหน่วยอัตโนมัติตามวิชาและห้อง -->
                                 <select id="assign-subject" onchange="populateUnitDropdownForAssign()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 text-sm bg-gray-50"></select>
                             </div>
                             <div>
@@ -334,7 +320,6 @@
                         </div>
                     </div>
 
-                    <!-- กล่อง 4: รายละเอียดชิ้นงาน -->
                     <div class="bg-teal-50 p-5 rounded-xl shadow-sm border border-teal-200">
                         <h3 class="font-bold text-teal-800 mb-3 border-b border-teal-200 pb-2"><i class="fas fa-info-circle text-teal-600 mr-1"></i> 4. รายละเอียดชิ้นงาน</h3>
                         <div class="space-y-4">
@@ -345,7 +330,6 @@
                                 </select>
                                 <p class="text-[10px] text-teal-600 mt-1">*(ถ้าไม่มีให้ไปสร้างหน่วยในข้อ 3 ด้านซ้ายก่อน)*</p>
                             </div>
-
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="text-xs text-teal-700 font-bold block mb-1">4.2 เพิ่มชื่อหัวข้องาน / กิจกรรม</label>
@@ -364,7 +348,6 @@
                 </div>
             </div>
 
-            <!-- ส่วนตารางแสดงข้อมูลงาน -->
             <div class="bg-white rounded-xl shadow overflow-hidden mt-6 border border-gray-100">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -453,7 +436,6 @@
                 <button onclick="loadTrackerData()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-bold shadow-sm"><i class="fas fa-search mr-1"></i> ดึงข้อมูล/รีเฟรช</button>
             </div>
 
-            <!-- แถบเครื่องมือจัดการคะแนนแบบกลุ่ม -->
             <div class="bg-blue-50 p-3 rounded-xl shadow-sm mb-4 flex flex-wrap gap-3 items-center justify-between border border-blue-100">
                 <div class="flex items-center">
                     <button onclick="markAllAsSubmitted()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm"><i class="fas fa-check-double mr-1"></i> เปลี่ยนทุกคนเป็นส่งแล้ว</button>
@@ -594,159 +576,6 @@
                         <tbody id="dashboard-table-body" class="bg-white divide-y divide-gray-200 text-sm"></tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-
-        <!-- View 7: NEW REPORTING & EXPORT DASHBOARD -->
-        <div id="view-reports" class="w-full max-w-7xl hidden-view mt-4">
-            <!-- Title & Quick Actions -->
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-                <div>
-                    <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center">
-                        <span class="bg-teal-600 text-white p-2 rounded-xl mr-3 shadow-md flex items-center justify-center w-11 h-11">
-                            <i class="fas fa-chart-bar text-xl"></i>
-                        </span>
-                        ระบบรายงานวิเคราะห์ & สถิติส่งงาน
-                    </h1>
-                    <p class="text-sm text-slate-500 mt-1">วิเคราะห์ภาพรวมการส่งงาน คะแนนสอบ และสรุปผลของห้องเรียนและรายวิชา</p>
-                </div>
-                <!-- Export Actions -->
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm font-semibold text-slate-500">ส่งออก:</span>
-                    <button onclick="exportData('xlsx')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-xl shadow-md flex items-center text-sm transition transform hover:-translate-y-0.5">
-                        <i class="fas fa-file-excel mr-2 text-lg"></i> Excel (.xlsx)
-                    </button>
-                    <button onclick="exportData('csv')" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-xl shadow-md flex items-center text-sm transition transform hover:-translate-y-0.5">
-                        <i class="fas fa-file-csv mr-2 text-lg"></i> CSV File
-                    </button>
-                </div>
-            </div>
-
-            <!-- Advanced Filter Panel -->
-            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100 mb-6 flex flex-col md:flex-row gap-4">
-                <div class="flex-1">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">ตัวกรองห้องเรียน</label>
-                    <select id="report-filter-room" onchange="applyReportFilters()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-slate-50">
-                        <option value="all">ทุกห้องเรียน</option>
-                    </select>
-                </div>
-                <div class="flex-1">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">ตัวกรองรายวิชา</label>
-                    <select id="report-filter-subject" onchange="applyReportFilters()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-slate-50">
-                        <option value="all">ทุกรายวิชา</option>
-                    </select>
-                </div>
-                <div class="flex-1">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">เลือกช่วงเวลา (เดือน)</label>
-                    <select id="report-filter-month" onchange="applyReportFilters()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-slate-50">
-                        <option value="all">ทุกเดือน</option>
-                        <option value="00">มกราคม</option>
-                        <option value="01">กุมภาพันธ์</option>
-                        <option value="02">มีนาคม</option>
-                        <option value="03">เมษายน</option>
-                        <option value="04">พฤษภาคม</option>
-                        <option value="05">มิถุนายน</option>
-                        <option value="06">กรกฎาคม</option>
-                        <option value="07">สิงหาคม</option>
-                        <option value="08">กันยายน</option>
-                        <option value="09">ตุลาคม</option>
-                        <option value="10">พฤศจิกายน</option>
-                        <option value="11">ธันวาคม</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button onclick="resetReportFilters()" class="w-full md:w-auto bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-5 py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-1">
-                        <i class="fas fa-undo"></i> รีเซ็ตตัวกรอง
-                    </button>
-                </div>
-            </div>
-
-            <!-- KPI Cards Row -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <!-- KPI 1 -->
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
-                    <div>
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">อัตราการส่งงานเฉลี่ย</span>
-                        <span id="kpi-submission-rate" class="text-3xl font-black text-emerald-600 mt-1 block">0%</span>
-                        <span class="text-xs text-slate-400 mt-1 block">ของการสั่งงานทั้งหมด</span>
-                    </div>
-                    <div class="bg-emerald-50 text-emerald-600 p-4 rounded-2xl">
-                        <i class="fas fa-chart-line text-2xl"></i>
-                    </div>
-                </div>
-                <!-- KPI 2 -->
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
-                    <div>
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">คะแนนเฉลี่ย</span>
-                        <span id="kpi-avg-score" class="text-3xl font-black text-teal-600 mt-1 block">0.0</span>
-                        <span class="text-xs text-slate-400 mt-1 block">จากงานที่ตรวจแล้ว</span>
-                    </div>
-                    <div class="bg-teal-50 text-teal-600 p-4 rounded-2xl">
-                        <i class="fas fa-star text-2xl"></i>
-                    </div>
-                </div>
-                <!-- KPI 3 -->
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
-                    <div>
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">จำนวนนักเรียนที่ดูแล</span>
-                        <span id="kpi-total-students" class="text-3xl font-black text-blue-600 mt-1 block">0</span>
-                        <span class="text-xs text-slate-400 mt-1 block">คนในฐานข้อมูล</span>
-                    </div>
-                    <div class="bg-blue-50 text-blue-600 p-4 rounded-2xl">
-                        <i class="fas fa-user-friends text-2xl"></i>
-                    </div>
-                </div>
-                <!-- KPI 4 -->
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
-                    <div>
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">งานที่มอบหมาย</span>
-                        <span id="kpi-total-assignments" class="text-3xl font-black text-orange-500 mt-1 block">0</span>
-                        <span class="text-xs text-slate-400 mt-1 block">ชิ้นงาน/กิจกรรม</span>
-                    </div>
-                    <div class="bg-orange-50 text-orange-500 p-4 rounded-2xl">
-                        <i class="fas fa-clipboard-list text-2xl"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charts Analysis Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <!-- Subject Submission Success Rate -->
-                <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100">
-                    <h3 class="font-bold text-slate-700 text-lg mb-4 flex items-center gap-2">
-                        <i class="fas fa-book-reader text-teal-600"></i> สัดส่วนความสำเร็จแยกตามรายวิชา (%)
-                    </h3>
-                    <div class="h-64 relative flex items-center justify-center">
-                        <canvas id="chart-subject-performance"></canvas>
-                    </div>
-                </div>
-                <!-- Monthly Submission Trend -->
-                <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100">
-                    <h3 class="font-bold text-slate-700 text-lg mb-4 flex items-center gap-2">
-                        <i class="fas fa-calendar-alt text-teal-600"></i> แนวโน้มการส่งงานรายเดือน (ครั้ง)
-                    </h3>
-                    <div class="h-64 relative flex items-center justify-center">
-                        <canvas id="chart-monthly-trend"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Classroom comparison list -->
-            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100 mb-6">
-                <h3 class="font-bold text-slate-700 text-lg mb-4 flex items-center gap-2">
-                    <i class="fas fa-school text-indigo-500"></i> สรุปภาพรวมรายห้องเรียน (Classroom Performance Overview)
-                </h3>
-                <div id="classroom-performance-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Dynamic Generation of classroom performance cards -->
-                    <div class="p-4 border rounded-xl bg-slate-50 text-center text-slate-400 py-10 col-span-full">กำลังประมวลผลข้อมูลรายห้องเรียน...</div>
-                </div>
-            </div>
-
-            <!-- ปุ่มดึงข้อมูลจากชีท (Refresh) -->
-            <div class="mt-6 flex justify-end">
-                <button onclick="fetchRawReportData()" class="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl shadow-sm transition-all flex items-center gap-2 focus:ring-2 focus:ring-teal-500 focus:outline-none hover:-translate-y-0.5">
-                    <i class="fas fa-sync-alt"></i> อัปเดตข้อมูลจากชีท
-                </button>
             </div>
         </div>
 
@@ -980,8 +809,6 @@
         let fullAttendanceData = []; // เก็บสถิติ
 
         // Variables for Charts & Parent View
-        let chartSubject = null;
-        let chartMonthly = null;
         let globalUnits = [];
         let currentParentRecords = [];
         let currentParentStudent = null;
@@ -1070,7 +897,7 @@
                 if(res && res.success) {
                     Swal.close();
                     document.getElementById('nav-brand').innerText = `${res.name}`;
-                    openReports(); // Direct educators into the premium Reporting & Export view
+                    showView('view-teacher-dashboard'); 
                     loadTeacherData();
                 } else {
                     Swal.fire('เกิดข้อผิดพลาด', res ? res.message : 'ไม่สามารถเข้าสู่ระบบได้', 'error');
@@ -1087,9 +914,6 @@
             google.script.run.withSuccessHandler(data => { 
                 globalStudents = Array.isArray(data) ? data : []; 
                 populateRoomDropdowns();
-                if(!document.getElementById('view-reports').classList.contains('hidden-view')) {
-                    applyReportFilters();
-                }
             }).getStudentsByRoom('all');
             loadAssignments();
             loadDashboardData();
@@ -1128,12 +952,12 @@
 
         function populateRoomDropdowns() {
             const rooms = [...new Set(globalStudents.map(s => s.room))].filter(r => r).sort();
-            const selects = ['assign-room', 'scan-room-filter', 'tool-room-select', 'tracker-room-filter', 'report-filter-room', 'att-room-select', 'usum-room', 'att-report-room', 'mw-room'];
+            const selects = ['assign-room', 'scan-room-filter', 'tool-room-select', 'tracker-room-filter', 'att-room-select', 'usum-room', 'att-report-room', 'mw-room'];
             selects.forEach(id => {
                 const el = document.getElementById(id);
                 if(el) {
                     const currentVal = el.value;
-                    const isReport = id === 'report-filter-room' || id === 'att-report-room' || id === 'mw-room';
+                    const isReport = id === 'att-report-room' || id === 'mw-room';
                     el.innerHTML = isReport ? '<option value="all">ทุกห้องเรียน</option>' : '<option value="">-- เลือกห้อง --</option>';
                     rooms.forEach(r => el.innerHTML += `<option value="${r}">${r}</option>`);
                     el.value = currentVal || (isReport ? 'all' : '');
@@ -1142,12 +966,12 @@
         }
 
         function updateSubjectDropdowns() {
-            const selects = ['parent-subject-select', 'assign-subject', 'scan-subject-filter', 'tracker-subject-filter', 'report-filter-subject', 'parent-dashboard-subject-select', 'unit-subject-select', 'usum-subject', 'mw-subject'];
+            const selects = ['parent-subject-select', 'assign-subject', 'scan-subject-filter', 'tracker-subject-filter', 'parent-dashboard-subject-select', 'unit-subject-select', 'usum-subject', 'mw-subject'];
             selects.forEach(id => {
                 const el = document.getElementById(id);
                 if(el) {
                     const currentVal = el.value;
-                    const isParentOrReport = id === 'parent-subject-select' || id === 'report-filter-subject' || id === 'parent-dashboard-subject-select' || id === 'mw-subject';
+                    const isParentOrReport = id === 'parent-subject-select' || id === 'parent-dashboard-subject-select' || id === 'mw-subject';
                     el.innerHTML = isParentOrReport ? '<option value="all">ดูทุกรายวิชา</option>' : '<option value="">-- เลือกวิชา --</option>';
                     globalSubjects.forEach(s => el.innerHTML += `<option value="${s}">${s}</option>`);
                     el.value = currentVal || (isParentOrReport ? 'all' : '');
