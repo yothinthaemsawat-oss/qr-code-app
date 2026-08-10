@@ -2483,6 +2483,159 @@
                 }
             });
         }
+    // ==========================================
+        // REPORTING & CHARTS (สรุปรายงานและกราฟ)
+        // ==========================================
+        let fullSubmissionData = [];
+        let fullAssignmentData = [];
+
+        function openReports() {
+            showView('view-reports');
+            // ถ้ายังไม่มีข้อมูล ให้ไปดึงมาจากชีต
+            if (!fullSubmissionData || fullSubmissionData.length === 0) {
+                fetchRawReportData();
+            } else {
+                applyReportFilters();
+            }
+        }
+
+        function fetchRawReportData() {
+            Swal.fire({ title: 'กำลังโหลดข้อมูลรายงาน...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            google.script.run.withSuccessHandler(res => {
+                if(res && res.submissions) {
+                    fullSubmissionData = res.submissions;
+                    fullAssignmentData = res.assignments;
+                    Swal.close();
+                    applyReportFilters();
+                } else {
+                    Swal.fire('ข้อผิดพลาด', 'ดึงข้อมูลไม่สำเร็จ', 'error');
+                }
+            }).getReportData();
+        }
+
+        function resetReportFilters() {
+            document.getElementById('report-filter-room').value = 'all';
+            document.getElementById('report-filter-subject').value = 'all';
+            document.getElementById('report-filter-month').value = 'all';
+            applyReportFilters();
+        }
+
+        function applyReportFilters() {
+            const roomF = document.getElementById('report-filter-room').value;
+            const subF = document.getElementById('report-filter-subject').value;
+            const monthF = document.getElementById('report-filter-month').value;
+
+            // กรองข้อมูลตามที่ครูเลือก
+            let fSubs = fullSubmissionData.filter(s => {
+                if(roomF !== 'all' && s.room !== roomF) return false;
+                if(subF !== 'all' && s.subject !== subF) return false;
+                if(monthF !== 'all') {
+                    if(!s.Timestamp) return false;
+                    let m = new Date(s.Timestamp).getMonth(); 
+                    if(m.toString().padStart(2,'0') !== monthF) return false;
+                }
+                return true;
+            });
+
+            let fAssigns = fullAssignmentData.filter(a => {
+                if(roomF !== 'all' && a.targetRoom !== roomF) return false;
+                if(subF !== 'all' && a.subject !== subF) return false;
+                return true;
+            });
+
+            // คำนวณตัวเลข KPI 4 กล่องบน
+            let totalAssignsCount = fAssigns.length;
+            document.getElementById('kpi-total-assignments').innerText = totalAssignsCount;
+
+            let studentsInRoom = globalStudents.filter(s => roomF === 'all' || s.room === roomF).length;
+            document.getElementById('kpi-total-students').innerText = studentsInRoom;
+
+            let totalExpectedSubs = totalAssignsCount * studentsInRoom;
+            let actualSubs = fSubs.length;
+            let subRate = totalExpectedSubs > 0 ? Math.round((actualSubs / totalExpectedSubs) * 100) : 0;
+            document.getElementById('kpi-submission-rate').innerText = subRate + '%';
+
+            let avgScore = fSubs.length > 0 ? (fSubs.reduce((sum, s) => sum + Number(s.score||0), 0) / fSubs.length).toFixed(1) : '0.0';
+            document.getElementById('kpi-avg-score').innerText = avgScore;
+
+            // วาดกราฟ
+            renderCharts(fSubs, fAssigns);
+            
+            // ซ่อนกล่องเปรียบเทียบรายห้อง (เพราะใช้กราฟอธิบายครอบคลุมแล้ว)
+            document.getElementById('classroom-performance-grid').innerHTML = '<div class="p-4 border rounded-xl bg-slate-50 text-center text-slate-400 py-10 col-span-full">อ้างอิงสถิติจากกราฟด้านบน</div>';
+        }
+
+        function renderCharts(subs, assigns) {
+            // ล้างกราฟเก่าก่อนวาดใหม่
+            if(chartSubject) chartSubject.destroy();
+            if(chartMonthly) chartMonthly.destroy();
+
+            // 1. กราฟแท่ง (คะแนนเฉลี่ยรายวิชา)
+            let subMap = {};
+            subs.forEach(s => {
+                if(!subMap[s.subject]) subMap[s.subject] = { totalScore: 0, count: 0 };
+                subMap[s.subject].totalScore += Number(s.score||0);
+                subMap[s.subject].count++;
+            });
+            let subLabels = Object.keys(subMap);
+            let subData = subLabels.map(k => (subMap[k].totalScore / subMap[k].count).toFixed(2));
+
+            const ctxSub = document.getElementById('chart-subject-performance').getContext('2d');
+            chartSubject = new Chart(ctxSub, {
+                type: 'bar',
+                data: {
+                    labels: subLabels.length > 0 ? subLabels : ['ไม่มีข้อมูล'],
+                    datasets: [{
+                        label: 'คะแนนเฉลี่ย',
+                        data: subData.length > 0 ? subData : [0],
+                        backgroundColor: '#0d9488',
+                        borderRadius: 4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // 2. กราฟเส้น (แนวโน้มการส่งงานแต่ละเดือน)
+            let monthMap = {};
+            subs.forEach(s => {
+                if(!s.Timestamp) return;
+                let d = new Date(s.Timestamp);
+                let mStr = d.toLocaleString('th-TH', { month: 'short' });
+                if(!monthMap[mStr]) monthMap[mStr] = 0;
+                monthMap[mStr]++;
+            });
+            let mLabels = Object.keys(monthMap);
+            let mData = mLabels.map(k => monthMap[k]);
+
+            const ctxMonth = document.getElementById('chart-monthly-trend').getContext('2d');
+            chartMonthly = new Chart(ctxMonth, {
+                type: 'line',
+                data: {
+                    labels: mLabels.length > 0 ? mLabels : ['ไม่มีข้อมูล'],
+                    datasets: [{
+                        label: 'จำนวนงานที่ส่ง (ครั้ง)',
+                        data: mData.length > 0 ? mData : [0],
+                        borderColor: '#4f46e5',
+                        tension: 0.3,
+                        fill: true,
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function exportData(type) {
+            if(!fullSubmissionData || fullSubmissionData.length === 0) return Swal.fire('แจ้งเตือน', 'ไม่มีข้อมูลให้ส่งออก', 'warning');
+            let ws = XLSX.utils.json_to_sheet(fullSubmissionData);
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Submissions");
+            if(type === 'xlsx') {
+                XLSX.writeFile(wb, "Report_Export.xlsx");
+            } else {
+                XLSX.writeFile(wb, "Report_Export.csv");
+            }
+        }
     </script>
 </body>
 </html>
