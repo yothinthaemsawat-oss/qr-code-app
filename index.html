@@ -1568,12 +1568,13 @@
             if(val) { handleAttendanceScannedId(val, false); input.value = ''; input.focus(); }
         }
 
-        function handleAttendanceScannedId(scannedId, fromCamera) {
+       function handleAttendanceScannedId(scannedId, fromCamera) {
             const room = document.getElementById('att-room-select').value;
             const rows = document.querySelectorAll('#attendance-table-body tr[data-student-id]');
+            const dateVal = document.getElementById('att-date').value;
             
-            if(!room || rows.length === 0) {
-                Swal.fire('แจ้งเตือน', 'กรุณาเลือกห้องเรียนและกดดึงรายชื่อก่อนเริ่มสแกน', 'warning');
+            if(!room || rows.length === 0 || !dateVal) {
+                Swal.fire('แจ้งเตือน', 'กรุณาเลือกห้องเรียน วันที่ และกดดึงรายชื่อก่อนเริ่มสแกน', 'warning');
                 if(fromCamera) setTimeout(() => attendanceScanner.resume(), 1500);
                 return;
             }
@@ -1599,10 +1600,28 @@
             }
 
             const radioPresent = document.getElementById(`att-${scannedId}-present`);
+            
+            // 🛑 เช็คว่าเช็คชื่อไปแล้วหรือยัง (ป้องกันสแกนซ้ำ)
+            if (radioPresent && radioPresent.checked) {
+                Swal.fire({ icon: 'warning', title: 'สแกนซ้ำ!', text: `${studentName} เช็คชื่อ (มา) ไปแล้ว`, timer: 1500 });
+                if(fromCamera) setTimeout(() => attendanceScanner.resume(), 1500);
+                return;
+            }
+
             if(radioPresent) radioPresent.checked = true;
 
             foundRow.classList.add('bg-emerald-100');
             setTimeout(() => foundRow.classList.remove('bg-emerald-100'), 800);
+
+            // 💾 ระบบบันทึกออโต้ทันทีเมื่อสแกนผ่าน
+            const d = new Date(dateVal);
+            const formattedDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+            
+            google.script.run.saveAttendanceRecords(formattedDate, room, [{
+                studentId: scannedId,
+                studentName: studentName,
+                status: 'มา'
+            }]);
 
             Swal.fire({
                 showConfirmButton: false, timer: 800, position: 'top-end', toast: true,
@@ -1764,7 +1783,7 @@
             if(val) { handleScannedId(val, false); input.value = ''; input.focus(); }
         }
 
-        function handleScannedId(scannedId, fromCamera) {
+       function handleScannedId(scannedId, fromCamera) {
             const room = document.getElementById('scan-room-filter').value;
             const sub = document.getElementById('scan-subject-filter').value;
             const task = document.getElementById('scan-task').value;
@@ -1783,6 +1802,14 @@
                 return;
             }
 
+            // 🛑 เพิ่มระบบป้องกันสแกนส่งงานซ้ำ
+            const isDuplicate = sessionScans.some(s => String(s.studentId) === String(student.studentId));
+            if (isDuplicate) {
+                Swal.fire({ icon: 'warning', title: 'สแกนซ้ำ!', text: `${student.fullName} ส่งงานชิ้นนี้ไปแล้ว`, timer: 1500 });
+                if(fromCamera) setTimeout(() => html5QrcodeScanner.resume(), 1500);
+                return;
+            }
+
             if(document.getElementById('sound-toggle').checked) {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator(); osc.frequency.setValueAtTime(800, ctx.currentTime);
@@ -1790,12 +1817,15 @@
             }
 
             const dataToSave = { studentId: student.studentId, studentName: student.fullName, room: student.room, subject: sub, workTitle: task, score: score };
+            
+            // 💾 ระบบบันทึกออโต้
             google.script.run.withSuccessHandler(() => {
                 loadDashboardData(); 
             }).saveSubmissions([dataToSave]); 
 
             const timeStr = new Date().toLocaleTimeString('th-TH');
-            sessionScans.unshift({ name: student.fullName, score: score, time: timeStr, room: student.room });
+            // อัปเดตให้จำรหัสนักเรียนไว้กันสแกนซ้ำ
+            sessionScans.unshift({ studentId: student.studentId, name: student.fullName, score: score, time: timeStr, room: student.room });
             renderRecentScans();
 
             let photoHtml = student.photo ? `<img src="${student.photo}" class="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-2 border-green-200">` : '';
