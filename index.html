@@ -1006,28 +1006,42 @@
         };
 
        function showView(viewId) {
+            // 1. ซ่อนทุกหน้า
             document.querySelectorAll('main > div[id^="view-"]').forEach(el => el.classList.add('hidden-view'));
+            
+            // 2. แสดงหน้าที่ต้องการ
             document.getElementById(viewId).classList.remove('hidden-view');
             
+            // 3. จัดการแถบเมนูด้านบน
             if(viewId === 'view-home' || viewId === 'view-parent-dashboard') {
                 document.getElementById('navbar').classList.add('hidden-view');
             } else {
                 document.getElementById('navbar').classList.remove('hidden-view');
             }
             
-            // เพิ่มการตรวจสอบว่าฟังก์ชัน stopScanner และ stopAttendanceScanner มีอยู่จริงหรือไม่ก่อนเรียกใช้
+            // 4. การจัดการปิดกล้องอย่างปลอดภัย (เพิ่มการเช็คอย่างระมัดระวังป้องกันเว็บค้าง)
             if(viewId !== 'view-scanner') {
-                if (typeof stopScanner === 'function') {
-                    stopScanner(); 
+                if (typeof html5QrcodeScanner !== 'undefined' && html5QrcodeScanner !== null && typeof isCameraOpen !== 'undefined' && isCameraOpen) {
+                    try {
+                        html5QrcodeScanner.stop().then(() => { 
+                            isCameraOpen = false; 
+                            document.getElementById('reader-container').classList.add('hidden'); 
+                        }).catch(err => console.error("Error stopping scanner:", err));
+                    } catch (e) { console.error("Scanner stop exception:", e); }
                 }
             }
+            
             if(viewId !== 'view-attendance') {
-                if (typeof stopAttendanceScanner === 'function') {
-                    stopAttendanceScanner(); 
+                if (typeof attendanceScanner !== 'undefined' && attendanceScanner !== null && typeof isAttendanceCameraOpen !== 'undefined' && isAttendanceCameraOpen) {
+                    try {
+                        attendanceScanner.stop().then(() => { 
+                            isAttendanceCameraOpen = false; 
+                            document.getElementById('attendance-reader-container').classList.add('hidden'); 
+                        }).catch(err => console.error("Error stopping attendance scanner:", err));
+                    } catch (e) { console.error("Attendance scanner stop exception:", e); }
                 }
             }
         }
-
         function switchLoginTab(type) {
             if(type === 'teacher') {
                 document.getElementById('tab-teacher').classList.replace('text-gray-400', 'text-teal-600');
