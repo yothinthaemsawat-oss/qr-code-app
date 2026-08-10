@@ -1005,15 +1005,27 @@
             switchLoginTab('parent');
         };
 
-        function showView(viewId) {
+       function showView(viewId) {
             document.querySelectorAll('main > div[id^="view-"]').forEach(el => el.classList.add('hidden-view'));
             document.getElementById(viewId).classList.remove('hidden-view');
             
-            if(viewId === 'view-home' || viewId === 'view-parent-dashboard') document.getElementById('navbar').classList.add('hidden-view');
-            else document.getElementById('navbar').classList.remove('hidden-view');
+            if(viewId === 'view-home' || viewId === 'view-parent-dashboard') {
+                document.getElementById('navbar').classList.add('hidden-view');
+            } else {
+                document.getElementById('navbar').classList.remove('hidden-view');
+            }
             
-            if(viewId !== 'view-scanner') stopScanner(); 
-            if(viewId !== 'view-attendance') stopAttendanceScanner(); 
+            // เพิ่มการตรวจสอบว่าฟังก์ชัน stopScanner และ stopAttendanceScanner มีอยู่จริงหรือไม่ก่อนเรียกใช้
+            if(viewId !== 'view-scanner') {
+                if (typeof stopScanner === 'function') {
+                    stopScanner(); 
+                }
+            }
+            if(viewId !== 'view-attendance') {
+                if (typeof stopAttendanceScanner === 'function') {
+                    stopAttendanceScanner(); 
+                }
+            }
         }
 
         function switchLoginTab(type) {
