@@ -580,6 +580,151 @@
             </div>
         </div>
 
+    <!-- View 7: REPORTING & EXPORT DASHBOARD -->
+        <div id="view-reports" class="w-full max-w-7xl hidden-view mt-4">
+            <!-- Title & Quick Actions -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center">
+                        <span class="bg-teal-600 text-white p-2 rounded-xl mr-3 shadow-md flex items-center justify-center w-11 h-11">
+                            <i class="fas fa-chart-bar text-xl"></i>
+                        </span>
+                        ระบบรายงานวิเคราะห์ & สถิติส่งงาน
+                    </h1>
+                    <p class="text-sm text-slate-500 mt-1">วิเคราะห์ภาพรวมการส่งงาน คะแนนสอบ และสรุปผลของห้องเรียนและรายวิชา</p>
+                </div>
+                <!-- Export Actions -->
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm font-semibold text-slate-500">ส่งออก:</span>
+                    <button onclick="exportData('xlsx')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-xl shadow-md flex items-center text-sm transition transform hover:-translate-y-0.5">
+                        <i class="fas fa-file-excel mr-2 text-lg"></i> Excel (.xlsx)
+                    </button>
+                    <button onclick="exportData('csv')" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-xl shadow-md flex items-center text-sm transition transform hover:-translate-y-0.5">
+                        <i class="fas fa-file-csv mr-2 text-lg"></i> CSV File
+                    </button>
+                </div>
+            </div>
+
+            <!-- Advanced Filter Panel -->
+            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100 mb-6 flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">ตัวกรองห้องเรียน</label>
+                    <select id="report-filter-room" onchange="applyReportFilters()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-slate-50">
+                        <option value="all">ทุกห้องเรียน</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">ตัวกรองรายวิชา</label>
+                    <select id="report-filter-subject" onchange="applyReportFilters()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-slate-50">
+                        <option value="all">ทุกรายวิชา</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">เลือกช่วงเวลา (เดือน)</label>
+                    <select id="report-filter-month" onchange="applyReportFilters()" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-slate-50">
+                        <option value="all">ทุกเดือน</option>
+                        <option value="00">มกราคม</option>
+                        <option value="01">กุมภาพันธ์</option>
+                        <option value="02">มีนาคม</option>
+                        <option value="03">เมษายน</option>
+                        <option value="04">พฤษภาคม</option>
+                        <option value="05">มิถุนายน</option>
+                        <option value="06">กรกฎาคม</option>
+                        <option value="07">สิงหาคม</option>
+                        <option value="08">กันยายน</option>
+                        <option value="09">ตุลาคม</option>
+                        <option value="10">พฤศจิกายน</option>
+                        <option value="11">ธันวาคม</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button onclick="resetReportFilters()" class="w-full md:w-auto bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-5 py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-1">
+                        <i class="fas fa-undo"></i> รีเซ็ตตัวกรอง
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Cards Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <!-- KPI 1 -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">อัตราการส่งงานเฉลี่ย</span>
+                        <span id="kpi-submission-rate" class="text-3xl font-black text-emerald-600 mt-1 block">0%</span>
+                        <span class="text-xs text-slate-400 mt-1 block">ของการสั่งงานทั้งหมด</span>
+                    </div>
+                    <div class="bg-emerald-50 text-emerald-600 p-4 rounded-2xl">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                </div>
+                <!-- KPI 2 -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">คะแนนเฉลี่ย</span>
+                        <span id="kpi-avg-score" class="text-3xl font-black text-teal-600 mt-1 block">0.0</span>
+                        <span class="text-xs text-slate-400 mt-1 block">จากงานที่ตรวจแล้ว</span>
+                    </div>
+                    <div class="bg-teal-50 text-teal-600 p-4 rounded-2xl">
+                        <i class="fas fa-star text-2xl"></i>
+                    </div>
+                </div>
+                <!-- KPI 3 -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">จำนวนนักเรียนที่ดูแล</span>
+                        <span id="kpi-total-students" class="text-3xl font-black text-blue-600 mt-1 block">0</span>
+                        <span class="text-xs text-slate-400 mt-1 block">คนในฐานข้อมูล</span>
+                    </div>
+                    <div class="bg-blue-50 text-blue-600 p-4 rounded-2xl">
+                        <i class="fas fa-user-friends text-2xl"></i>
+                    </div>
+                </div>
+                <!-- KPI 4 -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">งานที่มอบหมาย</span>
+                        <span id="kpi-total-assignments" class="text-3xl font-black text-orange-500 mt-1 block">0</span>
+                        <span class="text-xs text-slate-400 mt-1 block">ชิ้นงาน/กิจกรรม</span>
+                    </div>
+                    <div class="bg-orange-50 text-orange-500 p-4 rounded-2xl">
+                        <i class="fas fa-clipboard-list text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Analysis Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- Subject Submission Success Rate -->
+                <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100">
+                    <h3 class="font-bold text-slate-700 text-lg mb-4 flex items-center gap-2">
+                        <i class="fas fa-book-reader text-teal-600"></i> สัดส่วนความสำเร็จแยกตามรายวิชา (%)
+                    </h3>
+                    <div class="h-64 relative flex items-center justify-center">
+                        <canvas id="chart-subject-performance"></canvas>
+                    </div>
+                </div>
+                <!-- Monthly Submission Trend -->
+                <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100">
+                    <h3 class="font-bold text-slate-700 text-lg mb-4 flex items-center gap-2">
+                        <i class="fas fa-calendar-alt text-teal-600"></i> แนวโน้มการส่งงานรายเดือน (ครั้ง)
+                    </h3>
+                    <div class="h-64 relative flex items-center justify-center">
+                        <canvas id="chart-monthly-trend"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Classroom comparison list -->
+            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100 mb-6">
+                <h3 class="font-bold text-slate-700 text-lg mb-4 flex items-center gap-2">
+                    <i class="fas fa-school text-indigo-500"></i> สรุปภาพรวมรายห้องเรียน (Classroom Performance Overview)
+                </h3>
+                <div id="classroom-performance-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 border rounded-xl bg-slate-50 text-center text-slate-400 py-10 col-span-full">อ้างอิงสถิติจากกราฟด้านบน</div>
+                </div>
+            </div>
+        </div>
+        
       <!-- NEW View 9: Unit Summary (สรุปคะแนนเฉลี่ยแต่ละบท) -->
         <div id="view-unit-summary" class="w-full max-w-7xl hidden-view mt-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center">
