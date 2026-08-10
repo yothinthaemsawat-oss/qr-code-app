@@ -901,15 +901,15 @@
 
     </main>
 
-    <!-- Mock Google Apps Script Server Side Engine -->
+   <!-- Mock Google Apps Script Server Side Engine -->
     <script>
         const IS_MOCK_ENV = typeof google === 'undefined' || !google.script || !google.script.run;
 
         if (IS_MOCK_ENV) {
             console.log("Running via GitHub Pages API Bridge");
             
-            // ⚠️ นำ Web App URL ของคุณมาใส่ที่นี่ ⚠️
-            const GAS_URL = 'https://script.google.com/macros/s/AKfycbwgAIUk030QcR7kTixizdZ8f_6AnYyjAxPfbvBLPzF6cZfVoIPkiLvtQ7vG6UHoEQRC/exec';
+            // ⚠️ นำ Web App URL ของคุณมาใส่ที่นี่ (ต้องเป็น /exec ของเวอร์ชันล่าสุด) ⚠️
+            const GAS_URL = 'https://script.google.com/macros/s/AKfycbxASxeAmQtLUWSbnds6eHuCgUvyuNtGIH3Gh0y8M8QWQTgZc9NDl1CJucG-15227Xds/exec';
             
             window.google = {
                 script: {
@@ -920,6 +920,7 @@
                                     return function(...args) {
                                         fetch(GAS_URL, {
                                             method: 'POST',
+                                            redirect: 'follow', // เพิ่มคำสั่งนี้เพื่อแก้ปัญหา Google Redirect
                                             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                                             body: JSON.stringify({ action: prop, params: args })
                                         })
@@ -927,7 +928,7 @@
                                         .then(data => { if (onSuccess) onSuccess(data); })
                                         .catch(error => {
                                             console.error("API Fetch Error:", error);
-                                            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
+                                            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาตรวจสอบสิทธิ์การแชร์ของ Google Sheets', 'error');
                                         });
                                     }
                                 }
