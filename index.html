@@ -64,15 +64,27 @@
                     <span id="nav-brand" class="font-bold text-lg md:text-xl text-teal-700 truncate w-24 md:w-auto">ระบบครู</span>
                 </div>
                 <div class="flex items-center space-x-1 md:space-x-2 text-gray-600 overflow-x-auto no-scrollbar">
-                    <button onclick="showView('view-teacher-dashboard')" class="hover:text-teal-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-history"></i><span class="hidden md:inline ml-1"> ประวัติส่งงาน</span></button>
+                    
+                    <!-- 🟢 ปุ่มประวัติส่งงาน (สีเขียวอ่อน) -->
+                    <button onclick="showView('view-teacher-dashboard')" class="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-200 px-3 py-1.5 rounded-lg text-sm font-bold shadow-sm whitespace-nowrap transition-colors"><i class="fas fa-history mr-1 text-emerald-600"></i><span class="hidden md:inline ml-1"> ประวัติส่งงาน</span></button>
+                    
                     <button onclick="openUnitSummary()" class="hover:text-indigo-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-th-list"></i><span class="hidden md:inline ml-1"> สรุปรายหน่วย</span></button>
+                    
                     <button onclick="openAttendance()" class="bg-blue-500 text-white hover:bg-blue-600 px-3 py-1.5 rounded-lg text-sm font-bold shadow whitespace-nowrap transition-colors"><i class="fas fa-user-check mr-1"></i> เช็คชื่อ</button>
+                    
                     <button onclick="openAttendanceReport()" class="hover:text-blue-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-calendar-check"></i><span class="hidden md:inline ml-1"> สถิติเช็คชื่อ</span></button>
+                    
                     <button onclick="openScanner()" class="bg-orange-500 text-white hover:bg-orange-600 px-3 py-1.5 rounded-lg text-sm font-bold shadow whitespace-nowrap"><i class="fas fa-qrcode mr-1"></i> สแกน</button>
+                    
                     <button onclick="openGradeTracker()" class="hover:text-teal-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-check-double"></i><span class="hidden md:inline ml-1"> ตรวจงาน</span></button>
-                    <button onclick="openMissingWork()" class="hover:text-rose-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-search-minus"></i><span class="hidden md:inline ml-1"> ติดตามงานค้าง</span></button>
+                    
+                    <!-- 🔴 ปุ่มติดตามงานค้าง (สีแดงอ่อน) -->
+                    <button onclick="openMissingWork()" class="bg-rose-100 text-rose-800 hover:bg-rose-200 border border-rose-200 px-3 py-1.5 rounded-lg text-sm font-bold shadow-sm whitespace-nowrap transition-colors"><i class="fas fa-search-minus mr-1 text-rose-600"></i><span class="hidden md:inline ml-1"> ติดตามงานค้าง</span></button>
+                    
                     <button onclick="openManageAssignments()" class="hover:text-teal-600 p-2 text-sm md:text-base whitespace-nowrap"><i class="fas fa-tasks"></i><span class="hidden md:inline ml-1"> สั่งงาน</span></button>
+                    
                     <button onclick="openTools()" class="bg-purple-500 text-white hover:bg-purple-600 px-3 py-1.5 rounded-lg text-sm font-bold shadow whitespace-nowrap"><i class="fas fa-magic mr-1"></i> เครื่องมือ</button>
+                    
                     <button onclick="logout()" class="hover:text-red-500 p-2 ml-1"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
             </div>
