@@ -767,15 +767,15 @@
 
     </main>
 
-   <!-- Mock Google Apps Script Server Side Engine -->
+    <!-- Mock Google Apps Script Server Side Engine -->
     <script>
         const IS_MOCK_ENV = typeof google === 'undefined' || !google.script || !google.script.run;
 
         if (IS_MOCK_ENV) {
             console.log("Running via GitHub Pages API Bridge");
             
-            // ⚠️ ลิงก์ Web App ล่าสุดของคุณครู ⚠️
-            const GAS_URL = 'https://script.google.com/macros/s/AKfycbzWCvuz6M1y-fZWxTJgRI1JN7kImMSuZcFxB3--ojHxguKlUZCLzM5ToG7k4qRiAU09/exec';
+            // ⚠️ นำ Web App URL ของคุณมาใส่ที่นี่ ⚠️
+            const GAS_URL = 'https://script.google.com/macros/s/AKfycbwgAIUk030QcR7kTixizdZ8f_6AnYyjAxPfbvBLPzF6cZfVoIPkiLvtQ7vG6UHoEQRC/exec';
             
             window.google = {
                 script: {
@@ -784,33 +784,17 @@
                             return new Proxy({}, {
                                 get: function(target, prop) {
                                     return function(...args) {
-                                        // ฟังก์ชันเรียก API
-                                        const callApi = () => {
-                                            fetch(GAS_URL, {
-                                                method: 'POST',
-                                                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                                                body: JSON.stringify({ action: prop, params: args })
-                                            })
-                                            .then(response => response.json())
-                                            .then(data => { if (onSuccess) onSuccess(data); })
-                                            .catch(error => {
-                                                console.warn("Net hiccup, retrying...");
-                                                // ลองส่งคำขอซ้ำ 1 ครั้งแบบเงียบๆ ถ้าเน็ตกระตุก
-                                                setTimeout(() => {
-                                                    fetch(GAS_URL, {
-                                                        method: 'POST',
-                                                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                                                        body: JSON.stringify({ action: prop, params: args })
-                                                    })
-                                                    .then(res => res.json())
-                                                    .then(data => { if (onSuccess) onSuccess(data); })
-                                                    .catch(err => {
-                                                        Swal.fire('ข้อผิดพลาด', 'เชื่อมต่อฐานข้อมูลไม่ได้ กรุณารีเฟรชหน้าเว็บ', 'error');
-                                                    });
-                                                }, 1000);
-                                            });
-                                        };
-                                        callApi();
+                                        fetch(GAS_URL, {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                            body: JSON.stringify({ action: prop, params: args })
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => { if (onSuccess) onSuccess(data); })
+                                        .catch(error => {
+                                            console.error("API Fetch Error:", error);
+                                            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
+                                        });
                                     }
                                 }
                             });
