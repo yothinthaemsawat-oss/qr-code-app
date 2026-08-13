@@ -767,15 +767,15 @@
 
     </main>
 
-    <!-- Mock Google Apps Script Server Side Engine -->
+<!-- Mock Google Apps Script Server Side Engine (Upgraded Auto-Retry) -->
     <script>
         const IS_MOCK_ENV = typeof google === 'undefined' || !google.script || !google.script.run;
 
         if (IS_MOCK_ENV) {
-            console.log("Running via GitHub Pages API Bridge");
+            console.log("Running via GitHub Pages API Bridge (with Auto-Retry)");
             
-            // ⚠️ นำ Web App URL ของคุณมาใส่ที่นี่ ⚠️
-            const GAS_URL = 'https://script.google.com/macros/s/AKfycbwgAIUk030QcR7kTixizdZ8f_6AnYyjAxPfbvBLPzF6cZfVoIPkiLvtQ7vG6UHoEQRC/exec';
+            // ลิงก์ Web App ล่าสุดของคุณครู
+            const GAS_URL = 'https://script.google.com/macros/s/AKfycbzWCvuz6M1y-fZWxTJgRI1JN7kImMSuZcFxB3--ojHxguKlUZCLzM5ToG7k4qRiAU09/exec';
             
             window.google = {
                 script: {
@@ -783,18 +783,49 @@
                         withSuccessHandler: function(onSuccess) {
                             return new Proxy({}, {
                                 get: function(target, prop) {
-                                    return function(...args) {
-                                        fetch(GAS_URL, {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                                            body: JSON.stringify({ action: prop, params: args })
-                                        })
-                                        .then(response => response.json())
-                                        .then(data => { if (onSuccess) onSuccess(data); })
-                                        .catch(error => {
-                                            console.error("API Fetch Error:", error);
-                                            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
-                                        });
+                                    return async function(...args) {
+                                        // ตั้งค่าการพยายามเชื่อมต่อใหม่สูงสุด 3 รอบ
+                                        const MAX_RETRIES = 3;
+                                        const DELAY_MS = 1000;
+                                        
+                                        const attemptFetch = async (attempt) => {
+                                            try {
+                                                const response = await fetch(GAS_URL, {
+                                                    method: 'POST',
+                                                    redirect: 'follow',
+                                                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                                    body: JSON.stringify({ action: prop, params: args })
+                                                });
+                                                
+                                                const text = await response.text();
+                                                try {
+                                                    const data = JSON.parse(text);
+                                                    if (onSuccess) onSuccess(data);
+                                                } catch (parseError) {
+                                                    throw new Error("Google Server returned HTML instead of JSON. (Auth/Redirect Issue)");
+                                                }
+                                                
+                                            } catch (error) {
+                                                console.warn(`เชื่อมต่อรอบที่ ${attempt} ล้มเหลว:`, error.message);
+                                                
+                                                if (attempt < MAX_RETRIES) {
+                                                    // ถ้ายางไม่เกินโควต้า ให้รอ 1 วินาทีแล้วลองใหม่เงียบๆ
+                                                    console.log(`กำลังพยายามเชื่อมต่อใหม่รอบที่ ${attempt + 1}...`);
+                                                    await new Promise(resolve => setTimeout(resolve, DELAY_MS));
+                                                    return attemptFetch(attempt + 1);
+                                                } else {
+                                                    // ถ้าครบ 3 รอบแล้วยังไม่ได้ ค่อยแจ้ง Error
+                                                    Swal.fire({
+                                                        icon: 'error',
+                                                        title: 'การเชื่อมต่อขัดข้อง',
+                                                        html: 'เซิร์ฟเวอร์ของ Google ตอบสนองช้ากว่าปกติ<br><br><span class="text-sm text-red-500 font-bold">วิธีแก้เบื้องต้น: <br>1. ลองกดปุ่มรีเฟรชข้อมูลอีกครั้ง<br>2. หากเปิดในแอป LINE ให้กดปุ่ม 3 จุดมุมขวาบน แล้วเลือก "เปิดในเบราว์เซอร์เริ่มต้น (Open in Browser)"</span>'
+                                                    });
+                                                }
+                                            }
+                                        };
+                                        
+                                        // เริ่มการเชื่อมต่อรอบที่ 1
+                                        attemptFetch(1);
                                     }
                                 }
                             });
