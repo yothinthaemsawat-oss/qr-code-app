@@ -44,46 +44,55 @@
         .att-radio:checked + label.att-leave { background-color: #f59e0b; color: white; border-color: #f59e0b; }
         .att-radio:checked + label.att-sick { background-color: #3b82f6; color: white; border-color: #3b82f6; }
         .att-radio:checked + label.att-absent { background-color: #ef4444; color: white; border-color: #ef4444; }
-        /* Print QR Code Styles */
-        /* Print QR Code Styles */
+
+       /* Print QR Code Styles (แก้บั๊กพิมพ์ไม่ครบและตัดหน้ากระดาษ) */
         @media print {
-            /* 1. ปลดล็อกความสูงและกรอบหน้าจอทั้งหมดให้แตกหน้ากระดาษได้ */
-            html, body, main { 
-                height: auto !important; 
-                max-height: none !important; 
-                overflow: visible !important; 
-                display: block !important; 
+            /* 1. ซ่อนทุกส่วนในหน้าจอ ยกเว้นส่วน <main> */
+            body > *:not(main) { display: none !important; }
+            
+            /* 2. ซ่อนหน้าอื่นๆ ทั้งหมด ยกเว้น #view-tools */
+            main > *:not(#view-tools) { display: none !important; }
+            
+            /* 3. ซ่อนหัวเมนูของเครื่องมือ */
+            #view-tools > div:not(.bg-white.rounded-2xl) { display: none !important; }
+            
+            /* 4. ซ่อนเครื่องมืออื่นๆ ยกเว้นหน้า QR Code */
+            #view-tools .bg-white.rounded-2xl > div:not(#tool-qrcode) { display: none !important; }
+            
+            /* 5. ซ่อนปุ่มกดพิมพ์และข้อความด้านบน */
+            #tool-qrcode > div:not(#qr-print-area) { display: none !important; }
+
+            /* 6. ปลดล็อกความสูงและ Scrollbar ทั้งหมดตั้งแต่ html ลงมาถึงกล่อง QR (สำคัญที่สุด) */
+            html, body, main, #view-tools, #view-tools .bg-white.rounded-2xl, #tool-qrcode, #qr-print-area {
+                display: block !important;
+                height: auto !important;
+                min-height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+                position: static !important;
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                width: 100% !important;
+                max-width: 100% !important;
             }
-            /* 2. ซ่อนส่วนที่ไม่จำเป็น */
-            body * { visibility: hidden; }
-            
-            /* 3. แสดงเฉพาะพื้นที่ QR Code */
-            #qr-print-area, #qr-print-area * { visibility: visible; }
-            
-            /* 4. จัดเรียงพื้นที่พิมพ์ใหม่ให้เต็มหน้า A4 */
-            #qr-print-area { 
-                position: absolute !important; 
-                left: 0 !important; 
-                top: 0 !important; 
-                width: 100% !important; 
-                height: auto !important; 
-                max-height: none !important; 
-                overflow: visible !important; 
-                display: grid !important; 
-                grid-template-columns: repeat(4, 1fr) !important; 
-                gap: 15px !important; 
-                margin: 0 !important; 
-                padding: 10px !important; 
-                border: none !important; 
-                background: white !important; 
+
+            /* 7. จัดตาราง Grid ให้เป็น 4 คอลัมน์พอดีหน้า A4 */
+            #qr-print-area {
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 15px !important;
+                padding: 15px !important;
             }
-            
-            /* 5. ป้องกันบัตรโดนตัดขาดครึ่งตรงรอยต่อหน้ากระดาษ */
-            .print-card { 
-                page-break-inside: avoid !important; 
-                break-inside: avoid !important; 
-                border: 1px solid #94a3b8 !important; 
-                box-shadow: none !important; 
+
+            /* 8. ป้องกันบัตรถูกตัดขาดครึ่งตรงรอยต่อหน้ากระดาษ */
+            .print-card {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                border: 1px solid #94a3b8 !important;
+                margin-bottom: 10px !important;
             }
         }
     </style>
