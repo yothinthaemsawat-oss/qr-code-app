@@ -1575,7 +1575,7 @@
                 attendanceScanner.start({ facingMode: "environment" }, config, 
                     (text) => {
                         if(attendanceScanner.isPaused) return;
-                        attendanceScanner.pause(); handleAttendanceScannedId(text.trim(), true);
+                        attendanceScanner.pause(); (text.trim(), true);
                     },
                     (errorMessage) => { /* ignore */ }
                 ).then(() => { 
@@ -1584,7 +1584,7 @@
                     attendanceScanner.start({ facingMode: "user" }, config,
                         (text) => {
                             if(attendanceScanner.isPaused) return;
-                            attendanceScanner.pause(); handleAttendanceScannedId(text.trim(), true);
+                            attendanceScanner.pause(); (text.trim(), true);
                         },
                         (errorMessage) => { /* ignore */ }
                     ).then(() => {
@@ -1609,10 +1609,9 @@
         function processAttendanceManualID() {
             const input = document.getElementById('manual-att-student-id');
             const val = input.value.trim();
-            if(val) { handleAttendanceScannedId(val, false); input.value = ''; input.focus(); }
+            if(val) { (val, false); input.value = ''; input.focus(); }
         }
-
-       function handleAttendanceScannedId(scannedId, fromCamera) {
+function handleAttendanceScannedId(scannedId, fromCamera) {
             const room = document.getElementById('att-room-select').value;
             const rows = document.querySelectorAll('#attendance-table-body tr[data-student-id]');
             const dateVal = document.getElementById('att-date').value;
@@ -1667,12 +1666,40 @@
                 status: 'มา'
             }]);
 
+            // ✨ เอฟเฟกต์เด้งหน้าจอแบบสวยงาม (Pop-up) ✨
+            const stdObj = globalStudents.find(s => String(s.studentId).trim() == scannedId && s.room == room);
+            let photoHtml = (stdObj && stdObj.photo) ? `<img src="${stdObj.photo}" class="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-4 border-white shadow-md">` : `<div class="w-16 h-16 rounded-full bg-emerald-100 border-4 border-white shadow-md mx-auto flex items-center justify-center text-emerald-500 text-2xl mb-2"><i class="fas fa-user-check"></i></div>`;
+
             Swal.fire({
-                showConfirmButton: false, timer: 800, position: 'top-end', toast: true,
-                icon: 'success', title: `มาเรียน: ${studentName}`
+                showConfirmButton: false, 
+                timer: 1500, 
+                customClass: { popup: 'swal-green-popup' }, 
+                html: `
+                    <div class="bg-white rounded-3xl shadow-2xl w-64 mx-auto overflow-hidden border border-emerald-100">
+                        <div class="bg-gradient-to-b from-emerald-400 to-teal-500 p-4 pb-8 relative">
+                            <div class="text-white font-bold text-lg"><i class="fas fa-check-circle mr-1"></i> สแกนสำเร็จ!</div>
+                        </div>
+                        <div class="p-4 text-center -mt-10 relative z-10">
+                            ${photoHtml}
+                            <h3 class="text-sm font-extrabold text-gray-800 mb-1">${studentName}</h3>
+                            <span class="bg-emerald-50 text-emerald-600 rounded-full inline-block px-4 py-1 text-xs font-bold border border-emerald-100 shadow-sm">บันทึกเข้าเรียนแล้ว</span>
+                        </div>
+                    </div>
+                `
             });
 
-            if(fromCamera) setTimeout(() => attendanceScanner.resume(), 1000);
+            // 🎵 เพิ่มเสียง "ติ๊ง!" เบาๆ ให้รู้ว่าสแกนติด
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator(); 
+                osc.frequency.setValueAtTime(1200, ctx.currentTime);
+                osc.connect(ctx.destination); 
+                osc.start(); 
+                osc.stop(ctx.currentTime + 0.1);
+            } catch(e) {}
+
+            // หน่วงเวลาให้กล้องเริ่มสแกนคนต่อไปหลังจาก Pop-up หายไป
+            if(fromCamera) setTimeout(() => attendanceScanner.resume(), 1600);
         }
 
         function saveAttendanceData() {
