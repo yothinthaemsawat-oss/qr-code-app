@@ -45,11 +45,46 @@
         .att-radio:checked + label.att-sick { background-color: #3b82f6; color: white; border-color: #3b82f6; }
         .att-radio:checked + label.att-absent { background-color: #ef4444; color: white; border-color: #ef4444; }
         /* Print QR Code Styles */
+        /* Print QR Code Styles */
         @media print {
+            /* 1. ปลดล็อกความสูงและกรอบหน้าจอทั้งหมดให้แตกหน้ากระดาษได้ */
+            html, body, main { 
+                height: auto !important; 
+                max-height: none !important; 
+                overflow: visible !important; 
+                display: block !important; 
+            }
+            /* 2. ซ่อนส่วนที่ไม่จำเป็น */
             body * { visibility: hidden; }
+            
+            /* 3. แสดงเฉพาะพื้นที่ QR Code */
             #qr-print-area, #qr-print-area * { visibility: visible; }
-            #qr-print-area { position: absolute; left: 0; top: 0; width: 100%; display: grid; grid-template-columns: repeat(4, 1fr) !important; gap: 10px; margin: 0; padding: 10px; overflow: visible; height: auto; border: none; background: white; }
-            .print-card { border: 1px solid #64748b !important; box-shadow: none !important; page-break-inside: avoid; }
+            
+            /* 4. จัดเรียงพื้นที่พิมพ์ใหม่ให้เต็มหน้า A4 */
+            #qr-print-area { 
+                position: absolute !important; 
+                left: 0 !important; 
+                top: 0 !important; 
+                width: 100% !important; 
+                height: auto !important; 
+                max-height: none !important; 
+                overflow: visible !important; 
+                display: grid !important; 
+                grid-template-columns: repeat(4, 1fr) !important; 
+                gap: 15px !important; 
+                margin: 0 !important; 
+                padding: 10px !important; 
+                border: none !important; 
+                background: white !important; 
+            }
+            
+            /* 5. ป้องกันบัตรโดนตัดขาดครึ่งตรงรอยต่อหน้ากระดาษ */
+            .print-card { 
+                page-break-inside: avoid !important; 
+                break-inside: avoid !important; 
+                border: 1px solid #94a3b8 !important; 
+                box-shadow: none !important; 
+            }
         }
     </style>
 </head>
