@@ -1656,11 +1656,14 @@ function handleAttendanceScannedId(scannedId, fromCamera) {
             foundRow.classList.add('bg-emerald-100');
             setTimeout(() => foundRow.classList.remove('bg-emerald-100'), 800);
 
-            // 💾 ระบบบันทึกออโต้ทันทีเมื่อสแกนผ่าน
+            // 💾 ระบบบันทึกออโต้ (แก้ไขบั๊กเชื่อมต่อ GitHub แล้ว)
             const d = new Date(dateVal);
             const formattedDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
             
-            google.script.run.saveAttendanceRecords(formattedDate, room, [{
+            // 🚨 จุดที่แก้: ต้องใส่ withSuccessHandler ให้ API Bridge ของ GitHub เสมอ
+            google.script.run.withSuccessHandler(() => {
+                // บันทึกเสร็จแล้วเงียบๆ
+            }).saveAttendanceRecords(formattedDate, room, [{
                 studentId: scannedId,
                 studentName: studentName,
                 status: 'มา'
@@ -1701,7 +1704,7 @@ function handleAttendanceScannedId(scannedId, fromCamera) {
             // หน่วงเวลาให้กล้องเริ่มสแกนคนต่อไปหลังจาก Pop-up หายไป
             if(fromCamera) setTimeout(() => attendanceScanner.resume(), 1600);
         }
-
+        
         function saveAttendanceData() {
             const room = document.getElementById('att-room-select').value;
             const dateVal = document.getElementById('att-date').value;
