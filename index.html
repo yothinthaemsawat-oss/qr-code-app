@@ -1606,18 +1606,27 @@
             } 
         }
 
-        function processAttendanceManualID() {
+      function processAttendanceManualID() {
             const input = document.getElementById('manual-att-student-id');
             const val = input.value.trim();
-            if(val) { (val, false); input.value = ''; input.focus(); }
+            if(val) { 
+                handleAttendanceScannedId(val, false); 
+                input.value = ''; 
+                // บังคับให้ช่องพิมพ์รอรับข้อมูลต่อไปทันที
+                setTimeout(() => { input.focus(); }, 10);
+            }
         }
-function handleAttendanceScannedId(scannedId, fromCamera) {
+
+        function handleAttendanceScannedId(scannedId, fromCamera) {
             const room = document.getElementById('att-room-select').value;
             const rows = document.querySelectorAll('#attendance-table-body tr[data-student-id]');
             const dateVal = document.getElementById('att-date').value;
             
+            // ฟังก์ชันช่วยคืน Focus ให้เครื่องยิงบาร์โค้ด
+            const keepFocus = () => { setTimeout(() => { document.getElementById('manual-att-student-id').focus(); }, 10); };
+            
             if(!room || rows.length === 0 || !dateVal) {
-                Swal.fire('แจ้งเตือน', 'กรุณาเลือกห้องเรียน วันที่ และกดดึงรายชื่อก่อนเริ่มสแกน', 'warning');
+                Swal.fire({icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาเลือกห้องเรียน วันที่ และกดดึงรายชื่อก่อนเริ่มสแกน', timer: 2000, showConfirmButton: false, didClose: keepFocus});
                 if(fromCamera) setTimeout(() => attendanceScanner.resume(), 1500);
                 return;
             }
@@ -1634,20 +1643,21 @@ function handleAttendanceScannedId(scannedId, fromCamera) {
             if(!foundRow) {
                 const std = globalStudents.find(s => s.studentId == scannedId);
                 if (std) {
-                    Swal.fire({ icon: 'error', title: 'อยู่คนละห้อง', text: `${std.fullName} อยู่ห้อง ${std.room}`, timer: 1500 });
+                    Swal.fire({ icon: 'error', title: 'อยู่คนละห้อง', text: `${std.fullName} อยู่ห้อง ${std.room}`, timer: 1500, showConfirmButton: false, didClose: keepFocus });
                 } else {
-                    Swal.fire({ icon: 'error', title: 'ไม่พบรหัสนี้', text: `รหัส: ${scannedId}`, timer: 1500 });
+                    Swal.fire({ icon: 'error', title: 'ไม่พบรหัสนี้', text: `รหัส: ${scannedId}`, timer: 1500, showConfirmButton: false, didClose: keepFocus });
                 }
                 if(fromCamera) setTimeout(() => attendanceScanner.resume(), 1500);
+                keepFocus();
                 return;
             }
 
             const radioPresent = document.getElementById(`att-${scannedId}-present`);
             
-            // 🛑 เช็คว่าเช็คชื่อไปแล้วหรือยัง (ป้องกันสแกนซ้ำ)
             if (radioPresent && radioPresent.checked) {
-                Swal.fire({ icon: 'warning', title: 'สแกนซ้ำ!', text: `${studentName} เช็คชื่อ (มา) ไปแล้ว`, timer: 1500 });
+                Swal.fire({ icon: 'warning', title: 'สแกนซ้ำ!', text: `${studentName} เช็คชื่อ (มา) ไปแล้ว`, timer: 1500, showConfirmButton: false, didClose: keepFocus });
                 if(fromCamera) setTimeout(() => attendanceScanner.resume(), 1500);
+                keepFocus();
                 return;
             }
 
@@ -1656,27 +1666,31 @@ function handleAttendanceScannedId(scannedId, fromCamera) {
             foundRow.classList.add('bg-emerald-100');
             setTimeout(() => foundRow.classList.remove('bg-emerald-100'), 800);
 
-            // 💾 ระบบบันทึกออโต้ (แก้ไขบั๊กเชื่อมต่อ GitHub แล้ว)
             const d = new Date(dateVal);
             const formattedDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
             
-            // 🚨 จุดที่แก้: ต้องใส่ withSuccessHandler ให้ API Bridge ของ GitHub เสมอ
-            google.script.run.withSuccessHandler(() => {
-                // บันทึกเสร็จแล้วเงียบๆ
-            }).saveAttendanceRecords(formattedDate, room, [{
+            google.script.run.withSuccessHandler(() => {}).saveAttendanceRecords(formattedDate, room, [{
                 studentId: scannedId,
                 studentName: studentName,
                 status: 'มา'
             }]);
 
-            // ✨ เอฟเฟกต์เด้งหน้าจอแบบสวยงาม (Pop-up) ✨
             const stdObj = globalStudents.find(s => String(s.studentId).trim() == scannedId && s.room == room);
             let photoHtml = (stdObj && stdObj.photo) ? `<img src="${stdObj.photo}" class="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-4 border-white shadow-md">` : `<div class="w-16 h-16 rounded-full bg-emerald-100 border-4 border-white shadow-md mx-auto flex items-center justify-center text-emerald-500 text-2xl mb-2"><i class="fas fa-user-check"></i></div>`;
 
+            // ✨ เอาเอฟเฟกต์เด้งหน้าจอสวยๆ กลับมาแล้วครับ! ✨
             Swal.fire({
                 showConfirmButton: false, 
                 timer: 1500, 
+                backdrop: false, // 🌟 ปิดฉากหลังสีเทา เพื่อให้สแกนต่อเนื่องได้
                 customClass: { popup: 'swal-green-popup' }, 
+                didOpen: () => {
+                    // 🌟 บังคับคืน Focus ให้เครื่องยิงบาร์โค้ดทันทีที่ป๊อปอัพเด้ง
+                    document.getElementById('manual-att-student-id').focus();
+                },
+                didClose: () => {
+                    document.getElementById('manual-att-student-id').focus();
+                },
                 html: `
                     <div class="bg-white rounded-3xl shadow-2xl w-64 mx-auto overflow-hidden border border-emerald-100">
                         <div class="bg-gradient-to-b from-emerald-400 to-teal-500 p-4 pb-8 relative">
@@ -1691,7 +1705,6 @@ function handleAttendanceScannedId(scannedId, fromCamera) {
                 `
             });
 
-            // 🎵 เพิ่มเสียง "ติ๊ง!" เบาๆ ให้รู้ว่าสแกนติด
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator(); 
@@ -1701,7 +1714,6 @@ function handleAttendanceScannedId(scannedId, fromCamera) {
                 osc.stop(ctx.currentTime + 0.1);
             } catch(e) {}
 
-            // หน่วงเวลาให้กล้องเริ่มสแกนคนต่อไปหลังจาก Pop-up หายไป
             if(fromCamera) setTimeout(() => attendanceScanner.resume(), 1600);
         }
         
