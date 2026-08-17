@@ -1606,25 +1606,63 @@
             } 
         }
 
-     function processAttendanceManualID() {
+    // 1. ฟังก์ชันเปิดกล้องเช็คชื่อ (ที่หายไป เอากลับมาแล้วครับ!)
+        function startAttendanceScanner() {
+            const room = document.getElementById('att-room-select').value;
+            const rows = document.querySelectorAll('#attendance-table-body tr[data-student-id]');
+            
+            if(!room || rows.length === 0) {
+                Swal.fire('แจ้งเตือน', 'กรุณาเลือกห้องเรียนและกดดึงรายชื่อก่อนเปิดกล้อง', 'warning');
+                return;
+            }
+
+            document.getElementById('attendance-reader').style.display = 'block';
+            
+            if (typeof attendanceScanner === 'undefined' || !attendanceScanner) {
+                window.attendanceScanner = new Html5QrcodeScanner("attendance-reader", { 
+                    fps: 10, 
+                    qrbox: {width: 250, height: 250}
+                }, false);
+                
+                attendanceScanner.render((decodedText) => {
+                    // หยุดกล้องชั่วคราวตอนสแกนติด เพื่อให้ป๊อปอัพโชว์
+                    try { attendanceScanner.pause(); } catch(e) {}
+                    handleAttendanceScannedId(decodedText, true);
+                }, (error) => {});
+            }
+        }
+
+        // 2. ฟังก์ชันปิดกล้อง
+        function stopAttendanceScanner() {
+            if (typeof attendanceScanner !== 'undefined' && attendanceScanner) {
+                attendanceScanner.clear().then(() => {
+                    window.attendanceScanner = null;
+                    document.getElementById('attendance-reader').style.display = 'none';
+                }).catch(err => console.error(err));
+            } else {
+                document.getElementById('attendance-reader').style.display = 'none';
+            }
+        }
+
+        // 3. ฟังก์ชันรับข้อมูลจากเครื่องยิงบาร์โค้ด
+        function processAttendanceManualID() {
             const input = document.getElementById('manual-att-student-id');
             const val = input.value.trim();
             if(val) { 
                 handleAttendanceScannedId(val, false); 
                 input.value = ''; 
-                // คืนโฟกัสเฉพาะตอนใช้บาร์โค้ดสแกนเนอร์ (เครื่องยิง) เท่านั้น
                 setTimeout(() => { input.focus(); }, 50);
             }
         }
 
+        // 4. ฟังก์ชันประมวลผลตอนสแกนติด (เด้งป๊อปอัพ)
         function handleAttendanceScannedId(scannedId, fromCamera) {
             const room = document.getElementById('att-room-select').value;
             const rows = document.querySelectorAll('#attendance-table-body tr[data-student-id]');
             const dateVal = document.getElementById('att-date').value;
             
-            // ฟังก์ชันช่วยสั่งกล้องมือถือให้กลับมาทำงานต่อแบบปลอดภัย 100%
             const resumeScanner = () => {
-                if(fromCamera) {
+                if(fromCamera && typeof attendanceScanner !== 'undefined' && attendanceScanner) {
                     setTimeout(() => { try { attendanceScanner.resume(); } catch(e){} }, 300);
                 }
             };
@@ -1649,7 +1687,6 @@
             }
 
             const radioPresent = document.getElementById(`att-${scannedId}-present`);
-            
             if (radioPresent && radioPresent.checked) {
                 Swal.fire({ icon: 'warning', title: 'สแกนซ้ำ!', text: `${studentName} เช็คชื่อ (มา) ไปแล้ว`, timer: 1500, showConfirmButton: false }).then(resumeScanner);
                 return;
@@ -1676,7 +1713,7 @@
             Swal.fire({
                 showConfirmButton: false, 
                 timer: 1500, 
-                backdrop: false, // ปิดฉากหลังสีเทา เพื่อให้สแกนต่อเนื่องได้
+                backdrop: false, 
                 customClass: { popup: 'swal-green-popup' }, 
                 html: `
                     <div class="bg-white rounded-3xl shadow-2xl w-64 mx-auto overflow-hidden border border-emerald-100">
@@ -1690,7 +1727,7 @@
                         </div>
                     </div>
                 `
-            }).then(resumeScanner); // สั่งให้กล้องกลับมาทำงานต่อทันทีที่ป๊อปอัพหายไป
+            }).then(resumeScanner); 
 
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
