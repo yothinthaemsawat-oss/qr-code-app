@@ -219,7 +219,7 @@
                         <input type="text" id="manual-att-student-id" onkeypress="if(event.key === 'Enter') processAttendanceManualID()" class="flex-grow px-4 py-2 font-bold text-center focus:outline-none focus:bg-indigo-50 text-sm" placeholder="คลิกที่นี่แล้วยิงสแกนบาร์โค้ด / พิมพ์รหัสเช็คชื่อ (มา)">
                         <button onclick="processAttendanceManualID()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-5 font-bold transition"><i class="fas fa-qrcode"></i></button>
                     </div>
-                    <button onclick="" class="w-full md:w-auto text-sm font-bold text-indigo-700 hover:bg-indigo-100 px-4 py-2 rounded-xl border border-indigo-300 transition whitespace-nowrap"><i class="fas fa-camera mr-1"></i> เปิดกล้องมือถือสแกน</button>
+                    <button onclick="toggleAttendanceCamera()" class="w-full md:w-auto text-sm font-bold text-indigo-700 hover:bg-indigo-100 px-4 py-2 rounded-xl border border-indigo-300 transition whitespace-nowrap"><i class="fas fa-camera mr-1"></i> เปิดกล้องมือถือสแกน</button>
                 </div>
                 <div id="attendance-reader-container" class="mt-3 hidden">
                     <div id="attendance-reader" class="w-full max-w-sm mx-auto bg-black rounded-xl overflow-hidden shadow-inner min-h-[250px]"></div>
@@ -1562,9 +1562,10 @@
             });
         }
 
-        function toggleAttendanceCamera() {
-            if(isAttendanceCameraOpen) stopAttendanceScanner();
-            else {
+       function toggleAttendanceCamera() {
+            if(isAttendanceCameraOpen) {
+                stopAttendanceScanner();
+            } else {
                 const readerContainer = document.getElementById('attendance-reader-container');
                 readerContainer.classList.remove('hidden');
                 document.getElementById('attendance-reader').innerHTML = '<div class="text-gray-400 text-center py-12 text-sm"><i class="fas fa-spinner fa-spin text-2xl mb-2 text-indigo-500"></i><br>กำลังขออนุญาตและเชื่อมต่อกล้อง...</div>';
@@ -1575,7 +1576,8 @@
                 attendanceScanner.start({ facingMode: "environment" }, config, 
                     (text) => {
                         if(attendanceScanner.isPaused) return;
-                        attendanceScanner.pause(); (text.trim(), true);
+                        attendanceScanner.pause(); 
+                        handleAttendanceScannedId(text.trim(), true);
                     },
                     (errorMessage) => { /* ignore */ }
                 ).then(() => { 
@@ -1584,7 +1586,8 @@
                     attendanceScanner.start({ facingMode: "user" }, config,
                         (text) => {
                             if(attendanceScanner.isPaused) return;
-                            attendanceScanner.pause(); (text.trim(), true);
+                            attendanceScanner.pause(); 
+                            handleAttendanceScannedId(text.trim(), true);
                         },
                         (errorMessage) => { /* ignore */ }
                     ).then(() => {
@@ -1602,46 +1605,9 @@
                 attendanceScanner.stop().then(() => { 
                     isAttendanceCameraOpen = false; 
                     document.getElementById('attendance-reader-container').classList.add('hidden'); 
-                }); 
+                    document.getElementById('attendance-reader').innerHTML = '';
+                }).catch(err => console.error(err)); 
             } 
-        }
-
-    // 1. ฟังก์ชันเปิดกล้องเช็คชื่อ (ที่หายไป เอากลับมาแล้วครับ!)
-        function startAttendanceScanner() {
-            const room = document.getElementById('att-room-select').value;
-            const rows = document.querySelectorAll('#attendance-table-body tr[data-student-id]');
-            
-            if(!room || rows.length === 0) {
-                Swal.fire('แจ้งเตือน', 'กรุณาเลือกห้องเรียนและกดดึงรายชื่อก่อนเปิดกล้อง', 'warning');
-                return;
-            }
-
-            document.getElementById('attendance-reader').style.display = 'block';
-            
-            if (typeof attendanceScanner === 'undefined' || !attendanceScanner) {
-                window.attendanceScanner = new Html5QrcodeScanner("attendance-reader", { 
-                    fps: 10, 
-                    qrbox: {width: 250, height: 250}
-                }, false);
-                
-                attendanceScanner.render((decodedText) => {
-                    // หยุดกล้องชั่วคราวตอนสแกนติด เพื่อให้ป๊อปอัพโชว์
-                    try { attendanceScanner.pause(); } catch(e) {}
-                    handleAttendanceScannedId(decodedText, true);
-                }, (error) => {});
-            }
-        }
-
-        // 2. ฟังก์ชันปิดกล้อง
-        function stopAttendanceScanner() {
-            if (typeof attendanceScanner !== 'undefined' && attendanceScanner) {
-                attendanceScanner.clear().then(() => {
-                    window.attendanceScanner = null;
-                    document.getElementById('attendance-reader').style.display = 'none';
-                }).catch(err => console.error(err));
-            } else {
-                document.getElementById('attendance-reader').style.display = 'none';
-            }
         }
 
         // 3. ฟังก์ชันรับข้อมูลจากเครื่องยิงบาร์โค้ด
