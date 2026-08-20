@@ -1282,9 +1282,10 @@
 
             const targetUnits = globalUnits.filter(u => u.subject === subject && (u.room === room || u.room === 'All' || !u.room) && (u.term === term || (!u.term && term === '1')));
             
-            const unitMap = {}; 
+           const unitMap = {}; 
             targetUnits.forEach(u => { unitMap[u.unitName] = Number(u.unitMaxScore); });
-            const unitNames = Object.keys(unitMap);
+            // เพิ่มคำสั่งเรียงลำดับภาษาไทยและตัวเลข
+            const unitNames = Object.keys(unitMap).sort((a, b) => a.localeCompare(b, 'th', {numeric: true}));
 
             let theadHtml = `<tr>
                 <th class="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider w-16">เลขที่</th>
