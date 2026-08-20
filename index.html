@@ -386,7 +386,7 @@
                                 </select>
                                 <p class="text-[10px] text-teal-600 mt-1">*(ถ้าไม่มีให้ไปสร้างหน่วยในข้อ 3 ด้านซ้ายก่อน)*</p>
                             </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
                                 <div>
                                     <label class="text-xs text-teal-700 font-bold block mb-1">4.2 เพิ่มชื่อหัวข้องาน / กิจกรรม</label>
                                     <input type="text" id="assign-task" class="w-full px-3 py-2.5 border border-teal-300 rounded-lg focus:ring-teal-500 text-sm" placeholder="เช่น ใบงานที่ 1">
@@ -395,6 +395,10 @@
                                     <label class="text-xs text-teal-700 font-bold block mb-1">4.3 คะแนนดิบ (เต็ม) ของชิ้นงานนี้</label>
                                     <input type="number" id="assign-score" class="w-full px-3 py-2.5 border border-teal-300 rounded-lg focus:ring-teal-500 text-sm font-bold text-teal-700 text-center" value="10">
                                 </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-teal-700 font-bold block mb-1">4.4 ลิงก์รูปตัวอย่างใบงาน (มีหรือไม่มีก็ได้)</label>
+                                <input type="text" id="assign-example-link" class="w-full px-3 py-2.5 border border-teal-300 rounded-lg focus:ring-teal-500 text-sm bg-white shadow-sm" placeholder="วางลิงก์รูปภาพ (เช่น https://...)">
                             </div>
                             <div class="pt-2">
                                 <button onclick="saveAssignmentUI()" class="w-full bg-teal-600 hover:bg-teal-700 text-white px-4 py-3 rounded-lg font-bold shadow-md transition transform hover:-translate-y-0.5"><i class="fas fa-plus mr-2"></i> เพิ่มรายการงานลงในหน่วย</button>
@@ -810,7 +814,7 @@
         </div>
 
     </main>
-
+    
     <!-- Mock Google Apps Script Server Side Engine -->
     <script>
         const IS_MOCK_ENV = typeof google === 'undefined' || !google.script || !google.script.run;
@@ -966,7 +970,7 @@
             showView('view-home'); switchLoginTab('parent');
         }
 
-       function loadTeacherData() {
+        function loadTeacherData() {
             google.script.run.withSuccessHandler(data => { 
                 globalStudents = Array.isArray(data) ? data : []; 
                 populateRoomDropdowns();
@@ -1222,7 +1226,7 @@
             }).addUnit(subject, room, unitName, unitScore, term);
         }
 
-       function populateUnitDropdownForAssign() {
+        function populateUnitDropdownForAssign() {
             const subject = document.getElementById('assign-subject').value;
             const room = document.getElementById('assign-room').value;
             
@@ -1283,7 +1287,7 @@
 
             const targetUnits = globalUnits.filter(u => u.subject === subject && (u.room === room || u.room === 'All' || !u.room) && (u.term === term || (!u.term && term === '1')));
             
-           const unitMap = {}; 
+            const unitMap = {}; 
             targetUnits.forEach(u => { unitMap[u.unitName] = Number(u.unitMaxScore); });
             // เพิ่มคำสั่งเรียงลำดับภาษาไทยและตัวเลข
             const unitNames = Object.keys(unitMap).sort((a, b) => a.localeCompare(b, 'th', {numeric: true}));
@@ -1767,7 +1771,7 @@
             }).getAssignments();
         }
 
-       function renderAssignmentTable() {
+        function renderAssignmentTable() {
             const tbody = document.getElementById('assign-table-body');
             const selectedSub = document.getElementById('assign-subject').value;
             const selectedRoom = document.getElementById('assign-room').value;
@@ -1806,6 +1810,8 @@
             const room = document.getElementById('assign-room').value;
             const task = document.getElementById('assign-task').value.trim();
             const score = document.getElementById('assign-score').value || 10;
+            // 🌟 ดึงลิงก์รูปภาพมาเก็บไว้
+            const exampleLink = document.getElementById('assign-example-link') ? document.getElementById('assign-example-link').value.trim() : "";
             
             const unitSelection = document.getElementById('assign-unit-select').value;
             
@@ -1820,11 +1826,12 @@
                 if(res.success) { 
                     Swal.close(); 
                     document.getElementById('assign-task').value=''; 
+                    if(document.getElementById('assign-example-link')) document.getElementById('assign-example-link').value='';
                     loadAssignments(); 
                 } else {
                     Swal.fire('ข้อผิดพลาด', res.message, 'error');
                 }
-            }).addAssignment(sub, room, task, score, unitName, unitMax, term);
+            }).addAssignment(sub, room, task, score, unitName, unitMax, term, exampleLink); // 🌟 ส่งข้อมูลลิงก์ไปหลังบ้าน
         }
 
         function deleteAssignmentUI(sub, room, task) {
@@ -2439,6 +2446,13 @@
                             ? `<span class="text-3xl font-black text-${statusColor}-600">${r.score}</span><span class="text-sm text-slate-400 font-medium ml-1">/ ${r.maxScore}</span>` 
                             : `<span class="text-3xl font-black text-slate-300">-</span><span class="text-sm text-slate-400 font-medium ml-1">/ ${r.maxScore}</span>`;
 
+                        // 🌟 เช็คว่ามีรูปลิงก์ไหม ถ้ามีให้สร้างปุ่มดูตัวอย่าง
+                        let exampleBtnHtml = "";
+                        if (r.exampleLink) {
+                            const safeLink = r.exampleLink.replace(/"/g, '&quot;');
+                            exampleBtnHtml = `<button onclick="showExampleImage('${safeLink}')" class="mt-2 text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg border border-indigo-100 font-bold transition flex items-center shadow-sm"><i class="fas fa-image mr-1"></i> ดูตัวอย่างใบงาน</button>`;
+                        }
+
                         container.innerHTML += `
                             <div class="st-card bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
                                 <div class="absolute top-0 left-0 w-1.5 h-full bg-${statusColor}-500"></div>
@@ -2446,6 +2460,7 @@
                                     <div>
                                         <span class="inline-block px-2.5 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-lg uppercase tracking-wider mb-2">${r.subject}</span>
                                         <h4 class="text-slate-800 font-bold text-base leading-tight group-hover:text-teal-600 transition-colors">${r.workTitle}</h4>
+                                        ${exampleBtnHtml}
                                     </div>
                                     <div class="bg-${statusColor}-50 text-${statusColor}-600 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 shadow-inner">
                                         <i class="fas ${statusIcon} text-xl"></i>
@@ -2608,6 +2623,42 @@
                             Swal.fire('ข้อผิดพลาด', res.message, 'error');
                         }
                     }).archiveTermData(result.value.trim());
+                }
+            });
+        }
+        // 🌟 ฟังก์ชันเปิดหน้าต่างโชว์รูปตัวอย่าง (อัปเกรดทะลุบล็อกเบราว์เซอร์)
+        function showExampleImage(url) {
+            if (!url) return; 
+            
+            let finalUrl = String(url).trim();
+            
+            try {
+                let fileId = "";
+                // 1. แกะรหัสไฟล์ (ID) จากลิงก์แชร์ของ Google Drive
+                if (finalUrl.indexOf("drive.google.com/file/d/") !== -1) {
+                    fileId = finalUrl.split("file/d/")[1].split("/")[0];
+                } else if (finalUrl.indexOf("open?id=") !== -1) {
+                    fileId = finalUrl.split("open?id=")[1].split("&")[0];
+                }
+
+                // 2. ถ้าเจอ ID ไฟล์ ให้แปลงไปใช้เซิร์ฟเวอร์ Thumbnail ของ Google โดยตรง
+                if (fileId) {
+                    finalUrl = "https://drive.google.com/thumbnail?id=" + fileId + "&sz=w1000";
+                }
+            } catch (e) {
+                console.error("Link Error: ", e);
+            }
+
+            // 3. โชว์รูปภาพ
+            Swal.fire({
+                title: 'ตัวอย่างใบงาน/ชิ้นงาน',
+                imageUrl: finalUrl,
+                imageAlt: 'หากภาพไม่ขึ้น โปรดตรวจสอบสิทธิ์การแชร์ไฟล์',
+                width: 'auto',
+                confirmButtonText: '<i class="fas fa-times"></i> ปิดหน้าต่าง',
+                confirmButtonColor: '#0f766e',
+                customClass: {
+                    image: 'rounded-xl shadow-md max-h-[70vh] object-contain mx-auto bg-gray-50'
                 }
             });
         }
