@@ -966,13 +966,14 @@
             showView('view-home'); switchLoginTab('parent');
         }
 
-        function loadTeacherData() {
+       function loadTeacherData() {
             google.script.run.withSuccessHandler(data => { 
                 globalStudents = Array.isArray(data) ? data : []; 
                 populateRoomDropdowns();
             }).getStudentsByRoom('all');
             loadAssignments();
             loadDashboardData();
+            loadUnits(); // 🌟 เพิ่มคำสั่งให้ดึงข้อมูลหน่วยการเรียนรู้ใหม่เสมอ
         }
 
         function loadDashboardData() {
@@ -1221,7 +1222,7 @@
             }).addUnit(subject, room, unitName, unitScore, term);
         }
 
-        function populateUnitDropdownForAssign() {
+       function populateUnitDropdownForAssign() {
             const subject = document.getElementById('assign-subject').value;
             const room = document.getElementById('assign-room').value;
             
@@ -1232,21 +1233,21 @@
             
             if(!subject || !room) {
                 unitSelect.innerHTML = '<option value="">-- กรุณาเลือกวิชาและห้องในข้อ 2 ก่อน --</option>';
-                return;
-            }
-
-            const unitsForSubjectRoom = globalUnits.filter(u => u.subject === subject && (u.room === room || u.room === 'All' || !u.room));
-            
-            if(unitsForSubjectRoom.length === 0) {
-                unitSelect.innerHTML = '<option value="">-- ยังไม่มีหน่วย (ไปสร้างหน่วยในข้อ 3 ด้านซ้ายก่อน) --</option>';
             } else {
-                unitSelect.innerHTML = '<option value="">-- เลือกหน่วยการเรียนรู้ --</option>';
-                unitsForSubjectRoom.forEach(u => {
-                    unitSelect.innerHTML += `<option value="${u.unitName}|${u.unitMaxScore}|${u.term || '1'}">[เทอม ${u.term || '1'}] ${u.unitName} (เก็บ ${u.unitMaxScore} คะแนน)</option>`;
-                });
+                const unitsForSubjectRoom = globalUnits.filter(u => u.subject === subject && (u.room === room || u.room === 'All' || !u.room));
+                
+                if(unitsForSubjectRoom.length === 0) {
+                    unitSelect.innerHTML = '<option value="">-- ยังไม่มีหน่วย (ไปสร้างหน่วยในข้อ 3 ด้านซ้ายก่อน) --</option>';
+                } else {
+                    unitSelect.innerHTML = '<option value="">-- เลือกหน่วยการเรียนรู้ --</option>';
+                    unitsForSubjectRoom.forEach(u => {
+                        unitSelect.innerHTML += `<option value="${u.unitName}|${u.unitMaxScore}|${u.term || '1'}">[เทอม ${u.term || '1'}] ${u.unitName} (เก็บ ${u.unitMaxScore} คะแนน)</option>`;
+                    });
+                }
             }
+            // 🌟 สั่งให้ตารางด้านล่าง กรองข้อมูลตามวิชาและห้องที่เลือกทันที
+            renderAssignmentTable();
         }
-
         // ==========================================
         // NEW FEATURE: UNIT SUMMARY (สรุปรายหน่วย)
         // ==========================================
@@ -1766,13 +1767,22 @@
             }).getAssignments();
         }
 
-        function renderAssignmentTable() {
+       function renderAssignmentTable() {
             const tbody = document.getElementById('assign-table-body');
+            const selectedSub = document.getElementById('assign-subject').value;
+            const selectedRoom = document.getElementById('assign-room').value;
+            
             tbody.innerHTML = '';
-            if(globalAssignments.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">ยังไม่มีข้อมูลงานที่สั่ง</td></tr>';
+            
+            // 🌟 กรองชิ้นงานให้ตรงกับ วิชา และ ห้อง ที่เลือกในข้อ 2
+            let filteredAssignments = globalAssignments;
+            if(selectedSub) filteredAssignments = filteredAssignments.filter(a => a.subject === selectedSub);
+            if(selectedRoom) filteredAssignments = filteredAssignments.filter(a => a.targetRoom === selectedRoom);
+
+            if(filteredAssignments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">ยังไม่มีข้อมูลงานในวิชา/ห้องนี้</td></tr>';
             } else {
-                globalAssignments.forEach(a => {
+                filteredAssignments.forEach(a => {
                     const termLabel = a.term ? `<span class="bg-purple-100 text-purple-700 text-[10px] px-2 py-0.5 rounded-full mr-1">เทอม ${a.term}</span>` : '';
                     const unitInfo = a.learningUnit !== "ทั่วไป" ? `<span class="bg-indigo-50 text-indigo-700 text-xs px-2 py-0.5 rounded border border-indigo-100 font-bold">${termLabel}${a.learningUnit} <span class="text-indigo-400 ml-1">/ ${a.unitMaxScore || '-'}</span></span>` : `<span class="text-gray-400 text-xs">-</span>`;
                     
