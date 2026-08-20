@@ -1355,9 +1355,10 @@
             const roomAssigns = globalAssignments.filter(a => a.targetRoom === room && a.subject === subject);
             const targetUnits = globalUnits.filter(u => u.subject === subject && (u.room === room || u.room === 'All' || !u.room) && (u.term === term || (!u.term && term === '1')));
             
-            const unitNames = targetUnits.map(u => u.unitName);
             const unitMap = {};
             targetUnits.forEach(u => unitMap[u.unitName] = Number(u.unitMaxScore));
+            // เพิ่มคำสั่งเรียงลำดับภาษาไทยและตัวเลข ให้ตรงกับหน้าเว็บ
+            const unitNames = Object.keys(unitMap).sort((a, b) => a.localeCompare(b, 'th', {numeric: true}));
 
             if(unitNames.length === 0 || roomStudents.length === 0) return Swal.fire('แจ้งเตือน', 'ไม่มีข้อมูลตารางให้ส่งออก', 'warning');
 
